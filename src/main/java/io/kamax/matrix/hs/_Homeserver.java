@@ -33,4 +33,6 @@ public interface _Homeserver {
 
     _MatrixUser getUser(_MatrixID mxId);
 
+    void createUser(_MatrixUser user);
+
 }
