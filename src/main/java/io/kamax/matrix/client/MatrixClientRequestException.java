@@ -18,19 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs;
+package io.kamax.matrix.client;
 
-import io.kamax.matrix._MatrixID;
+import java.io.IOException;
 
-public interface _Room {
+public class MatrixClientRequestException extends RuntimeException {
 
-    void join();
-
-    void leave();
-
-    void send(String message);
-
-    void invite(_MatrixID mxId);
-
+    public MatrixClientRequestException(IOException e) {
+        super(e);
+    }
 
 }

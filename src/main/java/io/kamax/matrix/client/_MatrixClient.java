@@ -18,21 +18,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs;
+package io.kamax.matrix.client;
 
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
+import io.kamax.matrix.hs._MatrixHomeserver;
+import io.kamax.matrix.hs._Room;
 
 import java.util.Optional;
 
-public interface _Homeserver {
+public interface _MatrixClient {
+
+    void setHomeserver(_MatrixHomeserver hs);
 
     void setAccessToken(String token);
+
+    void setUserId(_MatrixID mxId);
 
     Optional<_Room> findRoom(String roomId);
 
     _MatrixUser getUser(_MatrixID mxId);
-
-    void createUser(_MatrixUser user);
 
 }

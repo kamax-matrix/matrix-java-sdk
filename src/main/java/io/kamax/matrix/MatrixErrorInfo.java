@@ -18,19 +18,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs;
+package io.kamax.matrix;
 
-import io.kamax.matrix._MatrixID;
+public class MatrixErrorInfo {
 
-public interface _Room {
+    private String errcode;
+    private String error;
 
-    void join();
+    public MatrixErrorInfo(String errcode) {
+        this.errcode = errcode;
+    }
 
-    void leave();
+    public MatrixErrorInfo(Throwable t) {
+        this.errcode = "AS_INTERNAL_SERVER_ERROR";
+    }
 
-    void send(String message);
+    public String getErrcode() {
+        return errcode;
+    }
 
-    void invite(_MatrixID mxId);
-
+    public String getError() {
+        return error;
+    }
 
 }

@@ -20,17 +20,22 @@
 
 package io.kamax.matrix.hs;
 
-import io.kamax.matrix._MatrixID;
+import org.apache.http.client.utils.URIBuilder;
 
-public interface _Room {
+import java.net.URI;
+import java.net.URISyntaxException;
 
-    void join();
+public class MatrixHomeserver implements _MatrixHomeserver {
 
-    void leave();
+    private URI base;
 
-    void send(String message);
+    public MatrixHomeserver(String baseUrl) throws URISyntaxException {
+        base = new URI(baseUrl);
+    }
 
-    void invite(_MatrixID mxId);
-
+    @Override
+    public URIBuilder getClientEndpoint() {
+        return new URIBuilder(base);
+    }
 
 }

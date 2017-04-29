@@ -18,19 +18,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs;
+package io.kamax.matrix;
 
-import io.kamax.matrix._MatrixID;
+import java.util.Optional;
 
-public interface _Room {
+public class MatrixUser implements _MatrixUser {
 
-    void join();
+    private _MatrixID mxId;
+    private String name;
 
-    void leave();
+    @Override
+    public _MatrixID getId() {
+        return mxId;
+    }
 
-    void send(String message);
+    public void setId(_MatrixID mxId) {
+        this.mxId = mxId;
+    }
 
-    void invite(_MatrixID mxId);
+    @Override
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

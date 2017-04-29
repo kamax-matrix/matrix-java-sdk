@@ -20,17 +20,10 @@
 
 package io.kamax.matrix.hs;
 
-import io.kamax.matrix._MatrixID;
+import org.apache.http.client.utils.URIBuilder;
 
-public interface _Room {
+public interface _MatrixHomeserver {
 
-    void join();
-
-    void leave();
-
-    void send(String message);
-
-    void invite(_MatrixID mxId);
-
+    URIBuilder getClientEndpoint();
 
 }

@@ -25,5 +25,10 @@ repositories {
 }
 
 dependencies {
+    compile 'org.slf4j:log4j-over-slf4j:1.7.25'
+    compile 'commons-io:commons-io:2.5'
+    compile 'org.apache.httpcomponents:fluent-hc:4.5.3'
+    compile 'com.google.code.gson:gson:2.8.0'
+
     testCompile 'junit:junit:4.12'
 }

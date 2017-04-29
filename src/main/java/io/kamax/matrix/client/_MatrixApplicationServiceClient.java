@@ -18,19 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs;
+package io.kamax.matrix.client;
 
-import io.kamax.matrix._MatrixID;
+import io.kamax.matrix._MatrixUser;
 
-public interface _Room {
+public interface _MatrixApplicationServiceClient extends _MatrixClient {
 
-    void join();
-
-    void leave();
-
-    void send(String message);
-
-    void invite(_MatrixID mxId);
-
+    void createUser(_MatrixUser user);
 
 }
