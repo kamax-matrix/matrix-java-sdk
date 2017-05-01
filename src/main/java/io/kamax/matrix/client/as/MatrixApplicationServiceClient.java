@@ -18,17 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.client;
+package io.kamax.matrix.client.as;
 
-import com.google.gson.Gson;
 import io.kamax.matrix.MatrixErrorInfo;
-import io.kamax.matrix._MatrixUser;
+import io.kamax.matrix.MatrixID;
+import io.kamax.matrix._MatrixID;
+import io.kamax.matrix.client.MatrixClientRequestException;
+import io.kamax.matrix.client._MatrixClient;
+import io.kamax.matrix.client.regular.MatrixClient;
+import io.kamax.matrix.hs._MatrixHomeserver;
+import io.kamax.matrix.json.VirtualUserRegistrationBody;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,55 +43,47 @@ public class MatrixApplicationServiceClient extends MatrixClient implements _Mat
 
     private Logger log = LoggerFactory.getLogger(MatrixApplicationServiceClient.class);
 
-    private HttpClient client = HttpClients.createDefault();
-    private Gson gson = new Gson();
+    private _MatrixID asMxId;
+
+    public MatrixApplicationServiceClient(_MatrixHomeserver hs, String token, String localpart) {
+        super(hs, token);
+        asMxId = new MatrixID(localpart, hs.getDomain());
+    }
 
     @Override
-    public void createUser(_MatrixUser user) {
-        String mxId = user.getId().getId();
+    public _MatrixID getUserId() {
+        return asMxId;
+    }
 
-        log.info("Creating new user {}", mxId);
+    @Override
+    public _MatrixClient createUser(String localpart) {
+        log.info("Creating new user {}", localpart);
         try {
             URI path = getPath("/register");
             log.info("Doing POST {}", path); // TODO redact access_token by encapsulating toString()
             HttpPost req = new HttpPost(path);
-            req.setEntity(getJsonEntity(new VirtualUserRegistrationBody(user.getId().getLocalPart())));
+            req.setEntity(getJsonEntity(new VirtualUserRegistrationBody(localpart)));
 
             HttpResponse res = client.execute(req);
 
             if (res.getStatusLine().getStatusCode() == 200) {
-                log.info("Successfully created user {}", mxId);
+                log.info("Successfully created user {}", localpart);
             } else {
                 Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
                 String body = IOUtils.toString(res.getEntity().getContent(), charset);
                 MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
                 if ("M_USER_IN_USE".contentEquals(info.getErrcode())) {
-                    log.warn("User {} already exists, ignoring", user.getId().getId());
+                    log.warn("User {} already exists, ignoring", localpart);
                 } else {
-                    throw new IOException("Error creating the new user " + mxId + " - " + info.getErrcode() + ": " + info.getError());
+                    // TODO turn into dedicated exceptions, following the Spec distinct errors
+                    throw new IOException("Error creating the new user " + localpart + " - " + info.getErrcode() + ": " + info.getError());
                 }
             }
         } catch (IOException e) {
             throw new MatrixClientRequestException(e);
         }
-    }
 
-    private class VirtualUserRegistrationBody {
-        private String type = "m.login.application_server";
-        private String username;
-
-        public VirtualUserRegistrationBody(String username) {
-            this.username = username;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getType() {
-            return type;
-        }
-
+        return new MatrixClient(getHomeserver(), getAccessToken(), getMatrixId(localpart));
     }
 
 }

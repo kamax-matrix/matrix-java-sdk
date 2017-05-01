@@ -22,6 +22,8 @@ package io.kamax.matrix.hs;
 
 import io.kamax.matrix._MatrixID;
 
+import java.util.List;
+
 public interface _Room {
 
     void join();
@@ -32,5 +34,6 @@ public interface _Room {
 
     void invite(_MatrixID mxId);
 
+    List<_MatrixID> getJoinedUsers();
 
 }

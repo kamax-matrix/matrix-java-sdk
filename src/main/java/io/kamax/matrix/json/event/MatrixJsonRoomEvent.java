@@ -18,31 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs;
+package io.kamax.matrix.json.event;
 
-import org.apache.http.client.utils.URIBuilder;
+import com.google.gson.JsonObject;
+import io.kamax.matrix.hs.event._RoomEvent;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+public class MatrixJsonRoomEvent extends MatrixJsonEvent implements _RoomEvent {
 
-public class MatrixHomeserver implements _MatrixHomeserver {
+    private String roomId;
 
-    private String domain;
-    private URI base;
+    public MatrixJsonRoomEvent(JsonObject obj) {
+        super(obj);
 
-    public MatrixHomeserver(String domain, String baseUrl) throws URISyntaxException {
-        this.domain = domain;
-        base = new URI(baseUrl);
+        roomId = getString("room_id");
     }
 
     @Override
-    public String getDomain() {
-        return domain;
-    }
-
-    @Override
-    public URIBuilder getClientEndpoint() {
-        return new URIBuilder(base);
+    public String getRoomId() {
+        return roomId;
     }
 
 }

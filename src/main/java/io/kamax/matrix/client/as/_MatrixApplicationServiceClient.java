@@ -18,31 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs;
+package io.kamax.matrix.client.as;
 
-import org.apache.http.client.utils.URIBuilder;
+import io.kamax.matrix.client._MatrixClient;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+public interface _MatrixApplicationServiceClient extends _MatrixClient {
 
-public class MatrixHomeserver implements _MatrixHomeserver {
-
-    private String domain;
-    private URI base;
-
-    public MatrixHomeserver(String domain, String baseUrl) throws URISyntaxException {
-        this.domain = domain;
-        base = new URI(baseUrl);
-    }
-
-    @Override
-    public String getDomain() {
-        return domain;
-    }
-
-    @Override
-    public URIBuilder getClientEndpoint() {
-        return new URIBuilder(base);
-    }
+    _MatrixClient createUser(String localpart);
 
 }

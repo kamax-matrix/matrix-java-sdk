@@ -24,6 +24,8 @@ import org.apache.http.client.utils.URIBuilder;
 
 public interface _MatrixHomeserver {
 
+    String getDomain();
+
     URIBuilder getClientEndpoint();
 
 }

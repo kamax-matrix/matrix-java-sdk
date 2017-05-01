@@ -18,12 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.client;
+package io.kamax.matrix.json;
 
-import io.kamax.matrix._MatrixUser;
+public class UserDisplaynameSetBody {
 
-public interface _MatrixApplicationServiceClient extends _MatrixClient {
+    private String displayname;
 
-    void createUser(_MatrixUser user);
+    public UserDisplaynameSetBody(String displayname) {
+        this.displayname = displayname;
+    }
 
 }

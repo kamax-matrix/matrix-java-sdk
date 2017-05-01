@@ -20,29 +20,22 @@
 
 package io.kamax.matrix.hs;
 
-import org.apache.http.client.utils.URIBuilder;
+public enum RoomMembership {
 
-import java.net.URI;
-import java.net.URISyntaxException;
+    Invite("invite"),
+    Join("join"),
+    Leave("leave"),
+    Ban("ban"),
+    Knock("knock");
 
-public class MatrixHomeserver implements _MatrixHomeserver {
+    private String id;
 
-    private String domain;
-    private URI base;
-
-    public MatrixHomeserver(String domain, String baseUrl) throws URISyntaxException {
-        this.domain = domain;
-        base = new URI(baseUrl);
+    RoomMembership(String id) {
+        this.id = id;
     }
 
-    @Override
-    public String getDomain() {
-        return domain;
-    }
-
-    @Override
-    public URIBuilder getClientEndpoint() {
-        return new URIBuilder(base);
+    public boolean is(String id) {
+        return this.id.contentEquals(id);
     }
 
 }
