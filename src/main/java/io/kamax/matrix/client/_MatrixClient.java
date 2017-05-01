@@ -21,13 +21,13 @@
 package io.kamax.matrix.client;
 
 import io.kamax.matrix._MatrixUser;
-import io.kamax.matrix.hs._Room;
+import io.kamax.matrix.hs._MatrixRoom;
 
 public interface _MatrixClient extends _MatrixClientRaw {
 
     void setDisplayName(String name);
 
-    _Room getRoom(String roomId);
+    _MatrixRoom getRoom(String roomId);
 
     _MatrixUser getUser(String localpart);
 

@@ -24,7 +24,9 @@ import io.kamax.matrix._MatrixID;
 
 import java.util.List;
 
-public interface _Room {
+public interface _MatrixRoom {
+
+    _MatrixHomeserver getHomeserver();
 
     void join();
 

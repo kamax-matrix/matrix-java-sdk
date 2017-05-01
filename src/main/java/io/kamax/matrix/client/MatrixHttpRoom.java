@@ -26,7 +26,7 @@ import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
-import io.kamax.matrix.hs._Room;
+import io.kamax.matrix.hs._MatrixRoom;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MatrixHttpRoom extends AMatrixHttpClient implements _Room {
+public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     private Logger log = LoggerFactory.getLogger(MatrixHttpRoom.class);
 

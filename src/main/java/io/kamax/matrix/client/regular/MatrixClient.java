@@ -29,7 +29,7 @@ import io.kamax.matrix.client.MatrixClientRequestException;
 import io.kamax.matrix.client.MatrixHttpRoom;
 import io.kamax.matrix.client._MatrixClient;
 import io.kamax.matrix.hs._MatrixHomeserver;
-import io.kamax.matrix.hs._Room;
+import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.UserDisplaynameSetBody;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -87,7 +87,7 @@ public class MatrixClient extends AMatrixHttpClient implements _MatrixClient {
     }
 
     @Override
-    public _Room getRoom(String roomId) {
+    public _MatrixRoom getRoom(String roomId) {
         return new MatrixHttpRoom(hs, token, mxId, roomId);
     }
 
