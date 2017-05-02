@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 public class MatrixID implements _MatrixID {
 
     // TODO fix to exactly match http://matrix.org/docs/spec/intro.html#user-identifiers
-    private static Pattern pattern = Pattern.compile("@(.+?):(.*)");
+    private static Pattern pattern = Pattern.compile("@(.+?):(.+)");
 
     private String id;
     private String localpart;
