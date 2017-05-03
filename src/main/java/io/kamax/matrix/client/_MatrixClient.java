@@ -20,6 +20,7 @@
 
 package io.kamax.matrix.client;
 
+import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
 import io.kamax.matrix.hs._MatrixRoom;
 
@@ -29,6 +30,6 @@ public interface _MatrixClient extends _MatrixClientRaw {
 
     _MatrixRoom getRoom(String roomId);
 
-    _MatrixUser getUser(String localpart);
+    _MatrixUser getUser(_MatrixID mxId);
 
 }

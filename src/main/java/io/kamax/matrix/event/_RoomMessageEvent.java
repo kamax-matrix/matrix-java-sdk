@@ -18,20 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs.event;
+package io.kamax.matrix.event;
 
-import io.kamax.matrix._MatrixID;
 
-import java.util.Optional;
+public interface _RoomMessageEvent extends _RoomEvent {
 
-public interface _RoomMembershipEvent extends _RoomEvent {
-
-    String getMembership();
-
-    Optional<String> getAvatarUrl();
-
-    Optional<String> getDisplayName();
-
-    _MatrixID getInvitee();
+    String getBody();
 
 }

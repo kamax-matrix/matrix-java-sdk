@@ -18,35 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix;
+package io.kamax.matrix.event;
+
+import io.kamax.matrix._MatrixID;
 
 import java.util.Optional;
 
-public class MatrixUser implements _MatrixUser {
+public interface _RoomMembershipEvent extends _RoomEvent {
 
-    private _MatrixID mxId;
-    private String name;
+    String getMembership();
 
-    public MatrixUser(_MatrixID mxId) {
-        this.mxId = mxId;
-    }
+    Optional<String> getAvatarUrl();
 
-    @Override
-    public _MatrixID getId() {
-        return mxId;
-    }
+    Optional<String> getDisplayName();
 
-    public void setId(_MatrixID mxId) {
-        this.mxId = mxId;
-    }
-
-    @Override
-    public Optional<String> getName() {
-        return Optional.ofNullable(name);
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    _MatrixID getInvitee();
 
 }

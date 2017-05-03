@@ -27,10 +27,12 @@ import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
 import io.kamax.matrix.hs._MatrixRoom;
+import io.kamax.matrix.json.RoomMessagePutBody;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -99,7 +101,34 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public void send(String message) {
+        try {
+            URI path = getPath("/rooms/{roomId}/send/m.room.message/" + System.currentTimeMillis());
+            log.info("Doing PUT {}", path); // TODO redact access_token by encapsulating toString()
+            HttpPut req = new HttpPut(path);
+            req.setEntity(getJsonEntity(new RoomMessagePutBody(message)));
+            HttpResponse res = client.execute(req);
 
+            if (res.getStatusLine().getStatusCode() == 200) {
+                log.info("Successfully sent message in room {} as {}", roomId, getUserId());
+            } else {
+                if (res.getStatusLine().getStatusCode() == 429) {
+                    // TODO handle rate limited
+                    log.warn("Request was rate limited", new Exception());
+                }
+
+                Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
+                String body = IOUtils.toString(res.getEntity().getContent(), charset);
+                MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+
+                if (res.getStatusLine().getStatusCode() == 403) {
+                    log.error("Failed send message, we are not allowed: {}", info.getError());
+                } else {
+                    throw new IOException("Error sending message for " + getUserId() + " - " + info.getErrcode() + ": " + info.getError());
+                }
+            }
+        } catch (IOException e) {
+            throw new MatrixClientRequestException(e);
+        }
     }
 
     @Override

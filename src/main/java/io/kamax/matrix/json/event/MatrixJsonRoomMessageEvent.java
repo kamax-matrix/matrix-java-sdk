@@ -18,8 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs.event;
+package io.kamax.matrix.json.event;
 
+import com.google.gson.JsonObject;
+import io.kamax.matrix.event._RoomMessageEvent;
 
-public interface _RoomMessageEvent extends _RoomEvent {
+public class MatrixJsonRoomMessageEvent extends MatrixJsonRoomEvent implements _RoomMessageEvent {
+
+    private JsonObject content;
+
+    public MatrixJsonRoomMessageEvent(JsonObject obj) {
+        super(obj);
+
+        this.content = obj.getAsJsonObject("content");
+    }
+
+    @Override
+    public String getBody() {
+        return content.get("body").getAsString();
+    }
+
 }

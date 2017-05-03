@@ -20,10 +20,7 @@
 
 package io.kamax.matrix.client.regular;
 
-import io.kamax.matrix.MatrixErrorInfo;
-import io.kamax.matrix.MatrixID;
-import io.kamax.matrix._MatrixID;
-import io.kamax.matrix._MatrixUser;
+import io.kamax.matrix.*;
 import io.kamax.matrix.client.AMatrixHttpClient;
 import io.kamax.matrix.client.MatrixClientRequestException;
 import io.kamax.matrix.client.MatrixHttpRoom;
@@ -92,8 +89,8 @@ public class MatrixClient extends AMatrixHttpClient implements _MatrixClient {
     }
 
     @Override
-    public _MatrixUser getUser(String localpart) {
-        return null;
+    public _MatrixUser getUser(_MatrixID mxId) {
+        return new MatrixUser(mxId);
     }
 
 }

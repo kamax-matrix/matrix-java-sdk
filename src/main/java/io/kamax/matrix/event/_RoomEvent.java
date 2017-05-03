@@ -18,18 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs.event;
+package io.kamax.matrix.event;
 
-import io.kamax.matrix._MatrixID;
 
-public interface _MatrixEvent {
+public interface _RoomEvent extends _MatrixEvent {
 
-    String getId();
-
-    String getType();
-
-    int getAge();
-
-    _MatrixID getSender();
+    String getRoomId();
 
 }

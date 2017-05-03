@@ -18,35 +18,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix;
+package io.kamax.matrix.json;
 
-import java.util.Optional;
+public class RoomMessagePutBody {
 
-public class MatrixUser implements _MatrixUser {
+    private String msgtype = "m.text";
+    private String body;
 
-    private _MatrixID mxId;
-    private String name;
-
-    public MatrixUser(_MatrixID mxId) {
-        this.mxId = mxId;
+    public RoomMessagePutBody(String body) {
+        this.body = body;
     }
 
-    @Override
-    public _MatrixID getId() {
-        return mxId;
+    public String getMsgtype() {
+        return msgtype;
     }
 
-    public void setId(_MatrixID mxId) {
-        this.mxId = mxId;
-    }
-
-    @Override
-    public Optional<String> getName() {
-        return Optional.ofNullable(name);
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public String getBody() {
+        return body;
     }
 
 }
