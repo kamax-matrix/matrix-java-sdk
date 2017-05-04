@@ -18,26 +18,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs;
+package io.kamax.matrix.json;
 
-import io.kamax.matrix._MatrixID;
+public class RoomMessageFormattedTextPutBody extends RoomMessageTextPutBody {
 
-import java.util.List;
+    private String formatted_body;
+    private String format = "org.matrix.custom.html";
 
-public interface _MatrixRoom {
+    public RoomMessageFormattedTextPutBody(String body, String formattedBody) {
+        super(body);
 
-    _MatrixHomeserver getHomeserver();
+        this.formatted_body = formattedBody;
+    }
 
-    void join();
+    public String getFormatted_body() {
+        return formatted_body;
+    }
 
-    void leave();
-
-    void sendText(String message);
-
-    void sendFormattedText(String formatted, String rawFallback);
-
-    void invite(_MatrixID mxId);
-
-    List<_MatrixID> getJoinedUsers();
+    public String getFormat() {
+        return format;
+    }
 
 }

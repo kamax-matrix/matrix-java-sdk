@@ -20,12 +20,12 @@
 
 package io.kamax.matrix.json;
 
-public class RoomMessagePutBody {
+public class RoomMessageTextPutBody {
 
     private String msgtype = "m.text";
     private String body;
 
-    public RoomMessagePutBody(String body) {
+    public RoomMessageTextPutBody(String body) {
         this.body = body;
     }
 

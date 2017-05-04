@@ -27,7 +27,8 @@ import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
 import io.kamax.matrix.hs._MatrixRoom;
-import io.kamax.matrix.json.RoomMessagePutBody;
+import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
+import io.kamax.matrix.json.RoomMessageTextPutBody;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -99,13 +100,12 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     }
 
-    @Override
-    public void send(String message) {
+    private void sendMessage(RoomMessageTextPutBody content) {
         try {
             URI path = getPath("/rooms/{roomId}/send/m.room.message/" + System.currentTimeMillis());
             log.info("Doing PUT {}", path); // TODO redact access_token by encapsulating toString()
             HttpPut req = new HttpPut(path);
-            req.setEntity(getJsonEntity(new RoomMessagePutBody(message)));
+            req.setEntity(getJsonEntity(content));
             HttpResponse res = client.execute(req);
 
             if (res.getStatusLine().getStatusCode() == 200) {
@@ -132,8 +132,20 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
-    public void invite(_MatrixID mxId) {
+    public void sendText(String message) {
+        sendMessage(new RoomMessageTextPutBody(message));
+    }
 
+    @Override
+    public void sendFormattedText(String formatted, String rawFallback) {
+        // TODO sanitize input
+        sendMessage(new RoomMessageFormattedTextPutBody(rawFallback, formatted));
+    }
+
+    @Override
+    public void invite(_MatrixID mxId) {
+        // TODO populate
+        log.error("Invite is not yet supported");
     }
 
     @Override
