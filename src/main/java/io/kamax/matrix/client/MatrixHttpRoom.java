@@ -97,7 +97,32 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public void leave() {
+        try {
+            URI path = getPath("/rooms/{roomId}/leave");
+            log.info("Doing POST {}", path); // TODO redact access_token by encapsulating toString()
+            HttpResponse res = client.execute(new HttpPost(path));
 
+            if (res.getStatusLine().getStatusCode() == 200) {
+                log.info("Successfully left room {} as {}", roomId, getUserId());
+            } else {
+                if (res.getStatusLine().getStatusCode() == 429) {
+                    // TODO handle rate limited
+                    log.warn("Request was rate limited", new Exception());
+                }
+
+                Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
+                String body = IOUtils.toString(res.getEntity().getContent(), charset);
+                MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+
+                if (res.getStatusLine().getStatusCode() == 403) {
+                    log.error("Failed to leave room, we are not allowed: {}", info.getError());
+                } else {
+                    throw new IOException("Error when leaving room " + roomId + " as " + getUserId() + " - " + info.getErrcode() + ": " + info.getError());
+                }
+            }
+        } catch (IOException e) {
+            throw new MatrixClientRequestException(e);
+        }
     }
 
     private void sendMessage(RoomMessageTextPutBody content) {

@@ -38,4 +38,9 @@ public class MatrixJsonRoomMessageEvent extends MatrixJsonRoomEvent implements _
         return content.get("body").getAsString();
     }
 
+    @Override
+    public String getBodyType() {
+        return content.get("msgtype").getAsString();
+    }
+
 }

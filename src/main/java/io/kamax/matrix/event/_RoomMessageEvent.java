@@ -25,4 +25,6 @@ public interface _RoomMessageEvent extends _RoomEvent {
 
     String getBody();
 
+    String getBodyType();
+
 }
