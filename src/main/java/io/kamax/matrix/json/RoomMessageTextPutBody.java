@@ -29,6 +29,11 @@ public class RoomMessageTextPutBody {
         this.body = body;
     }
 
+    public RoomMessageTextPutBody(String msgType, String body) {
+        this(body);
+        this.msgtype = msgType;
+    }
+
     public String getMsgtype() {
         return msgtype;
     }
