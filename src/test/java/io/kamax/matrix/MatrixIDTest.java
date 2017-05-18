@@ -28,6 +28,7 @@ public class MatrixIDTest {
 
     private static String validMxId1 = "@john.doe:example.org";
     private static String validMxId2 = "@john.doe:example.com";
+    private static String validMxId3 = "@JoHn.dOe:ExamPLE.ORG";
 
     private static String invalidMxId1 = "john.doe:example.org";
     private static String invalidMxId2 = "@john.doeexample.org";
@@ -40,9 +41,14 @@ public class MatrixIDTest {
     @Test
     public void validMatrixIDs() {
         _MatrixID mxId1 = new MatrixID(validMxId1);
+        _MatrixID mxId3 = new MatrixID(validMxId3);
         assertTrue(validMxId1.contentEquals(mxId1.getId()));
         assertTrue("john.doe".contentEquals(mxId1.getLocalPart()));
         assertTrue("example.org".contentEquals(mxId1.getDomain()));
+
+        assertTrue(validMxId1.contentEquals(mxId3.getId()));
+        assertTrue("john.doe".contentEquals(mxId3.getLocalPart()));
+        assertTrue("example.org".contentEquals(mxId3.getDomain()));
     }
 
     @Test

@@ -25,18 +25,26 @@ import java.util.regex.Pattern;
 
 public class MatrixID implements _MatrixID {
 
-    // TODO fix to exactly match http://matrix.org/docs/spec/intro.html#user-identifiers
-    private static Pattern pattern = Pattern.compile("@(.+?):(.+)");
+    public static final Pattern matrixIdPattern = Pattern.compile("@([0-9a-z-.=_]+):(.+)");
 
     private String id;
     private String localpart;
     private String domain;
 
+    private static String buildRaw(String localpart, String domain) {
+        return "@" + localpart + ":" + domain;
+    }
 
     public MatrixID(String mxId) {
-        Matcher m = pattern.matcher(mxId);
+        mxId = mxId.toLowerCase();
+
+        Matcher m = matrixIdPattern.matcher(mxId);
         if (!m.matches()) {
             throw new IllegalArgumentException(mxId + " is not a valid Matrix ID");
+        }
+
+        if (mxId.length() > 255) {
+            throw new IllegalArgumentException(mxId + " is longer than 255 characters");
         }
 
         this.id = mxId;
@@ -45,9 +53,7 @@ public class MatrixID implements _MatrixID {
     }
 
     public MatrixID(String localpart, String domain) {
-        this.id = "@" + localpart + ":" + domain;
-        this.localpart = localpart;
-        this.domain = domain;
+        this(buildRaw(localpart, domain));
     }
 
     @Override
