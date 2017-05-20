@@ -22,11 +22,15 @@ package io.kamax.matrix.event;
 
 import io.kamax.matrix._MatrixID;
 
+import java.time.Instant;
+
 public interface _MatrixEvent {
 
     String getId();
 
     String getType();
+
+    Instant getTime();
 
     int getAge();
 

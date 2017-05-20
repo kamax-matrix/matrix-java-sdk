@@ -27,10 +27,13 @@ import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.event._MatrixEvent;
 import io.kamax.matrix.json.MatrixJsonObject;
 
+import java.time.Instant;
+
 public class MatrixJsonEvent extends MatrixJsonObject implements _MatrixEvent {
 
     private String id;
     private String type;
+    private Instant time;
     private int age;
     private _MatrixID sender;
 
@@ -39,6 +42,7 @@ public class MatrixJsonEvent extends MatrixJsonObject implements _MatrixEvent {
 
         id = getString("event_id");
         type = getString("type");
+        time = Instant.ofEpochMilli(obj.get("origin_server_ts").getAsLong());
         age = getInt("age");
         sender = new MatrixID(getString("sender"));
     }
@@ -51,6 +55,11 @@ public class MatrixJsonEvent extends MatrixJsonObject implements _MatrixEvent {
     @Override
     public String getType() {
         return type;
+    }
+
+    @Override
+    public Instant getTime() {
+        return time;
     }
 
     @Override
