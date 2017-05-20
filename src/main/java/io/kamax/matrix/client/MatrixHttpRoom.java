@@ -45,6 +45,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
@@ -63,6 +64,69 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         builder.setPath(builder.getPath().replace("{roomId}", roomId));
 
         return builder;
+    }
+
+    @Override
+    public String getAddress() {
+        return roomId;
+    }
+
+    @Override
+    public Optional<String> getName() {
+        try {
+            URI path = getPath("/rooms/{roomId}/state/m.room.name");
+            log.info("Doing GET {}", path); // TODO redact access_token by encapsulating toString()
+            HttpResponse res = client.execute(new HttpGet(path));
+            Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
+            String body = IOUtils.toString(res.getEntity().getContent(), charset);
+
+            if (res.getStatusLine().getStatusCode() != 200) {
+                if (res.getStatusLine().getStatusCode() == 404) {
+                    // No name has been set
+                    return Optional.empty();
+                }
+
+                // TODO handle rate limited
+                if (res.getStatusLine().getStatusCode() == 429) {
+                    log.warn("Request was rate limited", new Exception());
+                }
+                MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+                throw new IOException("Couldn't get name for room " + roomId + " - " + info.getErrcode() + ": " + info.getError());
+            }
+
+            return Optional.of(jsonParser.parse(body).getAsJsonObject().get("name").getAsString());
+        } catch (IOException e) {
+            throw new MatrixClientRequestException(e);
+        }
+    }
+
+    @Override
+    public Optional<String> getTopic() {
+        try {
+            URI path = getPath("/rooms/{roomId}/state/m.room.topic");
+            log.info("Doing GET {}", path); // TODO redact access_token by encapsulating toString()
+            HttpResponse res = client.execute(new HttpGet(path));
+            Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
+            String body = IOUtils.toString(res.getEntity().getContent(), charset);
+
+            if (res.getStatusLine().getStatusCode() != 200) {
+                if (res.getStatusLine().getStatusCode() == 404) {
+                    // No topic has been set
+                    return Optional.empty();
+                }
+
+                // TODO handle rate limited
+                if (res.getStatusLine().getStatusCode() == 429) {
+                    log.warn("Request was rate limited", new Exception());
+                }
+                MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+                throw new IOException("Couldn't get topic for room " + roomId + " - " + info.getErrcode() + ": " + info.getError());
+            }
+
+            return Optional.of(jsonParser.parse(body).getAsJsonObject().get("topic").getAsString());
+        } catch (IOException e) {
+            throw new MatrixClientRequestException(e);
+        }
     }
 
     @Override

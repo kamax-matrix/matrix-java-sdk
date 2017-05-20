@@ -23,10 +23,17 @@ package io.kamax.matrix.hs;
 import io.kamax.matrix._MatrixID;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface _MatrixRoom {
 
     _MatrixHomeserver getHomeserver();
+
+    String getAddress();
+
+    Optional<String> getName();
+
+    Optional<String> getTopic();
 
     void join();
 
