@@ -179,7 +179,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                 MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
 
                 if (res.getStatusLine().getStatusCode() == 403) {
-                    log.error("Failed to leave room, we are not allowed: {}", info.getError());
+                    log.debug("Failed to leave room, we are not allowed, most likely already left: {} - {}", info.getErrcode(), info.getError());
                 } else {
                     throw new IOException("Error when leaving room " + roomId + " as " + getUserId() + " - " + info.getErrcode() + ": " + info.getError());
                 }
