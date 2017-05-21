@@ -173,6 +173,14 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                     log.warn("Request was rate limited", new Exception());
                 }
 
+                // TODO Find a better way to handle room objects for unknown rooms
+                // Maybe throw exception?
+                // TODO implement method to check room existence - isValid() ?
+                if (res.getStatusLine().getStatusCode() == 404) {
+                    log.warn("Room {} is not joined, ignoring call", roomId);
+                    return;
+                }
+
                 Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
                 String body = IOUtils.toString(res.getEntity().getContent(), charset);
                 MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
@@ -180,7 +188,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                 if (res.getStatusLine().getStatusCode() == 403) {
                     log.debug("Failed to leave room, we are not allowed, most likely already left: {} - {}", info.getErrcode(), info.getError());
                 } else {
-                    throw new IOException("Error when leaving room " + roomId + " as " + getUser() + " - " + info.getErrcode() + ": " + info.getError());
+                    throw new MatrixClientRequestException(info, "Error when leaving room " + roomId + " as " + getUser());
                 }
             }
         } catch (IOException e) {
