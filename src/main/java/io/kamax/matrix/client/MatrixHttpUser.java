@@ -55,7 +55,7 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
     @Override
     public Optional<String> getName() {
         try {
-            URI path = getPath("profile/" + mxId.getId() + "/displayname");
+            URI path = getPath("/profile/" + mxId.getId() + "/displayname");
             log.info("Doing GET {}", path); // TODO redact access_token by encapsulating toString()
             HttpResponse res = client.execute(new HttpGet(path));
             Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
