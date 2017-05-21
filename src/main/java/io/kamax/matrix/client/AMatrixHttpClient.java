@@ -63,7 +63,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     @Override
     public _MatrixID getUser() {
-        return getUser();
+        return context.getUser();
     }
 
     protected URIBuilder getPathBuilder(String action) {
