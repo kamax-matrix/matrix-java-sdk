@@ -20,27 +20,41 @@
 
 package io.kamax.matrix.client;
 
-import io.kamax.matrix.MatrixErrorInfo;
+import io.kamax.matrix._MatrixID;
+import io.kamax.matrix.hs._MatrixHomeserver;
 
-import java.io.IOException;
-import java.util.Optional;
+public class MatrixClientContext {
 
-public class MatrixClientRequestException extends RuntimeException {
+    private _MatrixHomeserver hs;
+    private _MatrixID user;
+    private String token;
+    private boolean isVirtualUser;
 
-    private MatrixErrorInfo errorInfo;
-
-    public MatrixClientRequestException(IOException e) {
-        super(e);
+    public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token) {
+        this(hs, user, token, false);
     }
 
-    public MatrixClientRequestException(MatrixErrorInfo errorInfo, String message) {
-        super(message);
-
-        this.errorInfo = errorInfo;
+    public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token, boolean isVirtualUser) {
+        this.hs = hs;
+        this.user = user;
+        this.token = token;
+        this.isVirtualUser = isVirtualUser;
     }
 
-    public Optional<MatrixErrorInfo> getError() {
-        return Optional.ofNullable(errorInfo);
+    public _MatrixHomeserver getHs() {
+        return hs;
+    }
+
+    public _MatrixID getUser() {
+        return user;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public boolean isVirtualUser() {
+        return isVirtualUser;
     }
 
 }

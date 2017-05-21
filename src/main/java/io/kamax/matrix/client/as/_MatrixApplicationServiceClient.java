@@ -26,4 +26,6 @@ public interface _MatrixApplicationServiceClient extends _MatrixClient {
 
     _MatrixClient createUser(String localpart);
 
+    _MatrixClient getUser(String localpart);
+
 }

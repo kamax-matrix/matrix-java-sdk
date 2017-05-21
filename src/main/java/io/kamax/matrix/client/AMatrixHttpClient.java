@@ -30,64 +30,49 @@ import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.HttpClients;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
-    private Logger log = LoggerFactory.getLogger(AMatrixHttpClient.class);
-
-    protected _MatrixHomeserver hs;
-    protected String token;
-    protected _MatrixID mxId;
+    protected MatrixClientContext context;
 
     protected HttpClient client = HttpClients.createDefault();
     protected Gson gson = new Gson();
     protected JsonParser jsonParser = new JsonParser();
 
-    public AMatrixHttpClient(_MatrixHomeserver hs, String token, _MatrixID mxId) {
-        setHomeserver(hs);
-        setAccessToken(token);
-        setUserId(mxId);
+    public AMatrixHttpClient(MatrixClientContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public MatrixClientContext getContext() {
+        return context;
     }
 
     @Override
     public _MatrixHomeserver getHomeserver() {
-        return hs;
+        return context.getHs();
     }
 
     @Override
     public String getAccessToken() {
-        return token;
+        return context.getToken();
     }
 
     @Override
-    public _MatrixID getUserId() {
-        return mxId;
-    }
-
-    private void setHomeserver(_MatrixHomeserver hs) {
-        this.hs = hs;
-    }
-
-    private void setAccessToken(String token) {
-        this.token = token;
-    }
-
-    private void setUserId(_MatrixID mxId) {
-        this.mxId = mxId;
+    public _MatrixID getUser() {
+        return getUser();
     }
 
     protected URIBuilder getPathBuilder(String action) {
-        URIBuilder builder = hs.getClientEndpoint();
+        URIBuilder builder = context.getHs().getClientEndpoint();
         builder.setPath(builder.getPath() + "/_matrix/client/r0" + action);
-        builder.setParameter("access_token", token);
-        if (mxId != null) {
-            builder.setPath(builder.getPath().replace("{userId}", mxId.getId()));
-            builder.setParameter("user_id", mxId.getId());
+        builder.setParameter("access_token", context.getToken());
+        builder.setPath(builder.getPath().replace("{userId}", context.getUser().getId()));
+        if (context.isVirtualUser()) {
+            builder.setParameter("user_id", context.getUser().getId());
         }
 
         return builder;

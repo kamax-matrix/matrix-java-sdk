@@ -20,12 +20,11 @@
 
 package io.kamax.matrix.client.regular;
 
-import io.kamax.matrix.*;
-import io.kamax.matrix.client.AMatrixHttpClient;
-import io.kamax.matrix.client.MatrixClientRequestException;
-import io.kamax.matrix.client.MatrixHttpRoom;
-import io.kamax.matrix.client._MatrixClient;
-import io.kamax.matrix.hs._MatrixHomeserver;
+import io.kamax.matrix.MatrixErrorInfo;
+import io.kamax.matrix.MatrixID;
+import io.kamax.matrix._MatrixID;
+import io.kamax.matrix._MatrixUser;
+import io.kamax.matrix.client.*;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.UserDisplaynameSetBody;
 import org.apache.commons.io.IOUtils;
@@ -39,20 +38,16 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 
-public class MatrixClient extends AMatrixHttpClient implements _MatrixClient {
+public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient {
 
-    private Logger log = LoggerFactory.getLogger(MatrixClient.class);
+    private Logger log = LoggerFactory.getLogger(MatrixHttpClient.class);
 
-    public MatrixClient(_MatrixHomeserver hs, String token) {
-        this(hs, token, null);
-    }
-
-    public MatrixClient(_MatrixHomeserver hs, String token, _MatrixID mxId) {
-        super(hs, token, mxId);
+    public MatrixHttpClient(MatrixClientContext context) {
+        super(context);
     }
 
     protected _MatrixID getMatrixId(String localpart) {
-        return new MatrixID(localpart, hs.getDomain());
+        return new MatrixID(localpart, getHomeserver().getDomain());
     }
 
     @Override
@@ -66,7 +61,7 @@ public class MatrixClient extends AMatrixHttpClient implements _MatrixClient {
             HttpResponse res = client.execute(req);
 
             if (res.getStatusLine().getStatusCode() == 200) {
-                log.info("Successfully set user {} displayname to {}", getUserId(), name);
+                log.info("Successfully set user {} displayname to {}", getUser(), name);
             } else {
                 if (res.getStatusLine().getStatusCode() == 429) {
                     // TODO handle rate limited
@@ -76,7 +71,7 @@ public class MatrixClient extends AMatrixHttpClient implements _MatrixClient {
                 Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
                 String body = IOUtils.toString(res.getEntity().getContent(), charset);
                 MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                throw new IOException("Error changing display name for " + getUserId() + " - " + info.getErrcode() + ": " + info.getError());
+                throw new MatrixClientRequestException(info, "Error changing display name for " + getUser());
             }
         } catch (IOException e) {
             throw new MatrixClientRequestException(e);
@@ -85,12 +80,12 @@ public class MatrixClient extends AMatrixHttpClient implements _MatrixClient {
 
     @Override
     public _MatrixRoom getRoom(String roomId) {
-        return new MatrixHttpRoom(hs, token, mxId, roomId);
+        return new MatrixHttpRoom(getContext(), roomId);
     }
 
     @Override
     public _MatrixUser getUser(_MatrixID mxId) {
-        return new MatrixUser(mxId);
+        return new MatrixHttpUser(getContext(), mxId);
     }
 
 }

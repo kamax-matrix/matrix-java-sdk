@@ -25,10 +25,12 @@ import io.kamax.matrix.hs._MatrixHomeserver;
 
 public interface _MatrixClientRaw {
 
+    MatrixClientContext getContext();
+
     _MatrixHomeserver getHomeserver();
 
     String getAccessToken();
 
-    _MatrixID getUserId();
+    _MatrixID getUser();
 
 }

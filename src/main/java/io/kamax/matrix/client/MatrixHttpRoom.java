@@ -25,7 +25,6 @@ import com.google.gson.JsonObject;
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
-import io.kamax.matrix.hs._MatrixHomeserver;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
 import io.kamax.matrix.json.RoomMessageTextPutBody;
@@ -53,8 +52,8 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     private String roomId;
 
-    public MatrixHttpRoom(_MatrixHomeserver hs, String token, _MatrixID mxId, String roomId) {
-        super(hs, token, mxId);
+    public MatrixHttpRoom(MatrixClientContext context, String roomId) {
+        super(context);
 
         this.roomId = roomId;
     }
@@ -120,7 +119,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                     log.warn("Request was rate limited", new Exception());
                 }
                 MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                throw new IOException("Couldn't get topic for room " + roomId + " - " + info.getErrcode() + ": " + info.getError());
+                throw new MatrixClientRequestException(info, "Couldn't get topic for room " + roomId);
             }
 
             return Optional.of(jsonParser.parse(body).getAsJsonObject().get("topic").getAsString());
@@ -137,7 +136,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
             HttpResponse res = client.execute(new HttpPost(path));
 
             if (res.getStatusLine().getStatusCode() == 200) {
-                log.info("Successfully joined room {} as {}", roomId, getUserId());
+                log.info("Successfully joined room {} as {}", roomId, getUser());
             } else {
                 if (res.getStatusLine().getStatusCode() == 429) {
                     // TODO handle rate limited
@@ -149,9 +148,9 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                 MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
 
                 if (res.getStatusLine().getStatusCode() == 403) {
-                    log.error("Failed to join room, we are not allowed: {}", info.getError());
+                    log.error("Failed to join room, we are not allowed: {} - {}", info.getErrcode(), info.getError());
                 } else {
-                    throw new IOException("Error changing display name for " + getUserId() + " - " + info.getErrcode() + ": " + info.getError());
+                    throw new MatrixClientRequestException(info, "Error joining for " + getUser());
                 }
             }
         } catch (IOException e) {
@@ -167,7 +166,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
             HttpResponse res = client.execute(new HttpPost(path));
 
             if (res.getStatusLine().getStatusCode() == 200) {
-                log.info("Successfully left room {} as {}", roomId, getUserId());
+                log.info("Successfully left room {} as {}", roomId, getUser());
             } else {
                 if (res.getStatusLine().getStatusCode() == 429) {
                     // TODO handle rate limited
@@ -181,7 +180,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                 if (res.getStatusLine().getStatusCode() == 403) {
                     log.debug("Failed to leave room, we are not allowed, most likely already left: {} - {}", info.getErrcode(), info.getError());
                 } else {
-                    throw new IOException("Error when leaving room " + roomId + " as " + getUserId() + " - " + info.getErrcode() + ": " + info.getError());
+                    throw new IOException("Error when leaving room " + roomId + " as " + getUser() + " - " + info.getErrcode() + ": " + info.getError());
                 }
             }
         } catch (IOException e) {
@@ -198,7 +197,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
             HttpResponse res = client.execute(req);
 
             if (res.getStatusLine().getStatusCode() == 200) {
-                log.info("Successfully sent message in room {} as {}", roomId, getUserId());
+                log.info("Successfully sent message in room {} as {}", roomId, getUser());
             } else {
                 if (res.getStatusLine().getStatusCode() == 429) {
                     // TODO handle rate limited
@@ -212,7 +211,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                 if (res.getStatusLine().getStatusCode() == 403) {
                     log.error("Failed send message, we are not allowed: {}", info.getError());
                 } else {
-                    throw new IOException("Error sending message for " + getUserId() + " - " + info.getErrcode() + ": " + info.getError());
+                    throw new IOException("Error sending message for " + getUser() + " - " + info.getErrcode() + ": " + info.getError());
                 }
             }
         } catch (IOException e) {

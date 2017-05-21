@@ -22,10 +22,10 @@ package io.kamax.matrix.client.as;
 
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix.MatrixID;
-import io.kamax.matrix._MatrixID;
+import io.kamax.matrix.client.MatrixClientContext;
 import io.kamax.matrix.client.MatrixClientRequestException;
 import io.kamax.matrix.client._MatrixClient;
-import io.kamax.matrix.client.regular.MatrixClient;
+import io.kamax.matrix.client.regular.MatrixHttpClient;
 import io.kamax.matrix.hs._MatrixHomeserver;
 import io.kamax.matrix.json.VirtualUserRegistrationBody;
 import org.apache.commons.io.IOUtils;
@@ -39,20 +39,16 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 
-public class MatrixApplicationServiceClient extends MatrixClient implements _MatrixApplicationServiceClient {
+public class MatrixApplicationServiceClient extends MatrixHttpClient implements _MatrixApplicationServiceClient {
 
     private Logger log = LoggerFactory.getLogger(MatrixApplicationServiceClient.class);
 
-    private _MatrixID asMxId;
-
     public MatrixApplicationServiceClient(_MatrixHomeserver hs, String token, String localpart) {
-        super(hs, token);
-        asMxId = new MatrixID(localpart, hs.getDomain());
+        super(new MatrixClientContext(hs, new MatrixID(localpart, hs.getDomain()), token));
     }
 
-    @Override
-    public _MatrixID getUserId() {
-        return asMxId;
+    private MatrixHttpClient createClient(String localpart) {
+        return new MatrixHttpClient(new MatrixClientContext(getHomeserver(), getMatrixId(localpart), getAccessToken(), true));
     }
 
     @Override
@@ -76,14 +72,19 @@ public class MatrixApplicationServiceClient extends MatrixClient implements _Mat
                     log.warn("User {} already exists, ignoring", localpart);
                 } else {
                     // TODO turn into dedicated exceptions, following the Spec distinct errors
-                    throw new IOException("Error creating the new user " + localpart + " - " + info.getErrcode() + ": " + info.getError());
+                    throw new MatrixClientRequestException(info, "Error creating the new user " + localpart);
                 }
             }
         } catch (IOException e) {
             throw new MatrixClientRequestException(e);
         }
 
-        return new MatrixClient(getHomeserver(), getAccessToken(), getMatrixId(localpart));
+        return createClient(localpart);
+    }
+
+    @Override
+    public _MatrixClient getUser(String localpart) {
+        return createClient(localpart);
     }
 
 }
