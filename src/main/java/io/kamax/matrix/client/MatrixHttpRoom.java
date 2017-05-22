@@ -58,8 +58,8 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         this.roomId = roomId;
     }
 
-    protected URIBuilder getPathBuilder(String action) {
-        URIBuilder builder = super.getPathBuilder(action);
+    protected URIBuilder getClientPathBuilder(String action) {
+        URIBuilder builder = super.getClientPathBuilder(action);
         builder.setPath(builder.getPath().replace("{roomId}", roomId));
 
         return builder;
@@ -73,7 +73,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     @Override
     public Optional<String> getName() {
         try {
-            URI path = getPath("/rooms/{roomId}/state/m.room.name");
+            URI path = getClientPath("/rooms/{roomId}/state/m.room.name");
             log.info("Doing GET {}", path); // TODO redact access_token by encapsulating toString()
             HttpResponse res = client.execute(new HttpGet(path));
             Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
@@ -102,7 +102,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     @Override
     public Optional<String> getTopic() {
         try {
-            URI path = getPath("/rooms/{roomId}/state/m.room.topic");
+            URI path = getClientPath("/rooms/{roomId}/state/m.room.topic");
             log.info("Doing GET {}", path); // TODO redact access_token by encapsulating toString()
             HttpResponse res = client.execute(new HttpGet(path));
             Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
@@ -131,27 +131,28 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     @Override
     public void join() {
         try {
-            URI path = getPath("/rooms/{roomId}/join");
+            URI path = getClientPath("/rooms/{roomId}/join");
             log.info("Doing POST {}", path); // TODO redact access_token by encapsulating toString()
             HttpResponse res = client.execute(new HttpPost(path));
 
             if (res.getStatusLine().getStatusCode() == 200) {
                 log.info("Successfully joined room {} as {}", roomId, getUser());
+                return;
+            }
+
+            if (res.getStatusLine().getStatusCode() == 429) {
+                // TODO handle rate limited
+                log.warn("Request was rate limited", new Exception());
+            }
+
+            Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
+            String body = IOUtils.toString(res.getEntity().getContent(), charset);
+            MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+
+            if (res.getStatusLine().getStatusCode() == 403) {
+                log.error("Failed to join room, we are not allowed: {} - {}", info.getErrcode(), info.getError());
             } else {
-                if (res.getStatusLine().getStatusCode() == 429) {
-                    // TODO handle rate limited
-                    log.warn("Request was rate limited", new Exception());
-                }
-
-                Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                String body = IOUtils.toString(res.getEntity().getContent(), charset);
-                MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-
-                if (res.getStatusLine().getStatusCode() == 403) {
-                    log.error("Failed to join room, we are not allowed: {} - {}", info.getErrcode(), info.getError());
-                } else {
-                    throw new MatrixClientRequestException(info, "Error joining for " + getUser());
-                }
+                throw new MatrixClientRequestException(info, "Error joining for " + getUser());
             }
         } catch (IOException e) {
             throw new MatrixClientRequestException(e);
@@ -161,7 +162,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     @Override
     public void leave() {
         try {
-            URI path = getPath("/rooms/{roomId}/leave");
+            URI path = getClientPath("/rooms/{roomId}/leave");
             log.info("Doing POST {}", path); // TODO redact access_token by encapsulating toString()
             HttpResponse res = client.execute(new HttpPost(path));
 
@@ -198,7 +199,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     private void sendMessage(RoomMessageTextPutBody content) {
         try {
-            URI path = getPath("/rooms/{roomId}/send/m.room.message/" + System.currentTimeMillis());
+            URI path = getClientPath("/rooms/{roomId}/send/m.room.message/" + System.currentTimeMillis());
             log.info("Doing PUT {}", path); // TODO redact access_token by encapsulating toString()
             HttpPut req = new HttpPut(path);
             req.setEntity(getJsonEntity(content));
@@ -252,7 +253,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     @Override
     public List<_MatrixID> getJoinedUsers() {
         try {
-            URI path = getPath("/rooms/{roomId}/joined_members");
+            URI path = getClientPath("/rooms/{roomId}/joined_members");
             log.info("Doing GET {}", path); // TODO redact access_token by encapsulating toString()
             HttpResponse res = client.execute(new HttpGet(path));
             Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();

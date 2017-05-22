@@ -20,14 +20,19 @@
 
 package io.kamax.matrix;
 
+import java.net.URI;
 import java.util.Optional;
 
-public interface _MatrixUser {
+public interface _MatrixContent {
 
-    _MatrixID getId();
+    URI getAddress();
 
-    Optional<String> getName();
+    boolean isValid();
 
-    Optional<_MatrixContent> getAvatar();
+    String getType();
+
+    byte[] getData();
+
+    Optional<String> getFilename();
 
 }

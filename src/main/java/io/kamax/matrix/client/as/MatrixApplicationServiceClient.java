@@ -55,7 +55,7 @@ public class MatrixApplicationServiceClient extends MatrixHttpClient implements 
     public _MatrixClient createUser(String localpart) {
         log.info("Creating new user {}", localpart);
         try {
-            URI path = getPath("/register");
+            URI path = getClientPath("/register");
             log.info("Doing POST {}", path); // TODO redact access_token by encapsulating toString()
             HttpPost req = new HttpPost(path);
             req.setEntity(getJsonEntity(new VirtualUserRegistrationBody(localpart)));

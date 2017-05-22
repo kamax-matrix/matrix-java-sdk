@@ -20,7 +20,9 @@
 
 package io.kamax.matrix.client;
 
+import com.google.gson.JsonObject;
 import io.kamax.matrix.MatrixErrorInfo;
+import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
 import org.apache.commons.io.IOUtils;
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
@@ -55,7 +58,7 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
     @Override
     public Optional<String> getName() {
         try {
-            URI path = getPath("/profile/" + mxId.getId() + "/displayname");
+            URI path = getClientPath("/profile/" + mxId.getId() + "/displayname");
             log.info("Doing GET {}", path); // TODO redact access_token by encapsulating toString()
             HttpResponse res = client.execute(new HttpGet(path));
             Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
@@ -82,6 +85,51 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
         } catch (IOException e) {
             throw new MatrixClientRequestException(e);
         }
+    }
+
+    @Override
+    public Optional<_MatrixContent> getAvatar() {
+        try {
+            URI path = getClientPath("/profile/" + mxId.getId() + "/avatar_url");
+            log.info("Doing GET {}", path); // TODO redact access_token by encapsulating toString()
+            HttpResponse res = client.execute(new HttpGet(path));
+            Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
+            String body = IOUtils.toString(res.getEntity().getContent(), charset);
+
+            if (res.getStatusLine().getStatusCode() != 200) {
+                if (res.getStatusLine().getStatusCode() == 404) {
+                    // No avatar url has been set
+                    return Optional.empty();
+                }
+
+                // TODO handle rate limited
+                if (res.getStatusLine().getStatusCode() == 429) {
+                    log.warn("Request was rate limited", new Exception());
+                    return Optional.empty();
+                }
+
+                MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+                log.error("Couldn't get the avatar_url of {}: {} - {}", mxId, info.getErrcode(), info.getError());
+                return Optional.empty();
+            }
+
+            JsonObject urlObj = jsonParser.parse(body).getAsJsonObject();
+            if (!urlObj.has("avatar_url")) {
+                return Optional.empty();
+            }
+
+            String uriRaw = urlObj.get("avatar_url").getAsString();
+            log.info("Avatar URI of {}: {}", mxId, uriRaw);
+            try {
+                return Optional.of(new MatrixHttpContent(getContext(), new URI(uriRaw)));
+            } catch (URISyntaxException e) {
+                log.warn("{} is not a valid URI for avatar, returning empty", uriRaw);
+                return Optional.empty();
+            }
+        } catch (IOException e) {
+            throw new MatrixClientRequestException(e);
+        }
+
     }
 
 }

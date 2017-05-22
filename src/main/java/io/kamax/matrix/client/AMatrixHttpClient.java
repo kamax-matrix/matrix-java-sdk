@@ -66,9 +66,9 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return context.getUser();
     }
 
-    protected URIBuilder getPathBuilder(String action) {
+    protected URIBuilder getPathBuilder(String module, String version, String action) {
         URIBuilder builder = context.getHs().getClientEndpoint();
-        builder.setPath(builder.getPath() + "/_matrix/client/r0" + action);
+        builder.setPath(builder.getPath() + "/_matrix/" + module + "/" + version + action);
         builder.setParameter("access_token", context.getToken());
         builder.setPath(builder.getPath().replace("{userId}", context.getUser().getId()));
         if (context.isVirtualUser()) {
@@ -78,9 +78,25 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return builder;
     }
 
-    protected URI getPath(String action) {
+    protected URIBuilder getClientPathBuilder(String action) {
+        return getPathBuilder("client", "r0", action);
+    }
+
+    protected URIBuilder getMediaPathBuilder(String action) {
+        return getPathBuilder("media", "v1", action);
+    }
+
+    protected URI getClientPath(String action) {
         try {
-            return getPathBuilder(action).build();
+            return getClientPathBuilder(action).build();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    protected URI getMediaPath(String action) {
+        try {
+            return getMediaPathBuilder(action).build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
