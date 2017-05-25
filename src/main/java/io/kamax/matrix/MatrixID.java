@@ -25,9 +25,11 @@ import java.util.regex.Pattern;
 
 public class MatrixID implements _MatrixID {
 
-    public static final Pattern matrixIdPattern = Pattern.compile("@([0-9a-z-.=_]+):(.+)");
+    private static final Pattern matrixIdLaxPattern = Pattern.compile("@(.+):(.+)");
+    private static final Pattern matrixIdStrictPattern = Pattern.compile("@([0-9a-z-.=_]+):(.+)");
 
     private String id;
+
     private String localpart;
     private String domain;
 
@@ -36,18 +38,13 @@ public class MatrixID implements _MatrixID {
     }
 
     public MatrixID(String mxId) {
-        mxId = mxId.toLowerCase();
+        this.id = mxId.toLowerCase();
 
-        Matcher m = matrixIdPattern.matcher(mxId);
+        Matcher m = matrixIdLaxPattern.matcher(id);
         if (!m.matches()) {
             throw new IllegalArgumentException(mxId + " is not a valid Matrix ID");
         }
 
-        if (mxId.length() > 255) {
-            throw new IllegalArgumentException(mxId + " is longer than 255 characters");
-        }
-
-        this.id = mxId;
         this.localpart = m.group(1);
         this.domain = m.group(2);
     }
@@ -69,6 +66,18 @@ public class MatrixID implements _MatrixID {
     @Override
     public String getDomain() {
         return domain;
+    }
+
+    @Override
+    public boolean isValid() {
+        return matrixIdStrictPattern.matcher(id).matches();
+    }
+
+    @Override
+    public boolean isAcceptable() {
+        // TODO properly implement
+
+        return id.length() <= 255;
     }
 
     @Override
