@@ -54,11 +54,10 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     public void setDisplayName(String name) {
         try {
             URI path = getClientPath("/profile/{userId}/displayname");
-            log.info("Doing PUT {}", path); // TODO redact access_token by encapsulating toString()
             HttpPut req = new HttpPut(path);
             req.setEntity(getJsonEntity(new UserDisplaynameSetBody(name)));
 
-            HttpResponse res = client.execute(req);
+            HttpResponse res = client.execute(log(req));
 
             if (res.getStatusLine().getStatusCode() == 200) {
                 log.info("Successfully set user {} displayname to {}", getUser(), name);

@@ -59,8 +59,7 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
     public Optional<String> getName() {
         try {
             URI path = getClientPath("/profile/" + mxId.getId() + "/displayname");
-            log.info("Doing GET {}", path); // TODO redact access_token by encapsulating toString()
-            HttpResponse res = client.execute(new HttpGet(path));
+            HttpResponse res = client.execute(log(new HttpGet(path)));
             Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
             String body = IOUtils.toString(res.getEntity().getContent(), charset);
 
@@ -91,8 +90,7 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
     public Optional<_MatrixContent> getAvatar() {
         try {
             URI path = getClientPath("/profile/" + mxId.getId() + "/avatar_url");
-            log.info("Doing GET {}", path); // TODO redact access_token by encapsulating toString()
-            HttpResponse res = client.execute(new HttpGet(path));
+            HttpResponse res = client.execute(log(new HttpGet(path)));
             Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
             String body = IOUtils.toString(res.getEntity().getContent(), charset);
 

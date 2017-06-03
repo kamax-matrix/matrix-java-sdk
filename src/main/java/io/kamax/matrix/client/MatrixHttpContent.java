@@ -70,8 +70,7 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
                 log.error("{} is not a supported protocol for avatars, ignoring", address.getScheme());
             } else {
                 URI path = getMediaPath("/download/" + address.getHost() + address.getPath());
-                log.info("Doing GET {}", path); // TODO redact access_token by encapsulating toString()
-                HttpResponse res = client.execute(new HttpGet(path));
+                HttpResponse res = client.execute(log(new HttpGet(path)));
                 if (res.getStatusLine().getStatusCode() != 200) {
                     if (res.getStatusLine().getStatusCode() == 404) {
                         log.info("Media {} does not exist on the HS {}", address.toString(), getContext().getHs().getDomain());

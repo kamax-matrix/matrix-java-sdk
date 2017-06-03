@@ -27,20 +27,28 @@ import io.kamax.matrix.hs._MatrixHomeserver;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class AMatrixHttpClient implements _MatrixClientRaw {
+
+    private Logger log = LoggerFactory.getLogger(AMatrixHttpClient.class);
 
     protected MatrixClientContext context;
 
     protected HttpClient client = HttpClients.createDefault();
     protected Gson gson = new Gson();
     protected JsonParser jsonParser = new JsonParser();
+    private Pattern accessTokenUrlPattern = Pattern.compile("\\?access_token=(?<token>[^&]*)");
 
     public AMatrixHttpClient(MatrixClientContext context) {
         this.context = context;
@@ -64,6 +72,22 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     @Override
     public _MatrixID getUser() {
         return context.getUser();
+    }
+
+    protected HttpRequestBase log(HttpRequestBase req) {
+        String reqUrl = req.getURI().toASCIIString();
+        Matcher m = accessTokenUrlPattern.matcher(reqUrl);
+        if (m.find()) {
+            StringBuilder b = new StringBuilder();
+            b.append(reqUrl.substring(0, m.start("token")));
+            b.append("<redacted>");
+            b.append(reqUrl.substring(m.end("token"), reqUrl.length()));
+            reqUrl = b.toString();
+        }
+
+        log.info("Doing {} {}", req.getMethod(), reqUrl);
+
+        return req;
     }
 
     protected URIBuilder getPathBuilder(String module, String version, String action) {

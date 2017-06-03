@@ -56,11 +56,10 @@ public class MatrixApplicationServiceClient extends MatrixHttpClient implements 
         log.info("Creating new user {}", localpart);
         try {
             URI path = getClientPath("/register");
-            log.info("Doing POST {}", path); // TODO redact access_token by encapsulating toString()
             HttpPost req = new HttpPost(path);
             req.setEntity(getJsonEntity(new VirtualUserRegistrationBody(localpart)));
 
-            HttpResponse res = client.execute(req);
+            HttpResponse res = client.execute(log(req));
 
             if (res.getStatusLine().getStatusCode() == 200) {
                 log.info("Successfully created user {}", localpart);
