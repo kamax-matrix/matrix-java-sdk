@@ -29,7 +29,7 @@ import io.kamax.matrix.client.regular.MatrixHttpClient;
 import io.kamax.matrix.hs._MatrixHomeserver;
 import io.kamax.matrix.json.VirtualUserRegistrationBody;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -59,19 +59,19 @@ public class MatrixApplicationServiceClient extends MatrixHttpClient implements 
             HttpPost req = new HttpPost(path);
             req.setEntity(getJsonEntity(new VirtualUserRegistrationBody(localpart)));
 
-            HttpResponse res = client.execute(log(req));
-
-            if (res.getStatusLine().getStatusCode() == 200) {
-                log.info("Successfully created user {}", localpart);
-            } else {
-                Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                String body = IOUtils.toString(res.getEntity().getContent(), charset);
-                MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                if ("M_USER_IN_USE".contentEquals(info.getErrcode())) {
-                    log.warn("User {} already exists, ignoring", localpart);
+            try (CloseableHttpResponse res = client.execute(log(req))) {
+                if (res.getStatusLine().getStatusCode() == 200) {
+                    log.info("Successfully created user {}", localpart);
                 } else {
-                    // TODO turn into dedicated exceptions, following the Spec distinct errors
-                    throw new MatrixClientRequestException(info, "Error creating the new user " + localpart);
+                    Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
+                    String body = IOUtils.toString(res.getEntity().getContent(), charset);
+                    MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+                    if ("M_USER_IN_USE".contentEquals(info.getErrcode())) {
+                        log.warn("User {} already exists, ignoring", localpart);
+                    } else {
+                        // TODO turn into dedicated exceptions, following the Spec distinct errors
+                        throw new MatrixClientRequestException(info, "Error creating the new user " + localpart);
+                    }
                 }
             }
         } catch (IOException e) {

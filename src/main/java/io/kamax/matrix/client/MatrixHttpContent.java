@@ -26,7 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -70,37 +70,38 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
                 log.error("{} is not a supported protocol for avatars, ignoring", address.getScheme());
             } else {
                 URI path = getMediaPath("/download/" + address.getHost() + address.getPath());
-                HttpResponse res = client.execute(log(new HttpGet(path)));
-                if (res.getStatusLine().getStatusCode() != 200) {
-                    if (res.getStatusLine().getStatusCode() == 404) {
-                        log.info("Media {} does not exist on the HS {}", address.toString(), getContext().getHs().getDomain());
-                    } else {
-                        Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                        String body = IOUtils.toString(res.getEntity().getContent(), charset);
-
-                        MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                        log.error("Couldn't get content data for {}: {} - {}", address.toString(), info.getErrcode(), info.getError());
-                    }
-                } else {
-                    HttpEntity entity = res.getEntity();
-                    if (entity == null) {
-                        log.info("No data for content {}", address.toString());
-                    } else {
-                        Header contentType = entity.getContentType();
-                        if (contentType == null) {
-                            log.info("No content type was given, unable to process avatar data");
+                try (CloseableHttpResponse res = client.execute(log(new HttpGet(path)))) {
+                    if (res.getStatusLine().getStatusCode() != 200) {
+                        if (res.getStatusLine().getStatusCode() == 404) {
+                            log.info("Media {} does not exist on the HS {}", address.toString(), getContext().getHs().getDomain());
                         } else {
-                            type = contentType.getValue();
-                            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-                            entity.writeTo(outStream);
-                            data = outStream.toByteArray();
-                            isValid = true;
+                            Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
+                            String body = IOUtils.toString(res.getEntity().getContent(), charset);
 
-                            Header contentDisposition = res.getFirstHeader("Content-Disposition");
-                            if (contentDisposition != null) {
-                                Matcher m = filenamePattern.matcher(contentDisposition.getValue());
-                                if (m.find()) {
-                                    filename = m.group("filename");
+                            MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+                            log.error("Couldn't get content data for {}: {} - {}", address.toString(), info.getErrcode(), info.getError());
+                        }
+                    } else {
+                        HttpEntity entity = res.getEntity();
+                        if (entity == null) {
+                            log.info("No data for content {}", address.toString());
+                        } else {
+                            Header contentType = entity.getContentType();
+                            if (contentType == null) {
+                                log.info("No content type was given, unable to process avatar data");
+                            } else {
+                                type = contentType.getValue();
+                                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                                entity.writeTo(outStream);
+                                data = outStream.toByteArray();
+                                isValid = true;
+
+                                Header contentDisposition = res.getFirstHeader("Content-Disposition");
+                                if (contentDisposition != null) {
+                                    Matcher m = filenamePattern.matcher(contentDisposition.getValue());
+                                    if (m.find()) {
+                                        filename = m.group("filename");
+                                    }
                                 }
                             }
                         }

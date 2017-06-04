@@ -25,11 +25,11 @@ import com.google.gson.JsonParser;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected MatrixClientContext context;
 
-    protected HttpClient client = HttpClients.createDefault();
+    protected CloseableHttpClient client = HttpClients.createDefault();
     protected Gson gson = new Gson();
     protected JsonParser jsonParser = new JsonParser();
     private Pattern accessTokenUrlPattern = Pattern.compile("\\?access_token=(?<token>[^&]*)");

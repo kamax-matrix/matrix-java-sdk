@@ -28,7 +28,7 @@ import io.kamax.matrix.client.*;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.UserDisplaynameSetBody;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -57,20 +57,20 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
             HttpPut req = new HttpPut(path);
             req.setEntity(getJsonEntity(new UserDisplaynameSetBody(name)));
 
-            HttpResponse res = client.execute(log(req));
+            try (CloseableHttpResponse res = client.execute(log(req))) {
+                if (res.getStatusLine().getStatusCode() == 200) {
+                    log.info("Successfully set user {} displayname to {}", getUser(), name);
+                } else {
+                    if (res.getStatusLine().getStatusCode() == 429) {
+                        // TODO handle rate limited
+                        log.warn("Request was rate limited", new Exception());
+                    }
 
-            if (res.getStatusLine().getStatusCode() == 200) {
-                log.info("Successfully set user {} displayname to {}", getUser(), name);
-            } else {
-                if (res.getStatusLine().getStatusCode() == 429) {
-                    // TODO handle rate limited
-                    log.warn("Request was rate limited", new Exception());
+                    Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
+                    String body = IOUtils.toString(res.getEntity().getContent(), charset);
+                    MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+                    throw new MatrixClientRequestException(info, "Error changing display name for " + getUser());
                 }
-
-                Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                String body = IOUtils.toString(res.getEntity().getContent(), charset);
-                MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                throw new MatrixClientRequestException(info, "Error changing display name for " + getUser());
             }
         } catch (IOException e) {
             throw new MatrixClientRequestException(e);
