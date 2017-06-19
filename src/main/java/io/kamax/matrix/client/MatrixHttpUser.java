@@ -80,7 +80,12 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
                     return Optional.empty();
                 }
 
-                return Optional.of(jsonParser.parse(body).getAsJsonObject().get("displayname").getAsString());
+                JsonObject displayNameObj = jsonParser.parse(body).getAsJsonObject();
+                if (!displayNameObj.has("displayname")) {
+                    return Optional.empty();
+                }
+
+                return Optional.of(displayNameObj.get("displayname").getAsString());
             }
         } catch (IOException e) {
             throw new MatrixClientRequestException(e);
