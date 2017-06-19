@@ -40,7 +40,7 @@ public class MatrixJsonRoomMessageEvent extends MatrixJsonRoomEvent implements _
 
     @Override
     public String getBodyType() {
-        return content.get("msgtype").getAsString();
+        return content.has("msgtype") ? content.get("msgtype").getAsString() : null;
     }
 
 }
