@@ -35,7 +35,6 @@ public class MatrixIDTest {
     private static String invalidMxId3 = "john.doe";
     private static String invalidMxId4 = "@:";
     private static String invalidMxId5 = "@john.doe:";
-    private static String invalidMxId6 = "@:example.org";
 
 
     @Test
@@ -86,11 +85,6 @@ public class MatrixIDTest {
     @Test(expected = IllegalArgumentException.class)
     public void invalidMatrixIDs5() {
         new MatrixID(invalidMxId5);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void invalidMatrixIDs6() {
-        new MatrixID(invalidMxId6);
     }
 
 }

@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 public class MatrixID implements _MatrixID {
 
-    private static final Pattern matrixIdLaxPattern = Pattern.compile("@(.+):(.+)");
+    private static final Pattern matrixIdLaxPattern = Pattern.compile("@(.*):(.+)");
     private static final Pattern matrixIdStrictPattern = Pattern.compile("@([0-9a-z-.=_]+):(.+)");
 
     private String id;
