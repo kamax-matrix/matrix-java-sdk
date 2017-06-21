@@ -31,6 +31,12 @@ public class RoomMessageFormattedTextPutBody extends RoomMessageTextPutBody {
         this.formatted_body = formattedBody;
     }
 
+    public RoomMessageFormattedTextPutBody(String msgtype, String body, String formattedBody) {
+        super(msgtype, body);
+
+        this.formatted_body = formattedBody;
+    }
+
     public String getFormatted_body() {
         return formatted_body;
     }

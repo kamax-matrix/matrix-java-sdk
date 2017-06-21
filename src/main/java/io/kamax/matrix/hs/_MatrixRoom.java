@@ -45,6 +45,8 @@ public interface _MatrixRoom {
 
     void sendNotice(String message);
 
+    void sendNotice(String formatted, String plain);
+
     void invite(_MatrixID mxId);
 
     List<_MatrixID> getJoinedUsers();

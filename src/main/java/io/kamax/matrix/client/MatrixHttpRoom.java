@@ -247,6 +247,12 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
+    public void sendNotice(String formatted, String plain) {
+        // TODO sanitize input
+        sendMessage(new RoomMessageFormattedTextPutBody("m.notice", plain, formatted));
+    }
+
+    @Override
     public void invite(_MatrixID mxId) {
         // TODO populate
         log.error("Invite is not yet supported");
