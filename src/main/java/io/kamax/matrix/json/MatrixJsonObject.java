@@ -56,6 +56,19 @@ public class MatrixJsonObject {
         return obj.get(field).getAsInt();
     }
 
+    protected int getInt(String field, int failover) {
+        if (!obj.has(field)) {
+            return failover;
+        }
+
+        JsonElement el = obj.get(field);
+        if (el.isJsonNull()) {
+            return failover;
+        }
+
+        return el.getAsInt();
+    }
+
     protected JsonObject getObj(String field) {
         return obj.get(field).getAsJsonObject();
     }
