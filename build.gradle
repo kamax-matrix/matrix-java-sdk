@@ -18,7 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+group = 'io.kamax'
+version = '0.0.0'
+
 apply plugin: 'java'
+apply plugin: 'maven'
+
+configurations {
+    deployerJars
+}
 
 repositories {
     mavenCentral()
@@ -32,4 +40,29 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
 
     testCompile 'junit:junit:4.12'
+
+    deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
+}
+
+uploadArchives {
+    gradle.ext.mavenUrl = System.env.MAVEN_URL + (project.version ==~ /\d+\.\d+\.\d+/ ? '/releases' : '/snapshots')
+    gradle.ext.mavenUser = System.env.MAVEN_USER
+    gradle.ext.mavenPassword = System.env.MAVEN_PASS
+    gradle.ext.mavenPrivateKey = System.env.MAVEN_PK
+
+    doLast {
+        println "Published ${project.version} to maven repository ${gradle.mavenUrl} with user ${gradle.mavenUser}"
+    }
+
+    repositories.mavenDeployer {
+        configuration = configurations.deployerJars
+
+        repository(url: gradle.mavenUrl) {
+            authentication(
+                    userName: gradle.mavenUser,
+                    password: gradle.mavenPassword,
+                    privateKey: gradle.mavenPrivateKey
+            )
+        }
+    }
 }
