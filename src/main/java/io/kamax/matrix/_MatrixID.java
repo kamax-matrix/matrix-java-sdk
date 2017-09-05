@@ -29,6 +29,13 @@ public interface _MatrixID {
     String getDomain();
 
     /**
+     * Render this Matrix ID strictly valid. In technical term, transform this ID so <code>isValid()</code> returns true.
+     *
+     * @return A canonical Matrix ID
+     */
+    _MatrixID canonicalize();
+
+    /**
      * If the Matrix ID is strictly valid in the protocol as per http://matrix.org/docs/spec/intro.html#user-identifiers
      *
      * @return true if strictly valid, false if not

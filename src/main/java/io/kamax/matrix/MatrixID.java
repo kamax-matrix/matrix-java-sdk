@@ -38,13 +38,12 @@ public class MatrixID implements _MatrixID {
     }
 
     public MatrixID(String mxId) {
-        this.id = mxId.toLowerCase();
-
-        Matcher m = matrixIdLaxPattern.matcher(id);
+        Matcher m = matrixIdLaxPattern.matcher(mxId);
         if (!m.matches()) {
-            throw new IllegalArgumentException(mxId + " is not a valid Matrix ID");
+            throw new IllegalArgumentException(mxId + " is not a possible Matrix ID");
         }
 
+        this.id = mxId;
         this.localpart = m.group(1);
         this.domain = m.group(2);
     }
@@ -69,8 +68,13 @@ public class MatrixID implements _MatrixID {
     }
 
     @Override
+    public _MatrixID canonicalize() {
+        return new MatrixID(getId().toLowerCase());
+    }
+
+    @Override
     public boolean isValid() {
-        return matrixIdStrictPattern.matcher(id).matches();
+        return isAcceptable() && matrixIdStrictPattern.matcher(id).matches();
     }
 
     @Override
