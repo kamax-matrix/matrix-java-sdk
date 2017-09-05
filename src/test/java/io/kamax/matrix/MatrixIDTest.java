@@ -44,10 +44,6 @@ public class MatrixIDTest {
         assertTrue(validMxId1.contentEquals(mxId1.getId()));
         assertTrue("john.doe".contentEquals(mxId1.getLocalPart()));
         assertTrue("example.org".contentEquals(mxId1.getDomain()));
-
-        assertTrue(validMxId1.contentEquals(mxId3.getId()));
-        assertTrue("john.doe".contentEquals(mxId3.getLocalPart()));
-        assertTrue("example.org".contentEquals(mxId3.getDomain()));
     }
 
     @Test
