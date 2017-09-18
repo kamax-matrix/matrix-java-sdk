@@ -19,14 +19,25 @@
  */
 package io.kamax.matrix;
 
-import io.kamax.matrix.client.regular.MatrixHttpClient;
+import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.NOPLoggerFactory;
 
 import java.net.URISyntaxException;
 
-public class LoggingErrorTest {
+/**
+ * A small test class, intended to verify that the logging framework has
+ * a suitable logging implementation.
+ */
+public class LoggingDependencyTest {
     @Test
     public void login() throws URISyntaxException {
-        MatrixHttpClient client = new MatrixHttpClient(null);
+        if (LoggerFactory.getILoggerFactory() instanceof NOPLoggerFactory) {
+            Assert.fail("No logging implementation found, using fallback NOP logger");
+        }
+        Logger logger = LoggerFactory.getLogger("");
+        logger.info("If you see this info in the logger, everything is alright");
     }
 }
