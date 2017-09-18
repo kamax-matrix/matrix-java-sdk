@@ -38,9 +38,9 @@ dependencies {
     compile 'commons-io:commons-io:2.5'
     compile 'org.apache.httpcomponents:fluent-hc:4.5.3'
     compile 'com.google.code.gson:gson:2.8.0'
-    testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.25'
 
     testCompile 'junit:junit:4.12'
+    testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.25'
 
     deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
 }
