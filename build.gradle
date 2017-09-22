@@ -18,6 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+plugins {
+    id "com.diffplug.gradle.spotless" version "3.5.2"
+}
+
 group = 'io.kamax'
 version = '0.0.2'
 
@@ -65,5 +69,21 @@ uploadArchives {
                     privateKey: gradle.mavenPrivateKey
             )
         }
+    }
+}
+
+// Settings for automatic code formatting
+compileJava.dependsOn { spotlessApply }
+
+spotless {
+    format 'misc', {
+        target '**/*.gradle', '**/*.md', '**/.gitignore'
+
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
+    java {
+        eclipse().configFile 'spotless.eclipseformat.xml'
     }
 }
