@@ -22,6 +22,7 @@ package io.kamax.matrix.client;
 
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixContent;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;

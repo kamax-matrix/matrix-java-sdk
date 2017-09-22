@@ -22,12 +22,14 @@ package io.kamax.matrix.client;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
 import io.kamax.matrix.json.RoomMessageTextPutBody;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;

@@ -21,10 +21,12 @@
 package io.kamax.matrix.client;
 
 import com.google.gson.JsonObject;
+
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;

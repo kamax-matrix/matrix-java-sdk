@@ -28,6 +28,7 @@ import io.kamax.matrix.client._MatrixClient;
 import io.kamax.matrix.client.regular.MatrixHttpClient;
 import io.kamax.matrix.hs._MatrixHomeserver;
 import io.kamax.matrix.json.VirtualUserRegistrationBody;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;

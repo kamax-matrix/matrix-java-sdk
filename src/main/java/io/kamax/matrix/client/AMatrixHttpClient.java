@@ -22,8 +22,10 @@ package io.kamax.matrix.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
+
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.HttpRequestBase;

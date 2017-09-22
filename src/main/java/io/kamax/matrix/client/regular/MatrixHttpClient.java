@@ -27,6 +27,7 @@ import io.kamax.matrix._MatrixUser;
 import io.kamax.matrix.client.*;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.UserDisplaynameSetBody;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;

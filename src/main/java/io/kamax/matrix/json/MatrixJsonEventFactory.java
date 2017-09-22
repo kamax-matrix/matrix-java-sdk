@@ -21,6 +21,7 @@
 package io.kamax.matrix.json;
 
 import com.google.gson.JsonObject;
+
 import io.kamax.matrix.event._MatrixEvent;
 import io.kamax.matrix.json.event.MatrixJsonEvent;
 import io.kamax.matrix.json.event.MatrixJsonRoomMembershipEvent;

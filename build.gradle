@@ -85,5 +85,7 @@ spotless {
     }
     java {
         eclipse().configFile 'spotless.eclipseformat.xml'
+        removeUnusedImports()
+        importOrderFile 'spotless.importorder'
     }
 }
