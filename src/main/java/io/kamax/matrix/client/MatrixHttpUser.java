@@ -76,7 +76,8 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
                     }
 
                     MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    log.error("Couldn't get the displayname of {}: {} - {}", mxId, info.getErrcode(), info.getError());
+                    log.error("Couldn't get the displayname of {}: {} - {}", mxId,
+                            info.getErrcode(), info.getError());
                     return Optional.empty();
                 }
 
@@ -114,7 +115,8 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
                     }
 
                     MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    log.error("Couldn't get the avatar_url of {}: {} - {}", mxId, info.getErrcode(), info.getError());
+                    log.error("Couldn't get the avatar_url of {}: {} - {}", mxId, info.getErrcode(),
+                            info.getError());
                     return Optional.empty();
                 }
 

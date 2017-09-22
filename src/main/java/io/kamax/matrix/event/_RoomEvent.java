@@ -20,7 +20,6 @@
 
 package io.kamax.matrix.event;
 
-
 public interface _RoomEvent extends _MatrixEvent {
 
     String getRoomId();

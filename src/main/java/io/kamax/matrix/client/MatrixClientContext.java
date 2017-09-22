@@ -34,7 +34,8 @@ public class MatrixClientContext {
         this(hs, user, token, false);
     }
 
-    public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token, boolean isVirtualUser) {
+    public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token,
+            boolean isVirtualUser) {
         this.hs = hs;
         this.user = user;
         this.token = token;

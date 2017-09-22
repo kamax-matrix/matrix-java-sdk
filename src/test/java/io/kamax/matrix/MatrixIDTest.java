@@ -36,7 +36,6 @@ public class MatrixIDTest {
     private static String invalidMxId4 = "@:";
     private static String invalidMxId5 = "@john.doe:";
 
-
     @Test
     public void validMatrixIDs() {
         _MatrixID mxId1 = new MatrixID(validMxId1);

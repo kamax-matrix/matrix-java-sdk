@@ -127,10 +127,8 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     protected HttpEntity getJsonEntity(Object o) {
-        return EntityBuilder.create()
-                .setText(gson.toJson(o))
-                .setContentType(ContentType.APPLICATION_JSON)
-                .build();
+        return EntityBuilder.create().setText(gson.toJson(o))
+                .setContentType(ContentType.APPLICATION_JSON).build();
     }
 
 }

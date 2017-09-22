@@ -20,7 +20,6 @@
 
 package io.kamax.matrix.event;
 
-
 public interface _RoomMessageEvent extends _RoomEvent {
 
     String getBody();
