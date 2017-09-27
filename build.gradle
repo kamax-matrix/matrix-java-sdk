@@ -72,9 +72,6 @@ uploadArchives {
     }
 }
 
-// Settings for automatic code formatting
-compileJava.dependsOn { spotlessApply }
-
 spotless {
     format 'misc', {
         target '**/*.gradle', '**/*.md', '**/.gitignore'
