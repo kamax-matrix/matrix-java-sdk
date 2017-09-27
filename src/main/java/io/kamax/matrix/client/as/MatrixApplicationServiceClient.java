@@ -40,8 +40,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 
-public class MatrixApplicationServiceClient extends MatrixHttpClient
-        implements _MatrixApplicationServiceClient {
+public class MatrixApplicationServiceClient extends MatrixHttpClient implements _MatrixApplicationServiceClient {
 
     private Logger log = LoggerFactory.getLogger(MatrixApplicationServiceClient.class);
 
@@ -50,8 +49,8 @@ public class MatrixApplicationServiceClient extends MatrixHttpClient
     }
 
     private MatrixHttpClient createClient(String localpart) {
-        return new MatrixHttpClient(new MatrixClientContext(getHomeserver(), getMatrixId(localpart),
-                getAccessToken(), true));
+        return new MatrixHttpClient(
+                new MatrixClientContext(getHomeserver(), getMatrixId(localpart), getAccessToken(), true));
     }
 
     @Override
@@ -73,8 +72,7 @@ public class MatrixApplicationServiceClient extends MatrixHttpClient
                         log.warn("User {} already exists, ignoring", localpart);
                     } else {
                         // TODO turn into dedicated exceptions, following the Spec distinct errors
-                        throw new MatrixClientRequestException(info,
-                                "Error creating the new user " + localpart);
+                        throw new MatrixClientRequestException(info, "Error creating the new user " + localpart);
                     }
                 }
             }

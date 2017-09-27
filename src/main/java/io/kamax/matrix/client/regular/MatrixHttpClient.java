@@ -70,8 +70,7 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
                     Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
                     String body = IOUtils.toString(res.getEntity().getContent(), charset);
                     MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    throw new MatrixClientRequestException(info,
-                            "Error changing display name for " + getUser());
+                    throw new MatrixClientRequestException(info, "Error changing display name for " + getUser());
                 }
             }
         } catch (IOException e) {

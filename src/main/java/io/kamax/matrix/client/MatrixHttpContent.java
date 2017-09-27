@@ -68,8 +68,7 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
 
         try {
             if (!StringUtils.equalsIgnoreCase("mxc", address.getScheme())) {
-                log.error("{} is not a supported protocol for avatars, ignoring",
-                        address.getScheme());
+                log.error("{} is not a supported protocol for avatars, ignoring", address.getScheme());
             } else {
                 URI path = getMediaPath("/download/" + address.getHost() + address.getPath());
                 try (CloseableHttpResponse res = client.execute(log(new HttpGet(path)))) {
@@ -78,13 +77,12 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
                             log.info("Media {} does not exist on the HS {}", address.toString(),
                                     getContext().getHs().getDomain());
                         } else {
-                            Charset charset = ContentType.getOrDefault(res.getEntity())
-                                    .getCharset();
+                            Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
                             String body = IOUtils.toString(res.getEntity().getContent(), charset);
 
                             MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                            log.error("Couldn't get content data for {}: {} - {}",
-                                    address.toString(), info.getErrcode(), info.getError());
+                            log.error("Couldn't get content data for {}: {} - {}", address.toString(),
+                                    info.getErrcode(), info.getError());
                         }
                     } else {
                         HttpEntity entity = res.getEntity();
@@ -93,8 +91,7 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
                         } else {
                             Header contentType = entity.getContentType();
                             if (contentType == null) {
-                                log.info(
-                                        "No content type was given, unable to process avatar data");
+                                log.info("No content type was given, unable to process avatar data");
                             } else {
                                 type = contentType.getValue();
                                 ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -102,11 +99,9 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
                                 data = outStream.toByteArray();
                                 isValid = true;
 
-                                Header contentDisposition = res
-                                        .getFirstHeader("Content-Disposition");
+                                Header contentDisposition = res.getFirstHeader("Content-Disposition");
                                 if (contentDisposition != null) {
-                                    Matcher m = filenamePattern
-                                            .matcher(contentDisposition.getValue());
+                                    Matcher m = filenamePattern.matcher(contentDisposition.getValue());
                                     if (m.find()) {
                                         filename = m.group("filename");
                                     }

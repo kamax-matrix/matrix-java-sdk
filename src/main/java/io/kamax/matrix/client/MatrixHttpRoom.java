@@ -92,12 +92,11 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                         log.warn("Request was rate limited", new Exception());
                     }
                     MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    throw new IOException("Couldn't get name for room " + roomId + " - "
-                            + info.getErrcode() + ": " + info.getError());
+                    throw new IOException("Couldn't get name for room " + roomId + " - " + info.getErrcode() + ": "
+                            + info.getError());
                 }
 
-                return Optional
-                        .of(jsonParser.parse(body).getAsJsonObject().get("name").getAsString());
+                return Optional.of(jsonParser.parse(body).getAsJsonObject().get("name").getAsString());
             }
         } catch (IOException e) {
             throw new MatrixClientRequestException(e);
@@ -124,12 +123,10 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                         log.warn("Request was rate limited", new Exception());
                     }
                     MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    throw new MatrixClientRequestException(info,
-                            "Couldn't get topic for room " + roomId);
+                    throw new MatrixClientRequestException(info, "Couldn't get topic for room " + roomId);
                 }
 
-                return Optional
-                        .of(jsonParser.parse(body).getAsJsonObject().get("topic").getAsString());
+                return Optional.of(jsonParser.parse(body).getAsJsonObject().get("topic").getAsString());
             }
         } catch (IOException e) {
             throw new MatrixClientRequestException(e);
@@ -157,8 +154,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                 MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
 
                 if (res.getStatusLine().getStatusCode() == 403) {
-                    log.error("Failed to join room, we are not allowed: {} - {}", info.getErrcode(),
-                            info.getError());
+                    log.error("Failed to join room, we are not allowed: {} - {}", info.getErrcode(), info.getError());
                 } else {
                     throw new MatrixClientRequestException(info, "Error joining for " + getUser());
                 }
@@ -195,8 +191,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                     MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
 
                     if (res.getStatusLine().getStatusCode() == 403) {
-                        log.debug(
-                                "Failed to leave room, we are not allowed, most likely already left: {} - {}",
+                        log.debug("Failed to leave room, we are not allowed, most likely already left: {} - {}",
                                 info.getErrcode(), info.getError());
                     } else {
                         throw new MatrixClientRequestException(info,
@@ -211,8 +206,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     private void sendMessage(RoomMessageTextPutBody content) {
         try {
-            URI path = getClientPath(
-                    "/rooms/{roomId}/send/m.room.message/" + System.currentTimeMillis());
+            URI path = getClientPath("/rooms/{roomId}/send/m.room.message/" + System.currentTimeMillis());
             HttpPut req = new HttpPut(path);
             req.setEntity(getJsonEntity(content));
 
@@ -232,8 +226,8 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                     if (res.getStatusLine().getStatusCode() == 403) {
                         log.error("Failed send message, we are not allowed: {}", info.getError());
                     } else {
-                        throw new IOException("Error sending message for " + getUser() + " - "
-                                + info.getErrcode() + ": " + info.getError());
+                        throw new IOException("Error sending message for " + getUser() + " - " + info.getErrcode()
+                                + ": " + info.getError());
                     }
                 }
             }
@@ -285,12 +279,11 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                         log.warn("Request was rate limited", new Exception());
                     }
                     MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    throw new IOException("Couldn't list joined users in " + roomId + " - "
-                            + info.getErrcode() + ": " + info.getError());
+                    throw new IOException("Couldn't list joined users in " + roomId + " - " + info.getErrcode() + ": "
+                            + info.getError());
                 }
 
-                JsonObject joinedUsers = jsonParser.parse(body).getAsJsonObject().get("joined")
-                        .getAsJsonObject();
+                JsonObject joinedUsers = jsonParser.parse(body).getAsJsonObject().get("joined").getAsJsonObject();
                 List<_MatrixID> ids = new ArrayList<>();
                 for (Map.Entry<String, JsonElement> entry : joinedUsers.entrySet()) {
                     ids.add(new MatrixID(entry.getKey()));
