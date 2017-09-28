@@ -11,19 +11,21 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.kamax.matrix.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
+
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -127,10 +129,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     protected HttpEntity getJsonEntity(Object o) {
-        return EntityBuilder.create()
-                .setText(gson.toJson(o))
-                .setContentType(ContentType.APPLICATION_JSON)
-                .build();
+        return EntityBuilder.create().setText(gson.toJson(o)).setContentType(ContentType.APPLICATION_JSON).build();
     }
 
 }

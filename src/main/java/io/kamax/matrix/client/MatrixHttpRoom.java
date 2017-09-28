@@ -11,23 +11,25 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.kamax.matrix.client;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
 import io.kamax.matrix.json.RoomMessageTextPutBody;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -90,7 +92,8 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                         log.warn("Request was rate limited", new Exception());
                     }
                     MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    throw new IOException("Couldn't get name for room " + roomId + " - " + info.getErrcode() + ": " + info.getError());
+                    throw new IOException("Couldn't get name for room " + roomId + " - " + info.getErrcode() + ": "
+                            + info.getError());
                 }
 
                 return Optional.of(jsonParser.parse(body).getAsJsonObject().get("name").getAsString());
@@ -188,9 +191,11 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                     MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
 
                     if (res.getStatusLine().getStatusCode() == 403) {
-                        log.debug("Failed to leave room, we are not allowed, most likely already left: {} - {}", info.getErrcode(), info.getError());
+                        log.debug("Failed to leave room, we are not allowed, most likely already left: {} - {}",
+                                info.getErrcode(), info.getError());
                     } else {
-                        throw new MatrixClientRequestException(info, "Error when leaving room " + roomId + " as " + getUser());
+                        throw new MatrixClientRequestException(info,
+                                "Error when leaving room " + roomId + " as " + getUser());
                     }
                 }
             }
@@ -221,7 +226,8 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                     if (res.getStatusLine().getStatusCode() == 403) {
                         log.error("Failed send message, we are not allowed: {}", info.getError());
                     } else {
-                        throw new IOException("Error sending message for " + getUser() + " - " + info.getErrcode() + ": " + info.getError());
+                        throw new IOException("Error sending message for " + getUser() + " - " + info.getErrcode()
+                                + ": " + info.getError());
                     }
                 }
             }
@@ -273,7 +279,8 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                         log.warn("Request was rate limited", new Exception());
                     }
                     MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    throw new IOException("Couldn't list joined users in " + roomId + " - " + info.getErrcode() + ": " + info.getError());
+                    throw new IOException("Couldn't list joined users in " + roomId + " - " + info.getErrcode() + ": "
+                            + info.getError());
                 }
 
                 JsonObject joinedUsers = jsonParser.parse(body).getAsJsonObject().get("joined").getAsJsonObject();

@@ -11,17 +11,18 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.kamax.matrix.client;
 
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixContent;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
@@ -73,13 +74,15 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
                 try (CloseableHttpResponse res = client.execute(log(new HttpGet(path)))) {
                     if (res.getStatusLine().getStatusCode() != 200) {
                         if (res.getStatusLine().getStatusCode() == 404) {
-                            log.info("Media {} does not exist on the HS {}", address.toString(), getContext().getHs().getDomain());
+                            log.info("Media {} does not exist on the HS {}", address.toString(),
+                                    getContext().getHs().getDomain());
                         } else {
                             Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
                             String body = IOUtils.toString(res.getEntity().getContent(), charset);
 
                             MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                            log.error("Couldn't get content data for {}: {} - {}", address.toString(), info.getErrcode(), info.getError());
+                            log.error("Couldn't get content data for {}: {} - {}", address.toString(),
+                                    info.getErrcode(), info.getError());
                         }
                     } else {
                         HttpEntity entity = res.getEntity();

@@ -11,11 +11,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.kamax.matrix;
@@ -29,21 +29,24 @@ public interface _MatrixID {
     String getDomain();
 
     /**
-     * Render this Matrix ID strictly valid. In technical term, transform this ID so <code>isValid()</code> returns true.
+     * Render this Matrix ID strictly valid. In technical term, transform this ID so
+     * <code>isValid()</code> returns true.
      *
      * @return A canonical Matrix ID
      */
     _MatrixID canonicalize();
 
     /**
-     * If the Matrix ID is strictly valid in the protocol as per http://matrix.org/docs/spec/intro.html#user-identifiers
+     * If the Matrix ID is strictly valid in the protocol as per
+     * http://matrix.org/docs/spec/intro.html#user-identifiers
      *
      * @return true if strictly valid, false if not
      */
     boolean isValid();
 
     /**
-     * If the Matrix ID is acceptable in the protocol as per http://matrix.org/docs/spec/intro.html#historical-user-ids
+     * If the Matrix ID is acceptable in the protocol as per
+     * http://matrix.org/docs/spec/intro.html#historical-user-ids
      *
      * @return
      */
