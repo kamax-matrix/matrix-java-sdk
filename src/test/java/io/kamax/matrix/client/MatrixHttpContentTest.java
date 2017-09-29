@@ -20,24 +20,6 @@
 
 package io.kamax.matrix.client;
 
-import com.github.tomakehurst.wiremock.client.MappingBuilder;
-
-import java.util.function.Consumer;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-
-public abstract class AMatrixHttpPutTester extends AMatrixHttpTester {
-    protected final Consumer<String> putMethod;
-    protected final String valueToConsume;
-
-    public AMatrixHttpPutTester(Consumer<String> putMethod, String valueToConsume) {
-        this.putMethod = putMethod;
-        this.valueToConsume = valueToConsume;
-    }
-
-    @Override
-    protected MappingBuilder createUrlMappingBuilder(String url) {
-        return put(urlEqualTo(url));
-    }
+public class MatrixHttpContentTest extends MatrixHttpTest {
+    // TODO getType, getData, getFilename
 }

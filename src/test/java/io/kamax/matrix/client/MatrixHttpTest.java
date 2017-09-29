@@ -29,18 +29,20 @@ import org.junit.Rule;
 
 import java.net.URISyntaxException;
 
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+
 public class MatrixHttpTest {
-    private static final String TEST_TOKEN = "testToken";
+    protected static final String TEST_TOKEN = "testToken";
     protected static final int PORT = 8098;
 
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule(PORT);
+    public WireMockRule wireMockRule = new WireMockRule(options().port(PORT));
 
     protected MatrixClientContext createClientContext() throws URISyntaxException {
         String domain = "localhost";
         String baseUrl = "http://localhost:" + PORT;
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        return new MatrixClientContext(hs, new MatrixID("Testuser", domain), TEST_TOKEN);
+        return new MatrixClientContext(hs, new MatrixID("testuser", domain), TEST_TOKEN);
     }
 
     protected String getAcessTokenParameter() {

@@ -27,18 +27,18 @@ import io.kamax.matrix.MatrixErrorInfo;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 
 import static org.junit.Assert.*;
 
-public class MatrixHttpPutTesterUnsuccessful extends AMatrixHttpConsumeTester {
+public class MatrixHttpPostTesterUnsuccessful extends AMatrixHttpConsumeTester {
     private final String errcode;
     private final String error;
 
-    public MatrixHttpPutTesterUnsuccessful(Consumer<String> putMethod, String valueToConsume, String url,
+    public MatrixHttpPostTesterUnsuccessful(Consumer<String> postMethod, String valueToConsume, String url,
             int returnStatus, String errcode, String error) {
-        super(putMethod, valueToConsume);
+        super(postMethod, valueToConsume);
         this.errcode = errcode;
         this.error = error;
         setupWiremock(url, returnStatus, getReturnBody());
@@ -64,7 +64,7 @@ public class MatrixHttpPutTesterUnsuccessful extends AMatrixHttpConsumeTester {
 
     @Override
     protected MappingBuilder createUrlMappingBuilder(String url) {
-        return put(urlEqualTo(url));
+        return post(urlEqualTo(url));
     }
 
 }
