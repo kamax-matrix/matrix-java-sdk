@@ -32,6 +32,9 @@ public class ResponseBuilder {
     private Optional<String> body = Optional.empty();
     private Optional<String> bodyFile = Optional.empty();
 
+    private Optional<String> customErrcode = Optional.empty();
+    private Optional<String> customError = Optional.empty();
+
     public ResponseBuilder(int status) {
         this.status = status;
     }
@@ -64,6 +67,11 @@ public class ResponseBuilder {
     }
 
     public Optional<String> getBody() {
+        if (status != 200) {
+            return Optional
+                    .of(("{'errcode': `" + getErrcode() + "`, " + "error: `" + getError() + "`}").replace('`', '"'));
+        }
+
         return body;
     }
 
@@ -81,5 +89,35 @@ public class ResponseBuilder {
 
     public Optional<String> getBodyFile() {
         return bodyFile;
+    }
+
+    public String getErrcode() {
+        if (customErrcode.isPresent()) {
+            return customErrcode.get();
+        }
+
+        switch (getStatus()) {
+        case 403:
+            return "M_FORBIDDEN";
+        case 429:
+            return "M_LIMIT_EXCEEDED";
+        default:
+            return "";
+        }
+    }
+
+    public String getError() {
+        if (customError.isPresent()) {
+            return customError.get();
+        }
+
+        switch (getStatus()) {
+        case 403:
+            return "You aren't a member of the room and weren't previously a member of the room.";
+        case 429:
+            return "Too many requests have been sent in a short period of time. Wait a while then try again.";
+        default:
+            return "";
+        }
     }
 }

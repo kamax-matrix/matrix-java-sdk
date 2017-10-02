@@ -20,6 +20,8 @@
 
 package io.kamax.matrix.client;
 
+// TODO really needed?
+
 public class RequestBuilder {
     private final String url;
 

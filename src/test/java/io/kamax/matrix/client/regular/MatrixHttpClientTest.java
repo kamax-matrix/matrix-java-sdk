@@ -22,9 +22,7 @@ package io.kamax.matrix.client.regular;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 
-import io.kamax.matrix.client.ErrorTestRunner;
-import io.kamax.matrix.client.MatrixClientContext;
-import io.kamax.matrix.client.MatrixHttpTest;
+import io.kamax.matrix.client.*;
 
 import org.junit.Test;
 
@@ -51,7 +49,8 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
 
     @Test
     public void setDisplaynameError429() throws URISyntaxException {
-        ErrorTestRunner<Void, String> runner = new ErrorTestRunner<>(createSetDisplaynameUrl(), 429);
+        ExceptionTestRunner<Void, String> runner = new ExceptionTestRunner<>(
+                new RequestBuilder(createSetDisplaynameUrl()), new ResponseBuilder(429));
         runner.runPutTest(createClientObject()::setDisplayName, "new name");
     }
 

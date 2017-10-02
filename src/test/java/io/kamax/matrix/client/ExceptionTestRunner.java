@@ -32,24 +32,30 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 import static org.junit.Assert.*;
 
-public class ErrorTestRunner<T, P> {
-    private final int responseStatus;
-    private final String url;
+/**
+ * Test runner for error cases, in which MatrixClientRequestException get thrown.
+ * 
+ * @param <R>
+ *            Return type of the tested get-method
+ * @param <P>
+ *            Parameter type of the tested consume-method
+ */
+public class ExceptionTestRunner<R, P> {
 
-    private Optional<String> customErrcode = Optional.empty();
-    private Optional<String> customError = Optional.empty();
+    private final RequestBuilder requestBuilder;
+    private final ResponseBuilder responseBuilder;
 
-    public ErrorTestRunner(String url, int responseStatus) {
-        this.responseStatus = responseStatus;
-        this.url = url;
+    public ExceptionTestRunner(RequestBuilder requestBuilder, ResponseBuilder responseBuilder) {
+        this.requestBuilder = requestBuilder;
+        this.responseBuilder = responseBuilder;
     }
 
     public ResponseDefinitionBuilder getResponse() {
-        return aResponse().withStatus(responseStatus).withBody(getErrorReturnBody());
+        return aResponse().withStatus(responseBuilder.getStatus()).withBody(responseBuilder.getBody().get());
     }
 
-    public void runGetTest(Supplier<T> method) {
-        stubFor(get(urlEqualTo(url)).willReturn(getResponse()));
+    public void runGetTest(Supplier<R> method) {
+        stubFor(get(urlEqualTo(requestBuilder.getUrl())).willReturn(getResponse()));
 
         try {
             method.get();
@@ -65,12 +71,12 @@ public class ErrorTestRunner<T, P> {
     }
 
     public void runPostTest(Consumer<P> method, P parameter) {
-        stubFor(post(urlEqualTo(url)).willReturn(getResponse()));
+        stubFor(post(urlEqualTo(requestBuilder.getUrl())).willReturn(getResponse()));
         runErrorTest(method, parameter);
     }
 
     public void runPutTest(Consumer<P> method, P parameter) {
-        stubFor(put(urlEqualTo(url)).willReturn(getResponse()));
+        stubFor(put(urlEqualTo(requestBuilder.getUrl())).willReturn(getResponse()));
         runErrorTest(method, parameter);
     }
 
@@ -87,42 +93,7 @@ public class ErrorTestRunner<T, P> {
     private void checkErrorInfo(MatrixClientRequestException e) {
         Optional<MatrixErrorInfo> errorOptional = e.getError();
         assertTrue(errorOptional.isPresent());
-        assertEquals(errorOptional.get().getErrcode(), getErrcode());
-        assertEquals(errorOptional.get().getError(), getError());
+        assertEquals(errorOptional.get().getErrcode(), responseBuilder.getErrcode());
+        assertEquals(errorOptional.get().getError(), responseBuilder.getError());
     }
-
-    private String getErrcode() {
-        if (customErrcode.isPresent()) {
-            return customErrcode.get();
-        }
-
-        switch (responseStatus) {
-        case 403:
-            return "M_FORBIDDEN";
-        case 429:
-            return "M_LIMIT_EXCEEDED";
-        default:
-            return "";
-        }
-    }
-
-    private String getError() {
-        if (customError.isPresent()) {
-            return customError.get();
-        }
-
-        switch (responseStatus) {
-        case 403:
-            return "You aren't a member of the room and weren't previously a member of the room.";
-        case 429:
-            return "Too many requests have been sent in a short period of time. Wait a while then try again.";
-        default:
-            return "";
-        }
-    }
-
-    private String getErrorReturnBody() {
-        return ("{'errcode': `" + getErrcode() + "`, " + "error: `" + getError() + "`}").replace('`', '"');
-    }
-
 }

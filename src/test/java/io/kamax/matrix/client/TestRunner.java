@@ -33,11 +33,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 import static org.junit.Assert.assertThat;
 
-public class SuccessTestRunner<R, P> {
+public class TestRunner<R, P> {
     private RequestBuilder requestBuilder;
     private ResponseBuilder responseBuilder;
 
-    public SuccessTestRunner(RequestBuilder requestBuilder, ResponseBuilder responseBuilder) {
+    public TestRunner(RequestBuilder requestBuilder, ResponseBuilder responseBuilder) {
         this.requestBuilder = requestBuilder;
         this.responseBuilder = responseBuilder;
     }
