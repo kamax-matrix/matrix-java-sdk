@@ -45,8 +45,8 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
         String url = createDownloadUrl();
         String bodyFile = "textfile.txt";
         ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile);
-        new TestRunner<Boolean, Void>(new RequestBuilder(url), responseBuilder)
-                .runGetTest(createContentObject()::isValid, false);
+        new TestRunnerGet<Boolean>(new RequestBuilder(url), responseBuilder).runGetTest(createContentObject()::isValid,
+                false);
     }
 
     @Test
@@ -71,8 +71,8 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
         ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBodyFile(bodyFile)//
                 .setContentType("text/plain");
 
-        new TestRunner<Boolean, Void>(new RequestBuilder(url), responseBuilder)
-                .runGetTest(createContentObject()::isValid, expectedResult);
+        new TestRunnerGet<Boolean>(new RequestBuilder(url), responseBuilder).runGetTest(createContentObject()::isValid,
+                expectedResult);
     }
 
     @Test
@@ -97,8 +97,8 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
         ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBodyFile(bodyFile)
                 .setContentType("text/plain");//
 
-        new TestRunner<String, Void>(new RequestBuilder(url), responseBuilder)
-                .runGetTest(createContentObject()::getType, contentType);
+        new TestRunnerGet<String>(new RequestBuilder(url), responseBuilder).runGetTest(createContentObject()::getType,
+                contentType);
     }
 
     @Test
@@ -125,8 +125,8 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
         ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBodyFile(bodyFile)//
                 .setContentType("text/plain");
 
-        new TestRunner<byte[], Void>(new RequestBuilder(url), responseBuilder)
-                .runGetTest(createContentObject()::getData, expectedResult);
+        new TestRunnerGet<byte[]>(new RequestBuilder(url), responseBuilder).runGetTest(createContentObject()::getData,
+                expectedResult);
     }
 
     @Test
@@ -138,19 +138,19 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
                 .setContentType("text/plain")//
                 .putHeader("Content-Disposition", "filename=" + bodyFile + ";");
 
-        new TestRunner<Optional<String>, Void>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
                 .runGetTest(createContentObject()::getFilename, Optional.of(bodyFile));
 
         responseBuilder.putHeader("Content-Disposition", ("filename=`" + bodyFile + "`;").replace('`', '"'));
-        new TestRunner<Optional<String>, Void>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
                 .runGetTest(createContentObject()::getFilename, Optional.of(bodyFile));
 
         responseBuilder.putHeader("Content-Disposition", ("filename=`" + bodyFile + "`").replace('`', '"'));
-        new TestRunner<Optional<String>, Void>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
                 .runGetTest(createContentObject()::getFilename, Optional.of(bodyFile));
 
         responseBuilder.putHeader("Content-Disposition", "filename=" + bodyFile);
-        new TestRunner<Optional<String>, Void>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
                 .runGetTest(createContentObject()::getFilename, Optional.of(bodyFile));
     }
 
@@ -172,7 +172,7 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
                 .setContentType("text/plain")//
                 .putHeader("Content-Disposition", "filename=" + bodyFile + ";");
 
-        new TestRunner<Optional<String>, Void>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
                 .runGetTest(createContentObject()::getFilename, expectedResult);
     }
 

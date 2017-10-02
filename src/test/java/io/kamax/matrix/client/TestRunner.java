@@ -22,47 +22,21 @@ package io.kamax.matrix.client;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 
-import org.hamcrest.core.IsEqual;
-
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 
-import static org.junit.Assert.assertThat;
-
-public class TestRunner<R, P> {
-    private RequestBuilder requestBuilder;
-    private ResponseBuilder responseBuilder;
+public class TestRunner {
+    protected RequestBuilder requestBuilder;
+    protected ResponseBuilder responseBuilder;
 
     public TestRunner(RequestBuilder requestBuilder, ResponseBuilder responseBuilder) {
         this.requestBuilder = requestBuilder;
         this.responseBuilder = responseBuilder;
     }
 
-    public void runGetTest(Supplier<R> method, R expectedResult) {
-        stubFor(get(urlEqualTo(requestBuilder.getUrl())).willReturn(createResponse()));
-
-        assertThat(method.get(), IsEqual.equalTo(expectedResult));
-    }
-
-    public void runPostTest(Consumer<P> method, P parameter, String verifyBody) {
-        String url = requestBuilder.getUrl();
-        stubFor(post(urlEqualTo(url)).willReturn(createResponse()));
-        method.accept(parameter);
-        verify(postRequestedFor(urlEqualTo(url)).withRequestBody(containing(verifyBody)));
-    }
-
-    public void runPutTest(Consumer<P> method, P parameter, String verifyBody) {
-        String url = requestBuilder.getUrl();
-        stubFor(put(urlEqualTo(url)).willReturn(createResponse()));
-        method.accept(parameter);
-        verify(putRequestedFor(urlEqualTo(url)).withRequestBody(containing(verifyBody)));
-    }
-
-    private ResponseDefinitionBuilder createResponse() {
+    protected ResponseDefinitionBuilder createResponse() {
         ResponseDefinitionBuilder response = aResponse().withStatus(responseBuilder.getStatus());
         Optional<String> body = responseBuilder.getBody();
         Optional<String> bodyFile = responseBuilder.getBodyFile();

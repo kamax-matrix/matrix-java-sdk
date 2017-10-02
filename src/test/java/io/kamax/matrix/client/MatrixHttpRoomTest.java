@@ -44,23 +44,23 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getNameError403() throws URISyntaxException {
-        ExceptionTestRunner<Optional<String>, Void> runner = new ExceptionTestRunner<>(
-                new RequestBuilder(createGetNameUrl()), new ResponseBuilder(403));
-        runner.runGetTest(createRoomObject()::getName);
+        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new RequestBuilder(createGetNameUrl()),
+                new ResponseBuilder(403));
+        runner.runGetTestExceptionExpected(createRoomObject()::getName);
     }
 
     @Test
     public void getNameError429() throws URISyntaxException {
-        ExceptionTestRunner<Optional<String>, Void> runner = new ExceptionTestRunner<>(
-                new RequestBuilder(createGetNameUrl()), new ResponseBuilder(429));
-        runner.runGetTest(createRoomObject()::getName);
+        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new RequestBuilder(createGetNameUrl()),
+                new ResponseBuilder(429));
+        runner.runGetTestExceptionExpected(createRoomObject()::getName);
     }
 
     private void getNameSuccessful(Optional<String> expectedResult, int responseStatus) throws URISyntaxException {
         String body = ("{`name`: `" + ROOM_NAME + "`}").replace('`', '"');
         ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBody(body);
 
-        new TestRunner<Optional<String>, Void>(new RequestBuilder(createGetNameUrl()), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new RequestBuilder(createGetNameUrl()), responseBuilder)
                 .runGetTest(createRoomObject()::getName, expectedResult);
     }
 
@@ -76,16 +76,16 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getTopicError403() throws URISyntaxException {
-        ExceptionTestRunner<Optional<String>, Void> runner = new ExceptionTestRunner<>(
-                new RequestBuilder(createGetTopicUrl()), new ResponseBuilder(403));
-        runner.runGetTest(createRoomObject()::getTopic);
+        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new RequestBuilder(createGetTopicUrl()),
+                new ResponseBuilder(403));
+        runner.runGetTestExceptionExpected(createRoomObject()::getTopic);
     }
 
     @Test
     public void getTopic429() throws URISyntaxException {
-        ExceptionTestRunner<Optional<String>, Void> runner = new ExceptionTestRunner<>(
-                new RequestBuilder(createGetTopicUrl()), new ResponseBuilder(429));
-        runner.runGetTest(createRoomObject()::getTopic);
+        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new RequestBuilder(createGetTopicUrl()),
+                new ResponseBuilder(429));
+        runner.runGetTestExceptionExpected(createRoomObject()::getTopic);
     }
 
     private void getTopicSuccessful(Optional<String> expectedResult, int responseStatus) throws URISyntaxException {
@@ -93,7 +93,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
         String body = ("{`topic`: `" + TOPIC_NAME + "`}").replace('`', '"');
         ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBody(body);
 
-        new TestRunner<Optional<String>, Void>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
                 .runGetTest(createRoomObject()::getTopic, expectedResult);
     }
 

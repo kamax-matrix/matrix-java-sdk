@@ -20,63 +20,42 @@
 
 package io.kamax.matrix.client;
 
-import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-
 import io.kamax.matrix.MatrixErrorInfo;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 import static org.junit.Assert.*;
 
-/**
- * Test runner for error cases, in which MatrixClientRequestException get thrown.
- * 
- * @param <R>
- *            Return type of the tested get-method
- * @param <P>
- *            Parameter type of the tested consume-method
- */
-public class ExceptionTestRunner<R, P> {
+public class TestRunnerPostPut<P> extends TestRunner {
 
-    private final RequestBuilder requestBuilder;
-    private final ResponseBuilder responseBuilder;
-
-    public ExceptionTestRunner(RequestBuilder requestBuilder, ResponseBuilder responseBuilder) {
-        this.requestBuilder = requestBuilder;
-        this.responseBuilder = responseBuilder;
+    public TestRunnerPostPut(RequestBuilder requestBuilder, ResponseBuilder responseBuilder) {
+        super(requestBuilder, responseBuilder);
     }
 
-    public ResponseDefinitionBuilder getResponse() {
-        return aResponse().withStatus(responseBuilder.getStatus()).withBody(responseBuilder.getBody().get());
+    public void runPostTest(Consumer<P> method, P parameter, String verifyBody) {
+        String url = requestBuilder.getUrl();
+        stubFor(post(urlEqualTo(url)).willReturn(createResponse()));
+        method.accept(parameter);
+        verify(postRequestedFor(urlEqualTo(url)).withRequestBody(containing(verifyBody)));
     }
 
-    public void runGetTest(Supplier<R> method) {
-        stubFor(get(urlEqualTo(requestBuilder.getUrl())).willReturn(getResponse()));
-
-        try {
-            method.get();
-        } catch (MatrixClientRequestException e) {
-            /*
-             * TODO refactor error handling, so that the error is returned. Afterwards, the error
-             * values can be checked here by using e.getError().
-             */
-            // checkErrorInfo( e);
-            return;
-        }
-        fail("In this case, an exception has to be thrown.");
-    }
-
-    public void runPostTest(Consumer<P> method, P parameter) {
-        stubFor(post(urlEqualTo(requestBuilder.getUrl())).willReturn(getResponse()));
+    public void runPostTestExceptionExpected(Consumer<P> method, P parameter) {
+        stubFor(post(urlEqualTo(requestBuilder.getUrl())).willReturn(createResponse()));
         runErrorTest(method, parameter);
     }
 
-    public void runPutTest(Consumer<P> method, P parameter) {
-        stubFor(put(urlEqualTo(requestBuilder.getUrl())).willReturn(getResponse()));
+    public void runPutTest(Consumer<P> method, P parameter, String verifyBody) {
+        String url = requestBuilder.getUrl();
+        stubFor(put(urlEqualTo(url)).willReturn(createResponse()));
+        method.accept(parameter);
+        verify(putRequestedFor(urlEqualTo(url)).withRequestBody(containing(verifyBody)));
+    }
+
+    public void runPutTestExceptionExpected(Consumer<P> method, P parameter) {
+        stubFor(put(urlEqualTo(requestBuilder.getUrl())).willReturn(createResponse()));
         runErrorTest(method, parameter);
     }
 

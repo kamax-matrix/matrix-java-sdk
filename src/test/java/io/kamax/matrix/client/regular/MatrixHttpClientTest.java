@@ -20,38 +20,30 @@
 
 package io.kamax.matrix.client.regular;
 
-import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-
 import io.kamax.matrix.client.*;
 
 import org.junit.Test;
 
 import java.net.URISyntaxException;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-
 public class MatrixHttpClientTest extends MatrixHttpTest {
 
     @Test
     public void setDisplayname() throws URISyntaxException {
         String url = createSetDisplaynameUrl();
-        String body = ("{}");
-
-        ResponseDefinitionBuilder response = aResponse().withStatus(200).withBody(body);
-        stubFor(put(urlEqualTo(url)).willReturn(response));
-
+        ResponseBuilder responseBuilder = new ResponseBuilder(200);
         String displayname = "new name";
-        createClientObject().setDisplayName(displayname);
-
         String verifyBody = ("`displayname`:`" + displayname + "`").replace('`', '"');
-        verify(putRequestedFor(urlEqualTo(createSetDisplaynameUrl())).withRequestBody(containing(verifyBody)));
+
+        new TestRunnerPostPut<String>(new RequestBuilder(url), responseBuilder)
+                .runPutTest(createClientObject()::setDisplayName, displayname, verifyBody);
     }
 
     @Test
     public void setDisplaynameError429() throws URISyntaxException {
-        ExceptionTestRunner<Void, String> runner = new ExceptionTestRunner<>(
-                new RequestBuilder(createSetDisplaynameUrl()), new ResponseBuilder(429));
-        runner.runPutTest(createClientObject()::setDisplayName, "new name");
+        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(new RequestBuilder(createSetDisplaynameUrl()),
+                new ResponseBuilder(429));
+        runner.runPutTestExceptionExpected(createClientObject()::setDisplayName, "new name");
     }
 
     private String createSetDisplaynameUrl() throws URISyntaxException {
