@@ -34,13 +34,13 @@ public class TestRunnerGet<R> extends TestRunner {
         super(requestBuilder, responseBuilder);
     }
 
-    public void runGetTest(Supplier<R> method, R expectedResult) {
+    public void runTest(Supplier<R> method, R expectedResult) {
         stubFor(get(urlEqualTo(requestBuilder.getUrl())).willReturn(createResponse()));
 
         assertThat(method.get(), IsEqual.equalTo(expectedResult));
     }
 
-    public void runGetTestExceptionExpected(Supplier<R> method) {
+    public void runTestExceptionExpected(Supplier<R> method) {
         stubFor(get(urlEqualTo(requestBuilder.getUrl())).willReturn(createResponse()));
 
         try {

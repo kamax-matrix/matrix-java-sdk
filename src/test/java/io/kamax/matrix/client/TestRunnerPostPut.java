@@ -42,9 +42,25 @@ public class TestRunnerPostPut<P> extends TestRunner {
         verify(postRequestedFor(urlEqualTo(url)).withRequestBody(containing(verifyBody)));
     }
 
+    public void runPostTest(Runnable method, String verifyBody) {
+        String url = requestBuilder.getUrl();
+        stubFor(post(urlEqualTo(url)).willReturn(createResponse()));
+        method.run();
+        verify(postRequestedFor(urlEqualTo(url)).withRequestBody(containing(verifyBody)));
+    }
+
+    public void runPostTest(Runnable method) {
+        runPostTest(method, "");
+    }
+
     public void runPostTestExceptionExpected(Consumer<P> method, P parameter) {
         stubFor(post(urlEqualTo(requestBuilder.getUrl())).willReturn(createResponse()));
         runErrorTest(method, parameter);
+    }
+
+    public void runPostTestExceptionExpected(Runnable method) {
+        stubFor(post(urlEqualTo(requestBuilder.getUrl())).willReturn(createResponse()));
+        runErrorTest(method);
     }
 
     public void runPutTest(Consumer<P> method, P parameter, String verifyBody) {
@@ -54,14 +70,36 @@ public class TestRunnerPostPut<P> extends TestRunner {
         verify(putRequestedFor(urlEqualTo(url)).withRequestBody(containing(verifyBody)));
     }
 
+    public void runPutTest(Runnable method, String verifyBody) {
+        String url = requestBuilder.getUrl();
+        stubFor(put(urlEqualTo(url)).willReturn(createResponse()));
+        method.run();
+        verify(putRequestedFor(urlEqualTo(url)).withRequestBody(containing(verifyBody)));
+    }
+
     public void runPutTestExceptionExpected(Consumer<P> method, P parameter) {
         stubFor(put(urlEqualTo(requestBuilder.getUrl())).willReturn(createResponse()));
         runErrorTest(method, parameter);
     }
 
+    public void runPutTestExceptionExpected(Runnable method) {
+        stubFor(put(urlEqualTo(requestBuilder.getUrl())).willReturn(createResponse()));
+        runErrorTest(method);
+    }
+
     private void runErrorTest(Consumer<P> method, P parameter) {
         try {
             method.accept(parameter);
+        } catch (MatrixClientRequestException e) {
+            checkErrorInfo(e);
+            return;
+        }
+        fail("In this case, an exception has to be thrown.");
+    }
+
+    private void runErrorTest(Runnable method) {
+        try {
+            method.run();
         } catch (MatrixClientRequestException e) {
             checkErrorInfo(e);
             return;
