@@ -24,9 +24,9 @@ import org.junit.Test;
 
 import java.net.URISyntaxException;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class MatrixHttpRoomTest extends MatrixHttpTest {
+    // TODO join, leave, sendText, sendNotice, invite, getJoinedUsers
 
     private static final String ROOM_NAME = "test room";
     private static final String ROOM_ID = "roomId892347847";
@@ -34,46 +34,59 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getName() throws URISyntaxException {
-        MatrixHttpGetTesterSuccessful tester = new MatrixHttpGetTesterSuccessful(createRoomObject()::getName,
-                createGetNameUrl(), ("{`name`: `" + ROOM_NAME + "`}").replace('`', '"'), Optional.of(ROOM_NAME));
-        tester.runTest();
+        getNameSuccessful(Optional.of(ROOM_NAME), 200);
+    }
+
+    @Test
+    public void getName404() throws URISyntaxException {
+        getNameSuccessful(Optional.empty(), 404);
     }
 
     @Test
     public void getNameError403() throws URISyntaxException {
-        error403(createGetNameUrl(), createRoomObject()::getName);
-    }
-
-    @Test
-    public void getNameError404() throws URISyntaxException {
-        error404(createGetNameUrl(), createRoomObject()::getName);
+        ErrorTestRunner<Optional<String>, Void> runner = new ErrorTestRunner(createGetNameUrl(), 403);
+        runner.runGetTest(createRoomObject()::getName);
     }
 
     @Test
     public void getNameError429() throws URISyntaxException {
-        error429(createGetNameUrl(), createRoomObject()::getName);
+        ErrorTestRunner<Optional<String>, Void> runner = new ErrorTestRunner(createGetNameUrl(), 429);
+        runner.runGetTest(createRoomObject()::getName);
+    }
+
+    private void getNameSuccessful(Optional<String> expectedResult, int responseStatus) throws URISyntaxException {
+        String url = createGetNameUrl();
+        String body = ("{`name`: `" + ROOM_NAME + "`}").replace('`', '"');
+        new SuccessTestRunner<>(url, responseStatus, body).runGetTest(createRoomObject()::getName, expectedResult);
     }
 
     @Test
     public void getTopic() throws URISyntaxException {
-        MatrixHttpGetTesterSuccessful tester = new MatrixHttpGetTesterSuccessful(createRoomObject()::getTopic,
-                createGetTopicUrl(), ("{`topic`: `" + TOPIC_NAME + "`}").replace('`', '"'), Optional.of(TOPIC_NAME));
-        tester.runTest();
+        getTopicSuccessful(Optional.of(TOPIC_NAME), 200);
+    }
+
+    @Test
+    public void getTopic404() throws URISyntaxException {
+        getTopicSuccessful(Optional.empty(), 404);
     }
 
     @Test
     public void getTopicError403() throws URISyntaxException {
-        error403(createGetTopicUrl(), createRoomObject()::getTopic);
-    }
-
-    @Test
-    public void getTopicError404() throws URISyntaxException {
-        error404(createGetTopicUrl(), createRoomObject()::getTopic);
+        ErrorTestRunner<Optional<String>, Void> runner = new ErrorTestRunner(createGetTopicUrl(), 403);
+        runner.runGetTest(createRoomObject()::getTopic);
     }
 
     @Test
     public void getTopic429() throws URISyntaxException {
-        error429(createGetTopicUrl(), createRoomObject()::getTopic);
+        ErrorTestRunner<Optional<String>, Void> runner = new ErrorTestRunner(createGetTopicUrl(), 429);
+        runner.runGetTest(createRoomObject()::getTopic);
+    }
+
+    private void getTopicSuccessful(Optional<String> expectedResult, int responseStatus) throws URISyntaxException {
+        String url = createGetTopicUrl();
+        String body = ("{`topic`: `" + TOPIC_NAME + "`}").replace('`', '"');
+
+        new SuccessTestRunner<>(url, responseStatus, body).runGetTest(createRoomObject()::getTopic, expectedResult);
     }
 
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {
@@ -88,28 +101,4 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     private String createGetTopicUrl() {
         return "/_matrix/client/r0/rooms/" + ROOM_ID + "/state/m.room.topic" + getAcessTokenParameter();
     }
-
-    private void error403(String url, Supplier<Optional<String>> methodToTest) throws URISyntaxException {
-        String errcode = "M_FORBIDDEN";
-        String error = "You aren't a member of the room and weren't previously a member of the room.";
-
-        MatrixHttpGetTesterUnsuccessful tester = new MatrixHttpGetTesterUnsuccessful(methodToTest, url, 403, errcode,
-                error);
-        tester.runTest();
-    }
-
-    private void error404(String url, Supplier<Optional<String>> methodToTest) throws URISyntaxException {
-        MatrixHttpGetTesterSuccessful tester = new MatrixHttpGetTesterSuccessful(methodToTest, url, 404, "{}",
-                Optional.empty());
-        tester.runTest();
-    }
-
-    private void error429(String url, Supplier<Optional<String>> methodToTest) throws URISyntaxException {
-        String errcode = "M_LIMIT_EXCEEDED";
-        String error = "Too many requests have been sent in a short period of time. " + "Wait a while then try again.";
-
-        new MatrixHttpGetTesterUnsuccessful(methodToTest, url, 429, errcode, error).runTest();
-    }
-
-    // TODO join, leave, sendText, sendNotice, invite, getJoinedUsers
 }

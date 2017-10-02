@@ -20,6 +20,30 @@
 
 package io.kamax.matrix.client;
 
+import org.junit.Test;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class MatrixHttpContentTest extends MatrixHttpTest {
+    URI address = new URI("http://localhost/testAddress.txt");
+
+    public MatrixHttpContentTest() throws URISyntaxException {
+    }
     // TODO getType, getData, getFilename
+
+    @Test
+    public void isValid() throws URISyntaxException {
+        String url = createDownloadUrl();
+    }
+
+    private MatrixHttpContent createContentObject() throws URISyntaxException {
+        MatrixClientContext context = createClientContext();
+        return new MatrixHttpContent(context, address);
+    }
+
+    private String createDownloadUrl() {
+        return "/_matrix/client/r0/download/" + address.getHost() + address.getPath() + getAcessTokenParameter();
+    }
+
 }

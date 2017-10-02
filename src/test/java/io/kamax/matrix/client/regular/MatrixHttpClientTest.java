@@ -20,28 +20,39 @@
 
 package io.kamax.matrix.client.regular;
 
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+
+import io.kamax.matrix.client.ErrorTestRunner;
 import io.kamax.matrix.client.MatrixClientContext;
-import io.kamax.matrix.client.MatrixHttpPutTesterSuccessful;
-import io.kamax.matrix.client.MatrixHttpPutTesterUnsuccessful;
 import io.kamax.matrix.client.MatrixHttpTest;
 
 import org.junit.Test;
 
 import java.net.URISyntaxException;
-import java.util.function.Consumer;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class MatrixHttpClientTest extends MatrixHttpTest {
 
     @Test
     public void setDisplayname() throws URISyntaxException {
-        MatrixHttpPutTesterSuccessful tester = new MatrixHttpPutTesterSuccessful(createClientObject()::setDisplayName,
-                "new name", createSetDisplaynameUrl(), ("{}"));
-        tester.runTest();
+        String url = createSetDisplaynameUrl();
+        String body = ("{}");
+
+        ResponseDefinitionBuilder response = aResponse().withStatus(200).withBody(body);
+        stubFor(put(urlEqualTo(url)).willReturn(response));
+
+        String displayname = "new name";
+        createClientObject().setDisplayName(displayname);
+
+        String verifyBody = ("`displayname`:`" + displayname + "`").replace('`', '"');
+        verify(putRequestedFor(urlEqualTo(createSetDisplaynameUrl())).withRequestBody(containing(verifyBody)));
     }
 
     @Test
     public void setDisplaynameError429() throws URISyntaxException {
-        error429(createSetDisplaynameUrl(), createClientObject()::setDisplayName, "new name");
+        ErrorTestRunner<Void, String> runner = new ErrorTestRunner<>(createSetDisplaynameUrl(), 429);
+        runner.runPutTest(createClientObject()::setDisplayName, "new name");
     }
 
     private String createSetDisplaynameUrl() throws URISyntaxException {
@@ -52,12 +63,5 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
     private MatrixHttpClient createClientObject() throws URISyntaxException {
         MatrixClientContext context = createClientContext();
         return new MatrixHttpClient(context);
-    }
-
-    private void error429(String url, Consumer<String> methodToTest, String valueToConsume) throws URISyntaxException {
-        String errcode = "M_LIMIT_EXCEEDED";
-        String error = "Too many requests have been sent in a short period of time. " + "Wait a while then try again.";
-
-        new MatrixHttpPutTesterUnsuccessful(methodToTest, valueToConsume, url, 429, errcode, error).runTest();
     }
 }

@@ -20,26 +20,32 @@
 
 package io.kamax.matrix.client.as;
 
-import io.kamax.matrix.client.*;
+import io.kamax.matrix.client.ErrorTestRunner;
+import io.kamax.matrix.client.MatrixHttpTest;
+import io.kamax.matrix.client.SuccessTestRunner;
 import io.kamax.matrix.hs.MatrixHomeserver;
 
 import org.junit.Test;
 
 import java.net.URISyntaxException;
-import java.util.function.Consumer;
 
 public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
 
     @Test
     public void createUser() throws URISyntaxException {
-        MatrixHttpPostTesterSuccessful tester = new MatrixHttpPostTesterSuccessful(createClientObject()::createUser,
-                "testuser", createUserUrl(), ("{}"));
-        tester.runTest();
+        String url = createUserUrl();
+        String body = ("{}");
+
+        String verifyBody = "`username`:`testuser`".replace('`', '"');
+        new SuccessTestRunner<Void, String>(url, 200, body).runPostTest(createClientObject()::createUser, "testuser",
+                verifyBody);
+
     }
 
     @Test
     public void createUserError429() throws URISyntaxException {
-        error429(createUserUrl(), createClientObject()::createUser, "testuser");
+        ErrorTestRunner<Void, String> runner = new ErrorTestRunner<>(createUserUrl(), 429);
+        runner.runPostTest(createClientObject()::createUser, "testuser");
     }
 
     private String createUserUrl() throws URISyntaxException {
@@ -53,10 +59,4 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
         return new MatrixApplicationServiceClient(hs, TEST_TOKEN, "testuser");
     }
 
-    private void error429(String url, Consumer<String> methodToTest, String valueToConsume) throws URISyntaxException {
-        String errcode = "M_LIMIT_EXCEEDED";
-        String error = "Too many requests have been sent in a short period of time. " + "Wait a while then try again.";
-
-        new MatrixHttpPostTesterUnsuccessful(methodToTest, valueToConsume, url, 429, errcode, error).runTest();
-    }
 }
