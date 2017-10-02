@@ -55,9 +55,11 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     private void getNameSuccessful(Optional<String> expectedResult, int responseStatus) throws URISyntaxException {
-        String url = createGetNameUrl();
         String body = ("{`name`: `" + ROOM_NAME + "`}").replace('`', '"');
-        new SuccessTestRunner<>(url, responseStatus, body).runGetTest(createRoomObject()::getName, expectedResult);
+        ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBody(body);
+
+        new SuccessTestRunner<Optional<String>, Void>(new RequestBuilder(createGetNameUrl()), responseBuilder)
+                .runGetTest(createRoomObject()::getName, expectedResult);
     }
 
     @Test
@@ -85,8 +87,10 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     private void getTopicSuccessful(Optional<String> expectedResult, int responseStatus) throws URISyntaxException {
         String url = createGetTopicUrl();
         String body = ("{`topic`: `" + TOPIC_NAME + "`}").replace('`', '"');
+        ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBody(body);
 
-        new SuccessTestRunner<>(url, responseStatus, body).runGetTest(createRoomObject()::getTopic, expectedResult);
+        new SuccessTestRunner<Optional<String>, Void>(new RequestBuilder(url), responseBuilder)
+                .runGetTest(createRoomObject()::getTopic, expectedResult);
     }
 
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {

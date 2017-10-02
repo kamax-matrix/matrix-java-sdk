@@ -22,19 +22,94 @@ package io.kamax.matrix.client;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Optional;
 
 public class MatrixHttpContentTest extends MatrixHttpTest {
-    URI address = new URI("http://localhost/testAddress.txt");
+    private URI address = new URI("mxc://localhost/testAddress.txt");
 
     public MatrixHttpContentTest() throws URISyntaxException {
     }
     // TODO getType, getData, getFilename
+    // TODO test error handling
 
     @Test
     public void isValid() throws URISyntaxException {
         String url = createDownloadUrl();
+        String bodyFile = "textfile.txt";
+
+        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile)//
+                .setContentType("text/plain");
+
+        new SuccessTestRunner<Boolean, Void>(new RequestBuilder(url), responseBuilder)
+                .runGetTest(createContentObject()::isValid, true);
+
+    }
+
+    public void isValidMissingContentType() throws URISyntaxException {
+        String url = createDownloadUrl();
+        String bodyFile = "textfile.txt";
+        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile);
+        new SuccessTestRunner<Boolean, Void>(new RequestBuilder(url), responseBuilder)
+                .runGetTest(createContentObject()::isValid, false);
+    }
+
+    @Test
+    public void getType() throws URISyntaxException, IOException {
+        String url = createDownloadUrl();
+        String bodyFile = "textfile.txt";
+        String contentType = "text/plain";
+
+        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile)//
+                .setContentType("text/plain");//
+
+        new SuccessTestRunner<String, Void>(new RequestBuilder(url), responseBuilder)
+                .runGetTest(createContentObject()::getType, contentType);
+
+    }
+
+    @Test
+    public void getData() throws URISyntaxException, IOException {
+        String url = createDownloadUrl();
+        String bodyFile = "textfile.txt";
+        byte[] expectedResult = Files.readAllBytes(Paths.get(ClassLoader
+                .getSystemResource("wiremock" + File.separator + "__files" + File.separator + bodyFile).toURI()));
+
+        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile)//
+                .setContentType("text/plain");
+
+        new SuccessTestRunner<byte[], Void>(new RequestBuilder(url), responseBuilder)
+                .runGetTest(createContentObject()::getData, expectedResult);
+    }
+
+    @Test
+    public void getFilename() throws URISyntaxException, IOException {
+        String url = createDownloadUrl();
+        String bodyFile = "textfile.txt";
+
+        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile)//
+                .setContentType("text/plain")//
+                .putHeader("Content-Disposition", "filename=" + bodyFile + ";");
+
+        new SuccessTestRunner<Optional<String>, Void>(new RequestBuilder(url), responseBuilder)
+                .runGetTest(createContentObject()::getFilename, Optional.of(bodyFile));
+
+        responseBuilder.putHeader("Content-Disposition", ("filename=`" + bodyFile + "`;").replace('`', '"'));
+        new SuccessTestRunner<Optional<String>, Void>(new RequestBuilder(url), responseBuilder)
+                .runGetTest(createContentObject()::getFilename, Optional.of(bodyFile));
+
+        responseBuilder.putHeader("Content-Disposition", ("filename=`" + bodyFile + "`").replace('`', '"'));
+        new SuccessTestRunner<Optional<String>, Void>(new RequestBuilder(url), responseBuilder)
+                .runGetTest(createContentObject()::getFilename, Optional.of(bodyFile));
+
+        responseBuilder.putHeader("Content-Disposition", "filename=" + bodyFile);
+        new SuccessTestRunner<Optional<String>, Void>(new RequestBuilder(url), responseBuilder)
+                .runGetTest(createContentObject()::getFilename, Optional.of(bodyFile));
     }
 
     private MatrixHttpContent createContentObject() throws URISyntaxException {
@@ -43,7 +118,7 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
     }
 
     private String createDownloadUrl() {
-        return "/_matrix/client/r0/download/" + address.getHost() + address.getPath() + getAcessTokenParameter();
+        return "/_matrix/media/v1/download/" + address.getHost() + address.getPath() + getAcessTokenParameter();
     }
 
 }

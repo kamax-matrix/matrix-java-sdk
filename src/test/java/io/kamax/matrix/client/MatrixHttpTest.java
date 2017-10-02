@@ -34,9 +34,10 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 public class MatrixHttpTest {
     protected static final String TEST_TOKEN = "testToken";
     protected static final int PORT = 8098;
+    protected static final String RESOURCE_PATH = "src/test/resources/wiremock";
 
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule(options().port(PORT));
+    public WireMockRule wireMockRule = new WireMockRule(options().port(PORT).usingFilesUnderDirectory(RESOURCE_PATH));
 
     protected MatrixClientContext createClientContext() throws URISyntaxException {
         String domain = "localhost";

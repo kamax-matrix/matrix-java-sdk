@@ -20,9 +20,7 @@
 
 package io.kamax.matrix.client.as;
 
-import io.kamax.matrix.client.ErrorTestRunner;
-import io.kamax.matrix.client.MatrixHttpTest;
-import io.kamax.matrix.client.SuccessTestRunner;
+import io.kamax.matrix.client.*;
 import io.kamax.matrix.hs.MatrixHomeserver;
 
 import org.junit.Test;
@@ -34,11 +32,10 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
     @Test
     public void createUser() throws URISyntaxException {
         String url = createUserUrl();
-        String body = ("{}");
-
         String verifyBody = "`username`:`testuser`".replace('`', '"');
-        new SuccessTestRunner<Void, String>(url, 200, body).runPostTest(createClientObject()::createUser, "testuser",
-                verifyBody);
+
+        new SuccessTestRunner<Void, String>(new RequestBuilder(url), new ResponseBuilder(200))
+                .runPostTest(createClientObject()::createUser, "testuser", verifyBody);
 
     }
 
