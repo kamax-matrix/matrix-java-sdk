@@ -20,9 +20,14 @@
 
 package io.kamax.matrix.client;
 
+import io.kamax.matrix.MatrixID;
+import io.kamax.matrix._MatrixID;
+
 import org.junit.Test;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class MatrixHttpRoomTest extends MatrixHttpTest {
@@ -210,6 +215,39 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
         return ("`msgtype`:`m.text`,`body`:`" + testText + "`").replace('`', '"');
     }
 
+    @Test
+    public void getJoinedUsers() throws URISyntaxException {
+        // TODO common values as constants?
+        // TODO inline replacement of string values?
+        String testuser1 = "@test:testserver.org";
+        String testuser2 = "@test2:testserver.org";
+
+        String url = createGetJoinedUsersUrl();
+        String responseBody = ("{`joined`: {`" + testuser1 + "`: `1`, `" + testuser2 + "`: `2`}}").replace('`', '"');
+        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBody(responseBody);
+
+        List<_MatrixID> expectedResult = new ArrayList<>();
+        expectedResult.add(new MatrixID(testuser1));
+        expectedResult.add(new MatrixID(testuser2));
+
+        new TestRunnerGet<List<_MatrixID>>(new RequestBuilder(url), responseBuilder)
+                .runTest(createRoomObject()::getJoinedUsers, expectedResult);
+    }
+
+    @Test
+    public void getJoinedUsersError404() throws URISyntaxException {
+        TestRunnerGet<List<_MatrixID>> runner = new TestRunnerGet<>(new RequestBuilder(createGetJoinedUsersUrl()),
+                new ResponseBuilder(404));
+        runner.runTestExceptionExpected(createRoomObject()::getJoinedUsers);
+    }
+
+    @Test
+    public void getJoinedUsers429() throws URISyntaxException {
+        TestRunnerGet<List<_MatrixID>> runner = new TestRunnerGet<>(new RequestBuilder(createGetJoinedUsersUrl()),
+                new ResponseBuilder(429));
+        runner.runTestExceptionExpected(createRoomObject()::getJoinedUsers);
+    }
+
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {
         MatrixClientContext context = createClientContext();
         return new MatrixHttpRoom(context, ROOM_ID);
@@ -233,5 +271,9 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     private String createSendTextUrl() {
         return "/_matrix/client/r0/rooms/" + ROOM_ID + "/send/m.room.message/([0-9.]+)\\" + getAcessTokenParameter();
+    }
+
+    private String createGetJoinedUsersUrl() {
+        return "/_matrix/client/r0/rooms/" + ROOM_ID + "/joined_members" + getAcessTokenParameter();
     }
 }
