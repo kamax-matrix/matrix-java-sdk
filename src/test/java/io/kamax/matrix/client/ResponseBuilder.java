@@ -32,9 +32,6 @@ public class ResponseBuilder {
     private Optional<String> body = Optional.empty();
     private Optional<String> bodyFile = Optional.empty();
 
-    private Optional<String> customErrcode = Optional.empty();
-    private Optional<String> customError = Optional.empty();
-
     public ResponseBuilder(int status) {
         this.status = status;
     }
@@ -92,13 +89,11 @@ public class ResponseBuilder {
     }
 
     public String getErrcode() {
-        if (customErrcode.isPresent()) {
-            return customErrcode.get();
-        }
-
         switch (getStatus()) {
         case 403:
             return "M_FORBIDDEN";
+        case 404:
+            return "M_NOT_FOUND";
         case 429:
             return "M_LIMIT_EXCEEDED";
         default:
@@ -107,13 +102,11 @@ public class ResponseBuilder {
     }
 
     public String getError() {
-        if (customError.isPresent()) {
-            return customError.get();
-        }
-
         switch (getStatus()) {
         case 403:
-            return "You aren't a member of the room and weren't previously a member of the room.";
+            return "Access denied.";
+        case 404:
+            return "Element not found.";
         case 429:
             return "Too many requests have been sent in a short period of time. Wait a while then try again.";
         default:

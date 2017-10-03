@@ -20,13 +20,26 @@
 
 package io.kamax.matrix.client;
 
-// TODO really needed?
-
 public class RequestBuilder {
+    public enum MatchingType {
+        EQUALITY,
+        REGEX
+    }
+
+    private MatchingType matchingType = MatchingType.EQUALITY;
     private final String url;
 
     public RequestBuilder(String url) {
         this.url = url;
+    }
+
+    public RequestBuilder setMatchingType(MatchingType matchingType) {
+        this.matchingType = matchingType;
+        return this;
+    }
+
+    public MatchingType getMatchingType() {
+        return matchingType;
     }
 
     public String getUrl() {

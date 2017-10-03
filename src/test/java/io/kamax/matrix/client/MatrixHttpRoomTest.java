@@ -165,6 +165,51 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
         runner.runPostTestExceptionExpected(createRoomObject()::leave);
     }
 
+    @Test
+    public void sendText() throws URISyntaxException {
+        String url = createSendTextUrl();
+        ResponseBuilder responseBuilder = new ResponseBuilder(200);
+        RequestBuilder requestBuilder = new RequestBuilder(url).setMatchingType(RequestBuilder.MatchingType.REGEX);
+
+        String testText = "test text";
+        new TestRunnerPostPut<String>(requestBuilder, responseBuilder).runPutTest(createRoomObject()::sendText,
+                testText, sendTextVerifyBody(testText));
+    }
+
+    @Test
+    public void sendTextError404() throws URISyntaxException {
+        sendTextExceptionExpected(404);
+    }
+
+    @Test
+    public void sendTextError403() throws URISyntaxException {
+        sendTextErrorWithoutException(403);
+    }
+
+    @Test
+    public void sendTextError429() throws URISyntaxException {
+        sendTextExceptionExpected(429);
+    }
+
+    private void sendTextErrorWithoutException(int responseStatus) throws URISyntaxException {
+        RequestBuilder requestBuilder = new RequestBuilder(createSendTextUrl())
+                .setMatchingType(RequestBuilder.MatchingType.REGEX);
+        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder, new ResponseBuilder(responseStatus));
+        String testText = "test text";
+        runner.runPutTest(createRoomObject()::sendText, testText, sendTextVerifyBody(testText));
+    }
+
+    private void sendTextExceptionExpected(int responseStatus) throws URISyntaxException {
+        RequestBuilder requestBuilder = new RequestBuilder(createSendTextUrl())
+                .setMatchingType(RequestBuilder.MatchingType.REGEX);
+        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder, new ResponseBuilder(responseStatus));
+        runner.runPutTestExceptionExpected(createRoomObject()::sendText, "test text");
+    }
+
+    private String sendTextVerifyBody(String testText) {
+        return ("`msgtype`:`m.text`,`body`:`" + testText + "`").replace('`', '"');
+    }
+
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {
         MatrixClientContext context = createClientContext();
         return new MatrixHttpRoom(context, ROOM_ID);
@@ -184,5 +229,9 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     private String createLeaveUrl() {
         return "/_matrix/client/r0/rooms/" + ROOM_ID + "/leave" + getAcessTokenParameter();
+    }
+
+    private String createSendTextUrl() {
+        return "/_matrix/client/r0/rooms/" + ROOM_ID + "/send/m.room.message/([0-9.]+)\\" + getAcessTokenParameter();
     }
 }
