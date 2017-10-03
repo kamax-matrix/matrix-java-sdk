@@ -32,7 +32,7 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
     @Test
     public void createUser() throws URISyntaxException {
         String url = createUserUrl();
-        String verifyBody = "`username`:`testuser`".replace('`', '"');
+        String verifyBody = "\"username\":\"testuser\"";
 
         new TestRunnerPostPut<String>(new RequestBuilder(url), new ResponseBuilder(200))
                 .runPostTest(createClientObject()::createUser, "testuser", verifyBody);

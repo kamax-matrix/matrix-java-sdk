@@ -31,20 +31,18 @@ import java.util.List;
 import java.util.Optional;
 
 public class MatrixHttpRoomTest extends MatrixHttpTest {
-    // TODO join, leave, sendText, sendNotice, invite, getJoinedUsers
-
-    private static final String ROOM_NAME = "test room";
     private static final String ROOM_ID = "roomId892347847";
-    private static final String TOPIC_NAME = "the room's topic";
 
     @Test
     public void getName() throws URISyntaxException {
-        getNameSuccessful(Optional.of(ROOM_NAME), 200);
+        String nameOfRoom = "test room";
+        getNameSuccessful(Optional.of(nameOfRoom), 200, nameOfRoom);
     }
 
     @Test
     public void getName404() throws URISyntaxException {
-        getNameSuccessful(Optional.empty(), 404);
+        String nameOfRoom = "test room";
+        getNameSuccessful(Optional.empty(), 404, nameOfRoom);
     }
 
     @Test
@@ -61,8 +59,9 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
         runner.runTestExceptionExpected(createRoomObject()::getName);
     }
 
-    private void getNameSuccessful(Optional<String> expectedResult, int responseStatus) throws URISyntaxException {
-        String body = ("{`name`: `" + ROOM_NAME + "`}").replace('`', '"');
+    private void getNameSuccessful(Optional<String> expectedResult, int responseStatus, String nameOfRoom)
+            throws URISyntaxException {
+        String body = String.format("{\"name\": \"%s\"}", nameOfRoom);
         ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBody(body);
 
         new TestRunnerGet<Optional<String>>(new RequestBuilder(createGetNameUrl()), responseBuilder)
@@ -71,12 +70,14 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getTopic() throws URISyntaxException {
-        getTopicSuccessful(Optional.of(TOPIC_NAME), 200);
+        String topic = "test topic";
+        getTopicSuccessful(Optional.of(topic), 200, topic);
     }
 
     @Test
     public void getTopic404() throws URISyntaxException {
-        getTopicSuccessful(Optional.empty(), 404);
+        String topic = "test topic";
+        getTopicSuccessful(Optional.empty(), 404, topic);
     }
 
     @Test
@@ -93,9 +94,10 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
         runner.runTestExceptionExpected(createRoomObject()::getTopic);
     }
 
-    private void getTopicSuccessful(Optional<String> expectedResult, int responseStatus) throws URISyntaxException {
+    private void getTopicSuccessful(Optional<String> expectedResult, int responseStatus, String topic)
+            throws URISyntaxException {
         String url = createGetTopicUrl();
-        String body = ("{`topic`: `" + TOPIC_NAME + "`}").replace('`', '"');
+        String body = String.format("{\"topic\": \"%s\"}", topic);
         ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBody(body);
 
         new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
@@ -105,7 +107,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void join() throws URISyntaxException {
         String url = createJoinUrl();
-        String body = ("{`roomId`: `" + ROOM_ID + "`}").replace('`', '"');
+        String body = String.format("{\"roomId\": \"%s\"}", ROOM_ID);
         ResponseBuilder responseBuilder = new ResponseBuilder(200).setBody(body);
 
         new TestRunnerPostPut<Void>(new RequestBuilder(url), responseBuilder).runPostTest(createRoomObject()::join);
@@ -137,7 +139,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void leave() throws URISyntaxException {
         String url = createLeaveUrl();
-        String body = ("{`roomId`: `" + ROOM_ID + "`}").replace('`', '"');
+        String body = String.format("{\"roomId\": \"%s\"}", ROOM_ID);
         ResponseBuilder responseBuilder = new ResponseBuilder(200).setBody(body);
 
         new TestRunnerPostPut<Void>(new RequestBuilder(url), responseBuilder).runPostTest(createRoomObject()::leave);
@@ -212,18 +214,16 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     private String sendTextVerifyBody(String testText) {
-        return ("`msgtype`:`m.text`,`body`:`" + testText + "`").replace('`', '"');
+        return String.format("\"msgtype\":\"m.text\",\"body\":\"%s\"", testText);
     }
 
     @Test
     public void getJoinedUsers() throws URISyntaxException {
-        // TODO common values as constants?
-        // TODO inline replacement of string values?
         String testuser1 = "@test:testserver.org";
         String testuser2 = "@test2:testserver.org";
 
         String url = createGetJoinedUsersUrl();
-        String responseBody = ("{`joined`: {`" + testuser1 + "`: `1`, `" + testuser2 + "`: `2`}}").replace('`', '"');
+        String responseBody = String.format("{\"joined\": {\"%s\": \"1\", \"%s\": \"2\"}}", testuser1, testuser2);
         ResponseBuilder responseBuilder = new ResponseBuilder(200).setBody(responseBody);
 
         List<_MatrixID> expectedResult = new ArrayList<>();
@@ -254,26 +254,27 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     private String createGetNameUrl() {
-        return "/_matrix/client/r0/rooms/" + ROOM_ID + "/state/m.room.name" + getAcessTokenParameter();
+        return String.format("/_matrix/client/r0/rooms/%s/state/m.room.name", ROOM_ID) + getAcessTokenParameter();
     }
 
     private String createGetTopicUrl() {
-        return "/_matrix/client/r0/rooms/" + ROOM_ID + "/state/m.room.topic" + getAcessTokenParameter();
+        return String.format("/_matrix/client/r0/rooms/%s/state/m.room.topic", ROOM_ID) + getAcessTokenParameter();
     }
 
     private String createJoinUrl() {
-        return "/_matrix/client/r0/rooms/" + ROOM_ID + "/join" + getAcessTokenParameter();
+        return String.format("/_matrix/client/r0/rooms/%s/join", ROOM_ID) + getAcessTokenParameter();
     }
 
     private String createLeaveUrl() {
-        return "/_matrix/client/r0/rooms/" + ROOM_ID + "/leave" + getAcessTokenParameter();
+        return String.format("/_matrix/client/r0/rooms/%s/leave", ROOM_ID) + getAcessTokenParameter();
     }
 
     private String createSendTextUrl() {
-        return "/_matrix/client/r0/rooms/" + ROOM_ID + "/send/m.room.message/([0-9.]+)\\" + getAcessTokenParameter();
+        return String.format("/_matrix/client/r0/rooms/%s/send/m.room.message/([0-9.]+)\\", ROOM_ID)
+                + getAcessTokenParameter();
     }
 
     private String createGetJoinedUsersUrl() {
-        return "/_matrix/client/r0/rooms/" + ROOM_ID + "/joined_members" + getAcessTokenParameter();
+        return String.format("/_matrix/client/r0/rooms/%s/joined_members", ROOM_ID) + getAcessTokenParameter();
     }
 }

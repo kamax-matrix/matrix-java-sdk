@@ -33,7 +33,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
         String url = createSetDisplaynameUrl();
         ResponseBuilder responseBuilder = new ResponseBuilder(200);
         String displayname = "new name";
-        String verifyBody = ("`displayname`:`" + displayname + "`").replace('`', '"');
+        String verifyBody = String.format("\"displayname\":\"%s\"", displayname);
 
         new TestRunnerPostPut<String>(new RequestBuilder(url), responseBuilder)
                 .runPutTest(createClientObject()::setDisplayName, displayname, verifyBody);
@@ -47,7 +47,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
     }
 
     private String createSetDisplaynameUrl() throws URISyntaxException {
-        return "/_matrix/client/r0/profile/" + createClientContext().getUser().getId() + "/displayname"
+        return String.format("/_matrix/client/r0/profile/%s/displayname", createClientContext().getUser().getId())
                 + getAcessTokenParameter();
     }
 

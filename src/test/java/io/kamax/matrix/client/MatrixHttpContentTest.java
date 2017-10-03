@@ -154,20 +154,20 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
 
         ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile)//
                 .setContentType("text/plain")//
-                .putHeader("Content-Disposition", "filename=" + bodyFile + ";");
+                .putHeader("Content-Disposition", String.format("filename=" + bodyFile + ";"));
 
         new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
                 .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
 
-        responseBuilder.putHeader("Content-Disposition", ("filename=`" + bodyFile + "`;").replace('`', '"'));
+        responseBuilder.putHeader("Content-Disposition", String.format("filename=\"%s\";", bodyFile));
         new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
                 .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
 
-        responseBuilder.putHeader("Content-Disposition", ("filename=`" + bodyFile + "`").replace('`', '"'));
+        responseBuilder.putHeader("Content-Disposition", String.format("filename=\"%s\"", bodyFile));
         new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
                 .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
 
-        responseBuilder.putHeader("Content-Disposition", "filename=" + bodyFile);
+        responseBuilder.putHeader("Content-Disposition", String.format("filename=%s", bodyFile));
         new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
                 .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
     }
@@ -197,7 +197,7 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
 
         ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBodyFile(bodyFile)//
                 .setContentType("text/plain")//
-                .putHeader("Content-Disposition", "filename=" + bodyFile + ";");
+                .putHeader("Content-Disposition", String.format("filename=%s;", bodyFile));
 
         new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
                 .runTest(createContentObject()::getFilename, expectedResult);

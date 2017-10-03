@@ -65,8 +65,7 @@ public class ResponseBuilder {
 
     public Optional<String> getBody() {
         if (status != 200) {
-            return Optional
-                    .of(("{'errcode': `" + getErrcode() + "`, " + "error: `" + getError() + "`}").replace('`', '"'));
+            return Optional.of(String.format("{\"errcode\": \"%s\", \"error\": \"%s\"}", getErrcode(), getError()));
         }
 
         return body;
