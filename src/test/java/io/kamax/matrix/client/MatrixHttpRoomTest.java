@@ -142,7 +142,8 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
         String body = String.format("{\"roomId\": \"%s\"}", ROOM_ID);
         TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBody(body);
 
-        new TestRunnerPostPut<Void>(new TestRequestBuilder(url), responseBuilder).runPostTest(createRoomObject()::leave);
+        new TestRunnerPostPut<Void>(new TestRequestBuilder(url), responseBuilder)
+                .runPostTest(createRoomObject()::leave);
     }
 
     @Test
@@ -176,7 +177,8 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     public void sendText() throws URISyntaxException {
         String url = createSendTextUrl();
         TestResponseBuilder responseBuilder = new TestResponseBuilder(200);
-        TestRequestBuilder requestBuilder = new TestRequestBuilder(url).setMatchingType(TestRequestBuilder.MatchingType.REGEX);
+        TestRequestBuilder requestBuilder = new TestRequestBuilder(url)
+                .setMatchingType(TestRequestBuilder.MatchingType.REGEX);
 
         String testText = "test text";
         new TestRunnerPostPut<String>(requestBuilder, responseBuilder).runPutTest(createRoomObject()::sendText,
@@ -201,7 +203,8 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     private void sendTextErrorWithoutException(int responseStatus) throws URISyntaxException {
         TestRequestBuilder requestBuilder = new TestRequestBuilder(createSendTextUrl())
                 .setMatchingType(TestRequestBuilder.MatchingType.REGEX);
-        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder, new TestResponseBuilder(responseStatus));
+        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder,
+                new TestResponseBuilder(responseStatus));
         String testText = "test text";
         runner.runPutTest(createRoomObject()::sendText, testText, sendTextVerifyBody(testText));
     }
@@ -209,7 +212,8 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     private void sendTextExceptionExpected(int responseStatus) throws URISyntaxException {
         TestRequestBuilder requestBuilder = new TestRequestBuilder(createSendTextUrl())
                 .setMatchingType(TestRequestBuilder.MatchingType.REGEX);
-        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder, new TestResponseBuilder(responseStatus));
+        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder,
+                new TestResponseBuilder(responseStatus));
         runner.runPutTestExceptionExpected(createRoomObject()::sendText, "test text");
     }
 
