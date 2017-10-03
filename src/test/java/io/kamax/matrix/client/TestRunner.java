@@ -28,10 +28,10 @@ import java.util.Optional;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 
 public class TestRunner {
-    protected RequestBuilder requestBuilder;
-    protected ResponseBuilder responseBuilder;
+    protected TestRequestBuilder requestBuilder;
+    protected TestResponseBuilder responseBuilder;
 
-    public TestRunner(RequestBuilder requestBuilder, ResponseBuilder responseBuilder) {
+    public TestRunner(TestRequestBuilder requestBuilder, TestResponseBuilder responseBuilder) {
         this.requestBuilder = requestBuilder;
         this.responseBuilder = responseBuilder;
     }

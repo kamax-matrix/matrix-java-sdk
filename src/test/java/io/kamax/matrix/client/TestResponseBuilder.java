@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class ResponseBuilder {
+public class TestResponseBuilder {
     private final int status;
 
     private Optional<String> contentType = Optional.empty();
@@ -32,7 +32,7 @@ public class ResponseBuilder {
     private Optional<String> body = Optional.empty();
     private Optional<String> bodyFile = Optional.empty();
 
-    public ResponseBuilder(int status) {
+    public TestResponseBuilder(int status) {
         this.status = status;
     }
 
@@ -40,7 +40,7 @@ public class ResponseBuilder {
         return status;
     }
 
-    public ResponseBuilder setContentType(String contentType) {
+    public TestResponseBuilder setContentType(String contentType) {
         this.contentType = Optional.ofNullable(contentType);
         return this;
     }
@@ -49,7 +49,7 @@ public class ResponseBuilder {
         return contentType;
     }
 
-    public ResponseBuilder putHeader(String header, String value) {
+    public TestResponseBuilder putHeader(String header, String value) {
         headers.put(header, value);
         return this;
     }
@@ -58,7 +58,7 @@ public class ResponseBuilder {
         return headers;
     }
 
-    public ResponseBuilder setBody(String body) {
+    public TestResponseBuilder setBody(String body) {
         this.body = Optional.ofNullable(body);
         return this;
     }
@@ -78,7 +78,7 @@ public class ResponseBuilder {
      *            Path to the bodyFile
      * @return The object itself (builder pattern)
      */
-    public ResponseBuilder setBodyFile(String bodyFile) {
+    public TestResponseBuilder setBodyFile(String bodyFile) {
         this.bodyFile = Optional.ofNullable(bodyFile);
         return this;
     }

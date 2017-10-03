@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 
 public class TestRunnerPostPut<P> extends TestRunner {
 
-    public TestRunnerPostPut(RequestBuilder requestBuilder, ResponseBuilder responseBuilder) {
+    public TestRunnerPostPut(TestRequestBuilder requestBuilder, TestResponseBuilder responseBuilder) {
         super(requestBuilder, responseBuilder);
     }
 
@@ -117,7 +117,7 @@ public class TestRunnerPostPut<P> extends TestRunner {
     private UrlPattern getUrlPattern() {
         String url = requestBuilder.getUrl();
 
-        if (requestBuilder.getMatchingType() == RequestBuilder.MatchingType.REGEX) {
+        if (requestBuilder.getMatchingType() == TestRequestBuilder.MatchingType.REGEX) {
             return urlMatching(url);
         }
 

@@ -20,7 +20,7 @@
 
 package io.kamax.matrix.client;
 
-public class RequestBuilder {
+public class TestRequestBuilder {
     public enum MatchingType {
         EQUALITY,
         REGEX
@@ -29,11 +29,11 @@ public class RequestBuilder {
     private MatchingType matchingType = MatchingType.EQUALITY;
     private final String url;
 
-    public RequestBuilder(String url) {
+    public TestRequestBuilder(String url) {
         this.url = url;
     }
 
-    public RequestBuilder setMatchingType(MatchingType matchingType) {
+    public TestRequestBuilder setMatchingType(MatchingType matchingType) {
         this.matchingType = matchingType;
         return this;
     }

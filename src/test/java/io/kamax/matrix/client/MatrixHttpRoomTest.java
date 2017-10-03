@@ -47,24 +47,24 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getNameError403() throws URISyntaxException {
-        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new RequestBuilder(createGetNameUrl()),
-                new ResponseBuilder(403));
+        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetNameUrl()),
+                new TestResponseBuilder(403));
         runner.runTestExceptionExpected(createRoomObject()::getName);
     }
 
     @Test
     public void getNameError429() throws URISyntaxException {
-        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new RequestBuilder(createGetNameUrl()),
-                new ResponseBuilder(429));
+        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetNameUrl()),
+                new TestResponseBuilder(429));
         runner.runTestExceptionExpected(createRoomObject()::getName);
     }
 
     private void getNameSuccessful(Optional<String> expectedResult, int responseStatus, String nameOfRoom)
             throws URISyntaxException {
         String body = String.format("{\"name\": \"%s\"}", nameOfRoom);
-        ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBody(body);
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBody(body);
 
-        new TestRunnerGet<Optional<String>>(new RequestBuilder(createGetNameUrl()), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(createGetNameUrl()), responseBuilder)
                 .runTest(createRoomObject()::getName, expectedResult);
     }
 
@@ -82,15 +82,15 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getTopicError403() throws URISyntaxException {
-        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new RequestBuilder(createGetTopicUrl()),
-                new ResponseBuilder(403));
+        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetTopicUrl()),
+                new TestResponseBuilder(403));
         runner.runTestExceptionExpected(createRoomObject()::getTopic);
     }
 
     @Test
     public void getTopic429() throws URISyntaxException {
-        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new RequestBuilder(createGetTopicUrl()),
-                new ResponseBuilder(429));
+        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetTopicUrl()),
+                new TestResponseBuilder(429));
         runner.runTestExceptionExpected(createRoomObject()::getTopic);
     }
 
@@ -98,9 +98,9 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
             throws URISyntaxException {
         String url = createGetTopicUrl();
         String body = String.format("{\"topic\": \"%s\"}", topic);
-        ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBody(body);
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBody(body);
 
-        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
                 .runTest(createRoomObject()::getTopic, expectedResult);
     }
 
@@ -108,9 +108,9 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     public void join() throws URISyntaxException {
         String url = createJoinUrl();
         String body = String.format("{\"roomId\": \"%s\"}", ROOM_ID);
-        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBody(body);
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBody(body);
 
-        new TestRunnerPostPut<Void>(new RequestBuilder(url), responseBuilder).runPostTest(createRoomObject()::join);
+        new TestRunnerPostPut<Void>(new TestRequestBuilder(url), responseBuilder).runPostTest(createRoomObject()::join);
     }
 
     @Test
@@ -120,8 +120,8 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void joinError403() throws URISyntaxException {
-        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new RequestBuilder(createJoinUrl()),
-                new ResponseBuilder(403));
+        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createJoinUrl()),
+                new TestResponseBuilder(403));
         runner.runPostTest(createRoomObject()::join);
     }
 
@@ -131,8 +131,8 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     private void joinExceptionExpected(int responseStatus) throws URISyntaxException {
-        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new RequestBuilder(createJoinUrl()),
-                new ResponseBuilder(responseStatus));
+        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createJoinUrl()),
+                new TestResponseBuilder(responseStatus));
         runner.runPostTestExceptionExpected(createRoomObject()::join);
     }
 
@@ -140,9 +140,9 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     public void leave() throws URISyntaxException {
         String url = createLeaveUrl();
         String body = String.format("{\"roomId\": \"%s\"}", ROOM_ID);
-        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBody(body);
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBody(body);
 
-        new TestRunnerPostPut<Void>(new RequestBuilder(url), responseBuilder).runPostTest(createRoomObject()::leave);
+        new TestRunnerPostPut<Void>(new TestRequestBuilder(url), responseBuilder).runPostTest(createRoomObject()::leave);
     }
 
     @Test
@@ -161,22 +161,22 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     private void leaveErrorWithoutException(int responseStatus) throws URISyntaxException {
-        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new RequestBuilder(createLeaveUrl()),
-                new ResponseBuilder(responseStatus));
+        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createLeaveUrl()),
+                new TestResponseBuilder(responseStatus));
         runner.runPostTest(createRoomObject()::leave);
     }
 
     private void leaveExceptionExpected(int responseStatus) throws URISyntaxException {
-        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new RequestBuilder(createLeaveUrl()),
-                new ResponseBuilder(responseStatus));
+        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createLeaveUrl()),
+                new TestResponseBuilder(responseStatus));
         runner.runPostTestExceptionExpected(createRoomObject()::leave);
     }
 
     @Test
     public void sendText() throws URISyntaxException {
         String url = createSendTextUrl();
-        ResponseBuilder responseBuilder = new ResponseBuilder(200);
-        RequestBuilder requestBuilder = new RequestBuilder(url).setMatchingType(RequestBuilder.MatchingType.REGEX);
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(200);
+        TestRequestBuilder requestBuilder = new TestRequestBuilder(url).setMatchingType(TestRequestBuilder.MatchingType.REGEX);
 
         String testText = "test text";
         new TestRunnerPostPut<String>(requestBuilder, responseBuilder).runPutTest(createRoomObject()::sendText,
@@ -199,17 +199,17 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     private void sendTextErrorWithoutException(int responseStatus) throws URISyntaxException {
-        RequestBuilder requestBuilder = new RequestBuilder(createSendTextUrl())
-                .setMatchingType(RequestBuilder.MatchingType.REGEX);
-        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder, new ResponseBuilder(responseStatus));
+        TestRequestBuilder requestBuilder = new TestRequestBuilder(createSendTextUrl())
+                .setMatchingType(TestRequestBuilder.MatchingType.REGEX);
+        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder, new TestResponseBuilder(responseStatus));
         String testText = "test text";
         runner.runPutTest(createRoomObject()::sendText, testText, sendTextVerifyBody(testText));
     }
 
     private void sendTextExceptionExpected(int responseStatus) throws URISyntaxException {
-        RequestBuilder requestBuilder = new RequestBuilder(createSendTextUrl())
-                .setMatchingType(RequestBuilder.MatchingType.REGEX);
-        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder, new ResponseBuilder(responseStatus));
+        TestRequestBuilder requestBuilder = new TestRequestBuilder(createSendTextUrl())
+                .setMatchingType(TestRequestBuilder.MatchingType.REGEX);
+        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder, new TestResponseBuilder(responseStatus));
         runner.runPutTestExceptionExpected(createRoomObject()::sendText, "test text");
     }
 
@@ -224,27 +224,27 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
         String url = createGetJoinedUsersUrl();
         String responseBody = String.format("{\"joined\": {\"%s\": \"1\", \"%s\": \"2\"}}", testuser1, testuser2);
-        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBody(responseBody);
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBody(responseBody);
 
         List<_MatrixID> expectedResult = new ArrayList<>();
         expectedResult.add(new MatrixID(testuser1));
         expectedResult.add(new MatrixID(testuser2));
 
-        new TestRunnerGet<List<_MatrixID>>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<List<_MatrixID>>(new TestRequestBuilder(url), responseBuilder)
                 .runTest(createRoomObject()::getJoinedUsers, expectedResult);
     }
 
     @Test
     public void getJoinedUsersError404() throws URISyntaxException {
-        TestRunnerGet<List<_MatrixID>> runner = new TestRunnerGet<>(new RequestBuilder(createGetJoinedUsersUrl()),
-                new ResponseBuilder(404));
+        TestRunnerGet<List<_MatrixID>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetJoinedUsersUrl()),
+                new TestResponseBuilder(404));
         runner.runTestExceptionExpected(createRoomObject()::getJoinedUsers);
     }
 
     @Test
     public void getJoinedUsers429() throws URISyntaxException {
-        TestRunnerGet<List<_MatrixID>> runner = new TestRunnerGet<>(new RequestBuilder(createGetJoinedUsersUrl()),
-                new ResponseBuilder(429));
+        TestRunnerGet<List<_MatrixID>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetJoinedUsersUrl()),
+                new TestResponseBuilder(429));
         runner.runTestExceptionExpected(createRoomObject()::getJoinedUsers);
     }
 

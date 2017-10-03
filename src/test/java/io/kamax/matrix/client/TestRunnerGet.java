@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 
 public class TestRunnerGet<R> extends TestRunner {
 
-    public TestRunnerGet(RequestBuilder requestBuilder, ResponseBuilder responseBuilder) {
+    public TestRunnerGet(TestRequestBuilder requestBuilder, TestResponseBuilder responseBuilder) {
         super(requestBuilder, responseBuilder);
     }
 

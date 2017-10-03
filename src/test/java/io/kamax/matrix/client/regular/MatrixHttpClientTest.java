@@ -31,18 +31,18 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
     @Test
     public void setDisplayname() throws URISyntaxException {
         String url = createSetDisplaynameUrl();
-        ResponseBuilder responseBuilder = new ResponseBuilder(200);
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(200);
         String displayname = "new name";
         String verifyBody = String.format("\"displayname\":\"%s\"", displayname);
 
-        new TestRunnerPostPut<String>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerPostPut<String>(new TestRequestBuilder(url), responseBuilder)
                 .runPutTest(createClientObject()::setDisplayName, displayname, verifyBody);
     }
 
     @Test
     public void setDisplaynameError429() throws URISyntaxException {
-        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(new RequestBuilder(createSetDisplaynameUrl()),
-                new ResponseBuilder(429));
+        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createSetDisplaynameUrl()),
+                new TestResponseBuilder(429));
         runner.runPutTestExceptionExpected(createClientObject()::setDisplayName, "new name");
     }
 

@@ -34,14 +34,14 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
         String url = createUserUrl();
         String verifyBody = "\"username\":\"testuser\"";
 
-        new TestRunnerPostPut<String>(new RequestBuilder(url), new ResponseBuilder(200))
+        new TestRunnerPostPut<String>(new TestRequestBuilder(url), new TestResponseBuilder(200))
                 .runPostTest(createClientObject()::createUser, "testuser", verifyBody);
     }
 
     @Test
     public void createUserError429() throws URISyntaxException {
-        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(new RequestBuilder(createUserUrl()),
-                new ResponseBuilder(429));
+        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createUserUrl()),
+                new TestResponseBuilder(429));
         runner.runPostTestExceptionExpected(createClientObject()::createUser, "testuser");
     }
 

@@ -49,8 +49,8 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
     public void isValidMissingContentType() throws URISyntaxException {
         String url = createDownloadUrl();
         String bodyFile = "textfile.txt";
-        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile);
-        new TestRunnerGet<Boolean>(new RequestBuilder(url), responseBuilder).runTest(createContentObject()::isValid,
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBodyFile(bodyFile);
+        new TestRunnerGet<Boolean>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::isValid,
                 false);
     }
 
@@ -68,10 +68,10 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
         String url = createDownloadUrl();
         String bodyFile = "textfile.txt";
 
-        ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBodyFile(bodyFile)//
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBodyFile(bodyFile)//
                 .setContentType("text/plain");
 
-        new TestRunnerGet<Boolean>(new RequestBuilder(url), responseBuilder).runTest(createContentObject()::isValid,
+        new TestRunnerGet<Boolean>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::isValid,
                 expectedResult);
     }
 
@@ -84,8 +84,8 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
     public void getTypeMissingContentType() throws URISyntaxException {
         String url = createDownloadUrl();
         String bodyFile = "textfile.txt";
-        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile);
-        new TestRunnerGet<String>(new RequestBuilder(url), responseBuilder).runTest(createContentObject()::getType,
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBodyFile(bodyFile);
+        new TestRunnerGet<String>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::getType,
                 null);
     }
 
@@ -103,10 +103,10 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
         String url = createDownloadUrl();
         String bodyFile = "textfile.txt";
 
-        ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBodyFile(bodyFile)
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBodyFile(bodyFile)
                 .setContentType("text/plain");//
 
-        new TestRunnerGet<String>(new RequestBuilder(url), responseBuilder).runTest(createContentObject()::getType,
+        new TestRunnerGet<String>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::getType,
                 contentType);
     }
 
@@ -121,8 +121,8 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
     public void getDataMissingContentType() throws URISyntaxException {
         String url = createDownloadUrl();
         String bodyFile = "textfile.txt";
-        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile);
-        new TestRunnerGet<byte[]>(new RequestBuilder(url), responseBuilder).runTest(createContentObject()::getData,
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBodyFile(bodyFile);
+        new TestRunnerGet<byte[]>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::getData,
                 null);
     }
 
@@ -140,10 +140,10 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
             throws URISyntaxException {
         String url = createDownloadUrl();
 
-        ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBodyFile(bodyFile)//
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBodyFile(bodyFile)//
                 .setContentType("text/plain");
 
-        new TestRunnerGet<byte[]>(new RequestBuilder(url), responseBuilder).runTest(createContentObject()::getData,
+        new TestRunnerGet<byte[]>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::getData,
                 expectedResult);
     }
 
@@ -152,23 +152,23 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
         String url = createDownloadUrl();
         String bodyFile = "textfile.txt";
 
-        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile)//
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBodyFile(bodyFile)//
                 .setContentType("text/plain")//
                 .putHeader("Content-Disposition", String.format("filename=" + bodyFile + ";"));
 
-        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
                 .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
 
         responseBuilder.putHeader("Content-Disposition", String.format("filename=\"%s\";", bodyFile));
-        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
                 .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
 
         responseBuilder.putHeader("Content-Disposition", String.format("filename=\"%s\"", bodyFile));
-        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
                 .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
 
         responseBuilder.putHeader("Content-Disposition", String.format("filename=%s", bodyFile));
-        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
                 .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
     }
 
@@ -176,8 +176,8 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
     public void getFilenameMissingContentType() throws URISyntaxException {
         String url = createDownloadUrl();
         String bodyFile = "textfile.txt";
-        ResponseBuilder responseBuilder = new ResponseBuilder(200).setBodyFile(bodyFile);
-        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBodyFile(bodyFile);
+        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
                 .runTest(createContentObject()::getFilename, Optional.empty());
     }
 
@@ -195,11 +195,11 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
             throws URISyntaxException {
         String url = createDownloadUrl();
 
-        ResponseBuilder responseBuilder = new ResponseBuilder(responseStatus).setBodyFile(bodyFile)//
+        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBodyFile(bodyFile)//
                 .setContentType("text/plain")//
                 .putHeader("Content-Disposition", String.format("filename=%s;", bodyFile));
 
-        new TestRunnerGet<Optional<String>>(new RequestBuilder(url), responseBuilder)
+        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
                 .runTest(createContentObject()::getFilename, expectedResult);
     }
 
