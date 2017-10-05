@@ -42,6 +42,20 @@ public class MatrixHttpTest {
     protected int port = 8098;
     protected String resourcePath = "src/test/resources/wiremock";
 
+    private String errorResponseTemplate = "{\"errcode\": \"%s\", \"error\": \"%s\"}";
+
+    private String errcode403 = "M_FORBIDDEN";
+    private String error403 = "Access denied.";
+    protected String error403Response = String.format(errorResponseTemplate, errcode403, error403);
+
+    private String errcode404 = "M_NOT_FOUND";
+    private String error404 = "Element not found.";
+    protected String error404Response = String.format(errorResponseTemplate, errcode404, error404);
+
+    private String errcode429 = "M_LIMIT_EXCEEDED";
+    private String error429 = "Too many requests have been sent in a short period of time. Wait a while then try again.";
+    protected String error429Response = String.format(errorResponseTemplate, errcode429, error429);
+
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(options().port(port).usingFilesUnderDirectory(resourcePath));
 
@@ -56,15 +70,17 @@ public class MatrixHttpTest {
         return "?access_token=" + testToken;
     }
 
-    protected void checkErrorInfo(MatrixClientRequestException e, String expectedErrcode, String expectedError) {
-        // TODO at the moment not every call throws a MatrixClientRequestException, so we cannot always evaluate the
-        // error. This code can be activated after the upcoming refactoring.
-
-        Optional<MatrixErrorInfo> errorOptional = e.getError();
-        assertTrue(errorOptional.isPresent());
-        assertEquals(errorOptional.get().getErrcode(), expectedErrcode);
-        assertEquals(errorOptional.get().getError(), expectedError);
-
+    protected void checkErrorInfo403(MatrixClientRequestException e) {
+        checkErrorInfo(errcode403, error403, e.getError());
     }
 
+    protected void checkErrorInfo429(MatrixClientRequestException e) {
+        checkErrorInfo(errcode429, error429, e.getError());
+    }
+
+    private void checkErrorInfo(String errcode, String error, Optional<MatrixErrorInfo> errorOptional) {
+        assertTrue(errorOptional.isPresent());
+        assertEquals(errorOptional.get().getErrcode(), errcode);
+        assertEquals(errorOptional.get().getError(), error);
+    }
 }

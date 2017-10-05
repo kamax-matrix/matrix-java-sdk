@@ -37,14 +37,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class MatrixHttpRoomTest extends MatrixHttpTest {
-    private String errcode403 = "M_FORBIDDEN";
-    private String error403 = "Access denied.";
-    private String errcode404 = "M_NOT_FOUND";
-    private String error404 = "Element not found.";
-    private String errcode429 = "M_LIMIT_EXCEEDED";
-    private String error429 = "Too many requests have been sent in a short period of time. Wait a while then try again.";
-
     private String roomId = "roomId892347847";
+
+    private String nameUrl = String.format("/_matrix/client/r0/rooms/%s/state/m.room.name", roomId) + tokenParameter;
+    private String nameOfRoom = "test room";
+    private String nameResponse = String.format("{\"name\": \"%s\"}", nameOfRoom);
 
     private String topicUrl = String.format("/_matrix/client/r0/rooms/%s/state/m.room.topic", roomId) + tokenParameter;
     private String testTopic = "test topic";
@@ -52,64 +49,64 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getName() throws URISyntaxException {
-        String nameOfRoom = "test room";
-        getNameSuccessful(Optional.of(nameOfRoom), 200, nameOfRoom);
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(200).withBody(nameResponse)));
+        assertThat(createRoomObject().getName(), IsEqual.equalTo(Optional.of(nameOfRoom)));
     }
 
     @Test
     public void getName404() throws URISyntaxException {
-        String nameOfRoom = "test room";
-        getNameSuccessful(Optional.empty(), 404, nameOfRoom);
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(nameResponse)));
+        assertThat(createRoomObject().getName(), IsEqual.equalTo(Optional.empty()));
     }
 
     @Test
     public void getNameError403() throws URISyntaxException {
-        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetNameUrl()),
-                new TestResponseBuilder(403));
-        runner.runTestExceptionExpected(createRoomObject()::getName);
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+
+        try {
+            createRoomObject().getName();
+        } catch (MatrixClientRequestException e) {
+            // TODO getName does not throw Exceptions with error infos, yet
+            // checkErrorInfo403(e);
+            return;
+        }
+        fail("In this case, an exception has to be thrown.");
     }
 
     @Test
     public void getNameError429() throws URISyntaxException {
-        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetNameUrl()),
-                new TestResponseBuilder(429));
-        runner.runTestExceptionExpected(createRoomObject()::getName);
-    }
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error403Response)));
 
-    private void getNameSuccessful(Optional<String> expectedResult, int responseStatus, String nameOfRoom)
-            throws URISyntaxException {
-        String body = String.format("{\"name\": \"%s\"}", nameOfRoom);
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBody(body);
-
-        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(createGetNameUrl()), responseBuilder)
-                .runTest(createRoomObject()::getName, expectedResult);
+        try {
+            createRoomObject().getName();
+        } catch (MatrixClientRequestException e) {
+            // TODO getName does not throw Exceptions with error infos, yet
+            // checkErrorInfo429(e);
+            return;
+        }
+        fail("In this case, an exception has to be thrown.");
     }
 
     @Test
     public void getTopic() throws URISyntaxException {
         stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(200).withBody(topicResponse)));
-
         assertThat(createRoomObject().getTopic(), IsEqual.equalTo(Optional.of(testTopic)));
-
     }
 
     @Test
     public void getTopicError404() throws URISyntaxException {
         stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(404).withBody(topicResponse)));
-
         assertThat(createRoomObject().getTopic(), IsEqual.equalTo(Optional.empty()));
-
     }
 
     @Test
     public void getTopicError403() throws URISyntaxException {
-        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(403)
-                .withBody(String.format("{\"errcode\": \"%s\", \"error\": \"%s\"}", errcode403, error403))));
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
         try {
             createRoomObject().getTopic();
         } catch (MatrixClientRequestException e) {
-            checkErrorInfo(e, errcode403, error403);
+            checkErrorInfo403(e);
             return;
         }
         fail("In this case, an exception has to be thrown.");
@@ -117,13 +114,12 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getTopicError429() throws URISyntaxException {
-        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(429)
-                .withBody(String.format("{\"errcode\": \"%s\", \"error\": \"%s\"}", errcode429, error429))));
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
         try {
             createRoomObject().getTopic();
         } catch (MatrixClientRequestException e) {
-            checkErrorInfo(e, errcode429, error429);
+            checkErrorInfo429(e);
             return;
         }
         fail("In this case, an exception has to be thrown.");
@@ -280,10 +276,6 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {
         MatrixClientContext context = createClientContext();
         return new MatrixHttpRoom(context, roomId);
-    }
-
-    private String createGetNameUrl() {
-        return String.format("/_matrix/client/r0/rooms/%s/state/m.room.name", roomId) + getAcessTokenParameter();
     }
 
     private String createJoinUrl() {
