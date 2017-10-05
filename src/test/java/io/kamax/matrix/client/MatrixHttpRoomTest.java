@@ -23,6 +23,7 @@ package io.kamax.matrix.client;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 
+import org.hamcrest.core.IsEqual;
 import org.junit.Test;
 
 import java.net.URISyntaxException;
@@ -30,8 +31,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 public class MatrixHttpRoomTest extends MatrixHttpTest {
-    private static final String ROOM_ID = "roomId892347847";
+    private String errcode403 = "M_FORBIDDEN";
+    private String error403 = "Access denied.";
+    private String errcode404 = "M_NOT_FOUND";
+    private String error404 = "Element not found.";
+    private String errcode429 = "M_LIMIT_EXCEEDED";
+    private String error429 = "Too many requests have been sent in a short period of time. Wait a while then try again.";
+
+    private String roomId = "roomId892347847";
+
+    private String topicUrl = String.format("/_matrix/client/r0/rooms/%s/state/m.room.topic", roomId) + tokenParameter;
+    private String testTopic = "test topic";
+    private String topicResponse = String.format("{\"topic\": \"%s\"}", testTopic);
 
     @Test
     public void getName() throws URISyntaxException {
@@ -70,44 +87,52 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getTopic() throws URISyntaxException {
-        String topic = "test topic";
-        getTopicSuccessful(Optional.of(topic), 200, topic);
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(200).withBody(topicResponse)));
+
+        assertThat(createRoomObject().getTopic(), IsEqual.equalTo(Optional.of(testTopic)));
+
     }
 
     @Test
-    public void getTopic404() throws URISyntaxException {
-        String topic = "test topic";
-        getTopicSuccessful(Optional.empty(), 404, topic);
+    public void getTopicError404() throws URISyntaxException {
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(404).withBody(topicResponse)));
+
+        assertThat(createRoomObject().getTopic(), IsEqual.equalTo(Optional.empty()));
+
     }
 
     @Test
     public void getTopicError403() throws URISyntaxException {
-        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetTopicUrl()),
-                new TestResponseBuilder(403));
-        runner.runTestExceptionExpected(createRoomObject()::getTopic);
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(403)
+                .withBody(String.format("{\"errcode\": \"%s\", \"error\": \"%s\"}", errcode403, error403))));
+
+        try {
+            createRoomObject().getTopic();
+        } catch (MatrixClientRequestException e) {
+            checkErrorInfo(e, errcode403, error403);
+            return;
+        }
+        fail("In this case, an exception has to be thrown.");
     }
 
     @Test
-    public void getTopic429() throws URISyntaxException {
-        TestRunnerGet<Optional<String>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetTopicUrl()),
-                new TestResponseBuilder(429));
-        runner.runTestExceptionExpected(createRoomObject()::getTopic);
-    }
+    public void getTopicError429() throws URISyntaxException {
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(429)
+                .withBody(String.format("{\"errcode\": \"%s\", \"error\": \"%s\"}", errcode429, error429))));
 
-    private void getTopicSuccessful(Optional<String> expectedResult, int responseStatus, String topic)
-            throws URISyntaxException {
-        String url = createGetTopicUrl();
-        String body = String.format("{\"topic\": \"%s\"}", topic);
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBody(body);
-
-        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
-                .runTest(createRoomObject()::getTopic, expectedResult);
+        try {
+            createRoomObject().getTopic();
+        } catch (MatrixClientRequestException e) {
+            checkErrorInfo(e, errcode429, error429);
+            return;
+        }
+        fail("In this case, an exception has to be thrown.");
     }
 
     @Test
     public void join() throws URISyntaxException {
         String url = createJoinUrl();
-        String body = String.format("{\"roomId\": \"%s\"}", ROOM_ID);
+        String body = String.format("{\"roomId\": \"%s\"}", roomId);
         TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBody(body);
 
         new TestRunnerPostPut<Void>(new TestRequestBuilder(url), responseBuilder).runPostTest(createRoomObject()::join);
@@ -139,7 +164,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void leave() throws URISyntaxException {
         String url = createLeaveUrl();
-        String body = String.format("{\"roomId\": \"%s\"}", ROOM_ID);
+        String body = String.format("{\"roomId\": \"%s\"}", roomId);
         TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBody(body);
 
         new TestRunnerPostPut<Void>(new TestRequestBuilder(url), responseBuilder)
@@ -254,31 +279,27 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {
         MatrixClientContext context = createClientContext();
-        return new MatrixHttpRoom(context, ROOM_ID);
+        return new MatrixHttpRoom(context, roomId);
     }
 
     private String createGetNameUrl() {
-        return String.format("/_matrix/client/r0/rooms/%s/state/m.room.name", ROOM_ID) + getAcessTokenParameter();
-    }
-
-    private String createGetTopicUrl() {
-        return String.format("/_matrix/client/r0/rooms/%s/state/m.room.topic", ROOM_ID) + getAcessTokenParameter();
+        return String.format("/_matrix/client/r0/rooms/%s/state/m.room.name", roomId) + getAcessTokenParameter();
     }
 
     private String createJoinUrl() {
-        return String.format("/_matrix/client/r0/rooms/%s/join", ROOM_ID) + getAcessTokenParameter();
+        return String.format("/_matrix/client/r0/rooms/%s/join", roomId) + getAcessTokenParameter();
     }
 
     private String createLeaveUrl() {
-        return String.format("/_matrix/client/r0/rooms/%s/leave", ROOM_ID) + getAcessTokenParameter();
+        return String.format("/_matrix/client/r0/rooms/%s/leave", roomId) + getAcessTokenParameter();
     }
 
     private String createSendTextUrl() {
-        return String.format("/_matrix/client/r0/rooms/%s/send/m.room.message/([0-9.]+)\\", ROOM_ID)
+        return String.format("/_matrix/client/r0/rooms/%s/send/m.room.message/([0-9.]+)\\", roomId)
                 + getAcessTokenParameter();
     }
 
     private String createGetJoinedUsersUrl() {
-        return String.format("/_matrix/client/r0/rooms/%s/joined_members", ROOM_ID) + getAcessTokenParameter();
+        return String.format("/_matrix/client/r0/rooms/%s/joined_members", roomId) + getAcessTokenParameter();
     }
 }

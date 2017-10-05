@@ -51,9 +51,9 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
 
     private MatrixApplicationServiceClient createClientObject() throws URISyntaxException {
         String domain = "localhost";
-        String baseUrl = "http://localhost:" + PORT;
+        String baseUrl = "http://localhost:" + port;
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        return new MatrixApplicationServiceClient(hs, TEST_TOKEN, "testuser");
+        return new MatrixApplicationServiceClient(hs, testToken, "testuser");
     }
 
 }

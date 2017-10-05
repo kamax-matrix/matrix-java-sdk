@@ -22,31 +22,49 @@ package io.kamax.matrix.client;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
+import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix.hs.MatrixHomeserver;
 
 import org.junit.Rule;
 
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+import static junit.framework.TestCase.assertEquals;
+
+import static org.junit.Assert.assertTrue;
 
 public class MatrixHttpTest {
-    protected static final String TEST_TOKEN = "testToken";
-    protected static final int PORT = 8098;
-    protected static final String RESOURCE_PATH = "src/test/resources/wiremock";
+    protected String testToken = "testToken";
+    protected String tokenParameter = "?access_token=" + testToken;
+    protected int port = 8098;
+    protected String resourcePath = "src/test/resources/wiremock";
 
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule(options().port(PORT).usingFilesUnderDirectory(RESOURCE_PATH));
+    public WireMockRule wireMockRule = new WireMockRule(options().port(port).usingFilesUnderDirectory(resourcePath));
 
     protected MatrixClientContext createClientContext() throws URISyntaxException {
         String domain = "localhost";
-        String baseUrl = "http://localhost:" + PORT;
+        String baseUrl = "http://localhost:" + port;
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        return new MatrixClientContext(hs, new MatrixID("testuser", domain), TEST_TOKEN);
+        return new MatrixClientContext(hs, new MatrixID("testuser", domain), testToken);
     }
 
     protected String getAcessTokenParameter() {
-        return "?access_token=" + TEST_TOKEN;
+        return "?access_token=" + testToken;
     }
+
+    protected void checkErrorInfo(MatrixClientRequestException e, String expectedErrcode, String expectedError) {
+        // TODO at the moment not every call throws a MatrixClientRequestException, so we cannot always evaluate the
+        // error. This code can be activated after the upcoming refactoring.
+
+        Optional<MatrixErrorInfo> errorOptional = e.getError();
+        assertTrue(errorOptional.isPresent());
+        assertEquals(errorOptional.get().getErrcode(), expectedErrcode);
+        assertEquals(errorOptional.get().getError(), expectedError);
+
+    }
+
 }
