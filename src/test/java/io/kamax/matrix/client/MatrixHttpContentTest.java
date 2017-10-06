@@ -31,8 +31,8 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 /*
- * TODO As the spec is outdated, I'm not sure, if the error 403 can really happen in this case. Has to be re-checked,
- * when the spec is up to date, again.
+ * TODO As the spec is outdated, I'm not sure if the error 403 can really happen in these test cases. This class has
+ * to be checked for correctness, when the matrix's spec is updated.
  */
 public class MatrixHttpContentTest extends MatrixHttpTest {
     private URI address = new URI("mxc://localhost/testAddress.txt");
