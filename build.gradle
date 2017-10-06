@@ -52,8 +52,8 @@ dependencies {
     compile 'org.apache.httpcomponents:fluent-hc:4.5.3'
     compile 'com.google.code.gson:gson:2.8.0'
 
-    testCompile "org.junit.jupiter:junit-jupiter-api:5.0.1"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.0.1"
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.0.0"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.0.0"
     testCompile "com.github.tomakehurst:wiremock:2.8.0"
     testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.25'
 
