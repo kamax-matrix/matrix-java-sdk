@@ -17,6 +17,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
+    }
+}
 
 plugins {
     id "com.diffplug.gradle.spotless" version "3.5.2"
@@ -27,6 +35,7 @@ version = '0.0.2'
 
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'org.junit.platform.gradle.plugin'
 
 configurations {
     deployerJars
@@ -43,7 +52,8 @@ dependencies {
     compile 'org.apache.httpcomponents:fluent-hc:4.5.3'
     compile 'com.google.code.gson:gson:2.8.0'
 
-    testCompile 'junit:junit:4.12'
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.0.1"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.0.1"
     testCompile "com.github.tomakehurst:wiremock:2.8.0"
     testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.25'
 
@@ -86,4 +96,8 @@ spotless {
         removeUnusedImports()
         importOrderFile 'spotless.importorder'
     }
+}
+
+junitPlatform {
+    enableStandardTestTask true
 }
