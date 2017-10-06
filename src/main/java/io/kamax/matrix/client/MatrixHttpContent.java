@@ -45,7 +45,7 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
 
     private Logger log = LoggerFactory.getLogger(MatrixHttpContent.class);
 
-    private final Pattern filenamePattern = Pattern.compile("filename=\"?(?<filename>.+[^\";])");
+    private final Pattern filenamePattern = Pattern.compile("filename=\"?(?<filename>[^\";]+)");
 
     private URI address;
     private String type;
