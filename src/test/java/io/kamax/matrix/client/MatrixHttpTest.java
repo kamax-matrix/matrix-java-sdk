@@ -74,6 +74,10 @@ public class MatrixHttpTest {
         checkErrorInfo(errcode403, error403, e.getError());
     }
 
+    protected void checkErrorInfo404(MatrixClientRequestException e) {
+        checkErrorInfo(errcode404, error404, e.getError());
+    }
+
     protected void checkErrorInfo429(MatrixClientRequestException e) {
         checkErrorInfo(errcode429, error429, e.getError());
     }

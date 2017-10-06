@@ -34,10 +34,11 @@ import java.util.Optional;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MatrixHttpRoomTest extends MatrixHttpTest {
     private String roomId = "roomId892347847";
+    private String eventId = "YUwRidLecu";
 
     private String nameUrl = String.format("/_matrix/client/r0/rooms/%s/state/m.room.name", roomId) + tokenParameter;
     private String nameOfRoom = "test room";
@@ -46,6 +47,24 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     private String topicUrl = String.format("/_matrix/client/r0/rooms/%s/state/m.room.topic", roomId) + tokenParameter;
     private String testTopic = "test topic";
     private String topicResponse = String.format("{\"topic\": \"%s\"}", testTopic);
+
+    private String joinUrl = String.format("/_matrix/client/r0/rooms/%s/join", roomId) + tokenParameter;
+    private String joinResponse = String.format("{\"roomId\": \"%s\"}", roomId);
+
+    private String leaveUrl = String.format("/_matrix/client/r0/rooms/%s/leave", roomId) + tokenParameter;
+    private String leaveResponse = String.format("{\"roomId\": \"%s\"}", roomId);
+
+    private String sendTextUrl = String.format("/_matrix/client/r0/rooms/%s/send/m.room.message/([0-9.]+)\\", roomId)
+            + tokenParameter;
+    private String testText = "test text";
+    private String sendTextResponse = String.format("{\"event_id\": \"%s\"}", eventId) + tokenParameter;
+
+    private String getJoinedUsersUrl = String.format("/_matrix/client/r0/rooms/%s/joined_members", roomId)
+            + tokenParameter;
+    private String joinedUser1 = "@test:testserver.org";
+    private String joinedUser2 = "@test2:testserver.org";
+    private String getJoinedUsersResponse = String.format("{\"joined\": {\"%s\": \"1\", \"%s\": \"2\"}}", joinedUser1,
+            joinedUser2);
 
     @Test
     public void getName() throws URISyntaxException {
@@ -63,28 +82,18 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     public void getNameError403() throws URISyntaxException {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
-        try {
-            createRoomObject().getName();
-        } catch (MatrixClientRequestException e) {
-            // TODO getName does not throw Exceptions with error infos, yet
-            // checkErrorInfo403(e);
-            return;
-        }
-        fail("In this case, an exception has to be thrown.");
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
+        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
+        // checkErrorInfo403(e);
     }
 
     @Test
     public void getNameError429() throws URISyntaxException {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error403Response)));
 
-        try {
-            createRoomObject().getName();
-        } catch (MatrixClientRequestException e) {
-            // TODO getName does not throw Exceptions with error infos, yet
-            // checkErrorInfo429(e);
-            return;
-        }
-        fail("In this case, an exception has to be thrown.");
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
+        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
+        // checkErrorInfo429(e);
     }
 
     @Test
@@ -103,195 +112,155 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     public void getTopicError403() throws URISyntaxException {
         stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
-        try {
-            createRoomObject().getTopic();
-        } catch (MatrixClientRequestException e) {
-            checkErrorInfo403(e);
-            return;
-        }
-        fail("In this case, an exception has to be thrown.");
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getTopic);
+        checkErrorInfo403(e);
     }
 
     @Test
     public void getTopicError429() throws URISyntaxException {
         stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
-        try {
-            createRoomObject().getTopic();
-        } catch (MatrixClientRequestException e) {
-            checkErrorInfo429(e);
-            return;
-        }
-        fail("In this case, an exception has to be thrown.");
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getTopic);
+        checkErrorInfo429(e);
     }
 
     @Test
     public void join() throws URISyntaxException {
-        String url = createJoinUrl();
-        String body = String.format("{\"roomId\": \"%s\"}", roomId);
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBody(body);
-
-        new TestRunnerPostPut<Void>(new TestRequestBuilder(url), responseBuilder).runPostTest(createRoomObject()::join);
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(200).withBody(joinResponse)));
+        createRoomObject().join();
     }
 
     @Test
     public void joinError404() throws URISyntaxException {
-        joinExceptionExpected(404);
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
+        checkErrorInfo404(e);
     }
 
     @Test
     public void joinError403() throws URISyntaxException {
-        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createJoinUrl()),
-                new TestResponseBuilder(403));
-        runner.runPostTest(createRoomObject()::join);
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+
+        // TODO After the refactoring, this test will throw a MatrixClientRequestException
+        createRoomObject().join();
+        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
+        // checkErrorInfo403(e);
     }
 
     @Test
     public void joinError429() throws URISyntaxException {
-        joinExceptionExpected(429);
-    }
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
-    private void joinExceptionExpected(int responseStatus) throws URISyntaxException {
-        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createJoinUrl()),
-                new TestResponseBuilder(responseStatus));
-        runner.runPostTestExceptionExpected(createRoomObject()::join);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
+        checkErrorInfo429(e);
     }
 
     @Test
     public void leave() throws URISyntaxException {
-        String url = createLeaveUrl();
-        String body = String.format("{\"roomId\": \"%s\"}", roomId);
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBody(body);
-
-        new TestRunnerPostPut<Void>(new TestRequestBuilder(url), responseBuilder)
-                .runPostTest(createRoomObject()::leave);
-    }
-
-    @Test
-    public void leaveError404() throws URISyntaxException {
-        leaveErrorWithoutException(404);
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(200).withBody(leaveResponse)));
+        createRoomObject().leave();
     }
 
     @Test
     public void leaveError403() throws URISyntaxException {
-        leaveErrorWithoutException(403);
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+
+        // TODO After the refactoring, this test will throw a MatrixClientRequestException
+        createRoomObject().leave();
+        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
+        // checkErrorInfo403(e);
+    }
+
+    @Test
+    public void leaveError404() throws URISyntaxException {
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+
+        // TODO After the refactoring, this test will throw a MatrixClientRequestException
+        createRoomObject().leave();
+        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
+        // checkErrorInfo404(e);
     }
 
     @Test
     public void leaveError429() throws URISyntaxException {
-        leaveExceptionExpected(429);
-    }
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
-    private void leaveErrorWithoutException(int responseStatus) throws URISyntaxException {
-        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createLeaveUrl()),
-                new TestResponseBuilder(responseStatus));
-        runner.runPostTest(createRoomObject()::leave);
-    }
-
-    private void leaveExceptionExpected(int responseStatus) throws URISyntaxException {
-        TestRunnerPostPut<Void> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createLeaveUrl()),
-                new TestResponseBuilder(responseStatus));
-        runner.runPostTestExceptionExpected(createRoomObject()::leave);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
+        checkErrorInfo429(e);
     }
 
     @Test
     public void sendText() throws URISyntaxException {
-        String url = createSendTextUrl();
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(200);
-        TestRequestBuilder requestBuilder = new TestRequestBuilder(url)
-                .setMatchingType(TestRequestBuilder.MatchingType.REGEX);
-
-        String testText = "test text";
-        new TestRunnerPostPut<String>(requestBuilder, responseBuilder).runPutTest(createRoomObject()::sendText,
-                testText, sendTextVerifyBody(testText));
-    }
-
-    @Test
-    public void sendTextError404() throws URISyntaxException {
-        sendTextExceptionExpected(404);
+        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(200).withBody(sendTextResponse)));
+        createRoomObject().sendText(testText);
     }
 
     @Test
     public void sendTextError403() throws URISyntaxException {
-        sendTextErrorWithoutException(403);
+        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+
+        // TODO After the refactoring, this test will throw a MatrixClientRequestException
+        createRoomObject().sendText(testText);
+        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+        // () -> createRoomObject().sendText(testText));
+        // checkErrorInfo404(e);
+    }
+
+    @Test
+    public void sendTextError404() throws URISyntaxException {
+        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+                () -> createRoomObject().sendText(testText));
+        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
+        // checkErrorInfo404(e);
     }
 
     @Test
     public void sendTextError429() throws URISyntaxException {
-        sendTextExceptionExpected(429);
-    }
+        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
-    private void sendTextErrorWithoutException(int responseStatus) throws URISyntaxException {
-        TestRequestBuilder requestBuilder = new TestRequestBuilder(createSendTextUrl())
-                .setMatchingType(TestRequestBuilder.MatchingType.REGEX);
-        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder,
-                new TestResponseBuilder(responseStatus));
-        String testText = "test text";
-        runner.runPutTest(createRoomObject()::sendText, testText, sendTextVerifyBody(testText));
-    }
-
-    private void sendTextExceptionExpected(int responseStatus) throws URISyntaxException {
-        TestRequestBuilder requestBuilder = new TestRequestBuilder(createSendTextUrl())
-                .setMatchingType(TestRequestBuilder.MatchingType.REGEX);
-        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(requestBuilder,
-                new TestResponseBuilder(responseStatus));
-        runner.runPutTestExceptionExpected(createRoomObject()::sendText, "test text");
-    }
-
-    private String sendTextVerifyBody(String testText) {
-        return String.format("\"msgtype\":\"m.text\",\"body\":\"%s\"", testText);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+                () -> createRoomObject().sendText(testText));
+        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
+        // checkErrorInfo429(e);
     }
 
     @Test
     public void getJoinedUsers() throws URISyntaxException {
-        String testuser1 = "@test:testserver.org";
-        String testuser2 = "@test2:testserver.org";
-
-        String url = createGetJoinedUsersUrl();
-        String responseBody = String.format("{\"joined\": {\"%s\": \"1\", \"%s\": \"2\"}}", testuser1, testuser2);
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBody(responseBody);
+        stubFor(get(urlEqualTo(getJoinedUsersUrl))
+                .willReturn(aResponse().withStatus(200).withBody(getJoinedUsersResponse)));
 
         List<_MatrixID> expectedResult = new ArrayList<>();
-        expectedResult.add(new MatrixID(testuser1));
-        expectedResult.add(new MatrixID(testuser2));
+        expectedResult.add(new MatrixID(joinedUser1));
+        expectedResult.add(new MatrixID(joinedUser2));
 
-        new TestRunnerGet<List<_MatrixID>>(new TestRequestBuilder(url), responseBuilder)
-                .runTest(createRoomObject()::getJoinedUsers, expectedResult);
+        assertThat(createRoomObject().getJoinedUsers(), IsEqual.equalTo(expectedResult));
     }
 
     @Test
     public void getJoinedUsersError404() throws URISyntaxException {
-        TestRunnerGet<List<_MatrixID>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetJoinedUsersUrl()),
-                new TestResponseBuilder(404));
-        runner.runTestExceptionExpected(createRoomObject()::getJoinedUsers);
+        stubFor(get(urlEqualTo(getJoinedUsersUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+                createRoomObject()::getJoinedUsers);
+        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
+        // checkErrorInfo404(e);
     }
 
     @Test
     public void getJoinedUsers429() throws URISyntaxException {
-        TestRunnerGet<List<_MatrixID>> runner = new TestRunnerGet<>(new TestRequestBuilder(createGetJoinedUsersUrl()),
-                new TestResponseBuilder(429));
-        runner.runTestExceptionExpected(createRoomObject()::getJoinedUsers);
+        stubFor(get(urlEqualTo(getJoinedUsersUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+                createRoomObject()::getJoinedUsers);
+        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
+        // checkErrorInfo404(e);
     }
 
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {
         MatrixClientContext context = createClientContext();
         return new MatrixHttpRoom(context, roomId);
-    }
-
-    private String createJoinUrl() {
-        return String.format("/_matrix/client/r0/rooms/%s/join", roomId) + getAcessTokenParameter();
-    }
-
-    private String createLeaveUrl() {
-        return String.format("/_matrix/client/r0/rooms/%s/leave", roomId) + getAcessTokenParameter();
-    }
-
-    private String createSendTextUrl() {
-        return String.format("/_matrix/client/r0/rooms/%s/send/m.room.message/([0-9.]+)\\", roomId)
-                + getAcessTokenParameter();
-    }
-
-    private String createGetJoinedUsersUrl() {
-        return String.format("/_matrix/client/r0/rooms/%s/joined_members", roomId) + getAcessTokenParameter();
     }
 }
