@@ -20,6 +20,7 @@
 
 package io.kamax.matrix.client;
 
+import org.hamcrest.core.IsEqual;
 import org.junit.Test;
 
 import java.io.File;
@@ -30,186 +31,154 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
 /*
  * TODO As the spec is outdated, I'm not sure if the error 403 can really happen in these test cases. This class has
- * to be checked for correctness, when the matrix's spec is updated.
+ * to be checked for correctness, when matrix's spec is updated.
  */
 public class MatrixHttpContentTest extends MatrixHttpTest {
-    private URI address = new URI("mxc://localhost/testAddress.txt");
+    private String bodyFilename = "textfile.txt";
+    private URI address = new URI("mxc://localhost/testpath/" + bodyFilename);
+    private String downloadUrl = "/_matrix/media/v1/download/" + address.getHost() + address.getPath() + tokenParameter;
 
     public MatrixHttpContentTest() throws URISyntaxException {
     }
 
     @Test
     public void isValid() throws URISyntaxException {
-        isValidSuccessful(true, 200);
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(
+                aResponse().withStatus(200).withBodyFile(bodyFilename).withHeader("Content-Type", "text/plain")));
+        assertTrue(createContentObject().isValid());
     }
 
     @Test
     public void isValidMissingContentType() throws URISyntaxException {
-        String url = createDownloadUrl();
-        String bodyFile = "textfile.txt";
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBodyFile(bodyFile);
-        new TestRunnerGet<Boolean>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::isValid,
-                false);
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(200).withBodyFile(bodyFilename)));
+        assertFalse(createContentObject().isValid());
     }
 
     @Test
     public void isValidError404() throws URISyntaxException {
-        isValidSuccessful(false, 404);
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        assertFalse(createContentObject().isValid());
     }
 
     @Test
     public void isValidError403() throws URISyntaxException {
-        isValidSuccessful(false, 403);
-    }
-
-    private void isValidSuccessful(boolean expectedResult, int responseStatus) throws URISyntaxException {
-        String url = createDownloadUrl();
-        String bodyFile = "textfile.txt";
-
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBodyFile(bodyFile)//
-                .setContentType("text/plain");
-
-        new TestRunnerGet<Boolean>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::isValid,
-                expectedResult);
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        assertFalse(createContentObject().isValid());
     }
 
     @Test
     public void getType() throws URISyntaxException, IOException {
-        getTypeSuccessful(200, "text/plain");
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(
+                aResponse().withStatus(200).withBodyFile(bodyFilename).withHeader("Content-Type", "text/plain")));
+        assertEquals("text/plain", createContentObject().getType());
     }
 
     @Test
     public void getTypeMissingContentType() throws URISyntaxException {
-        String url = createDownloadUrl();
-        String bodyFile = "textfile.txt";
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBodyFile(bodyFile);
-        new TestRunnerGet<String>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::getType,
-                null);
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(200).withBodyFile(bodyFilename)));
+        assertNull(createContentObject().getType());
     }
 
     @Test
     public void getTypeError404() throws URISyntaxException, IOException {
-        getTypeSuccessful(404, null);
+        stubFor(get(urlEqualTo(downloadUrl))
+                .willReturn(aResponse().withStatus(404).withStatus(404).withBody(error404Response)));
+        assertNull(createContentObject().getType());
     }
 
     @Test
     public void getTypeError403() throws URISyntaxException, IOException {
-        getTypeSuccessful(403, null);
-    }
-
-    private void getTypeSuccessful(int responseStatus, String contentType) throws URISyntaxException {
-        String url = createDownloadUrl();
-        String bodyFile = "textfile.txt";
-
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBodyFile(bodyFile)
-                .setContentType("text/plain");//
-
-        new TestRunnerGet<String>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::getType,
-                contentType);
+        stubFor(get(urlEqualTo(downloadUrl))
+                .willReturn(aResponse().withStatus(403).withStatus(403).withBody(error403Response)));
+        assertNull(createContentObject().getType());
     }
 
     @Test
     public void getData() throws URISyntaxException, IOException {
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(
+                aResponse().withStatus(200).withBodyFile(bodyFilename).withHeader("Content-Type", "text/plain")));
+
         byte[] expectedResult = Files.readAllBytes(Paths.get(ClassLoader
-                .getSystemResource("wiremock" + File.separator + "__files" + File.separator + "textfile.txt").toURI()));
-        getDataSuccessful(200, expectedResult, "textfile.txt");
+                .getSystemResource("wiremock" + File.separator + "__files" + File.separator + bodyFilename).toURI()));
+        assertThat(createContentObject().getData(), IsEqual.equalTo(expectedResult));
     }
 
     @Test
     public void getDataMissingContentType() throws URISyntaxException {
-        String url = createDownloadUrl();
-        String bodyFile = "textfile.txt";
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBodyFile(bodyFile);
-        new TestRunnerGet<byte[]>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::getData,
-                null);
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(200).withBodyFile(bodyFilename)));
+        assertNull(createContentObject().getData());
     }
 
     @Test
     public void getDataError404() throws URISyntaxException, IOException {
-        getDataSuccessful(404, null, "textfile.txt");
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        assertNull(createContentObject().getData());
     }
 
     @Test
     public void getDataError403() throws URISyntaxException, IOException {
-        getDataSuccessful(403, null, "textfile.txt");
-    }
-
-    private void getDataSuccessful(int responseStatus, byte[] expectedResult, String bodyFile)
-            throws URISyntaxException {
-        String url = createDownloadUrl();
-
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBodyFile(bodyFile)//
-                .setContentType("text/plain");
-
-        new TestRunnerGet<byte[]>(new TestRequestBuilder(url), responseBuilder).runTest(createContentObject()::getData,
-                expectedResult);
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        assertNull(createContentObject().getData());
     }
 
     @Test
     public void getFilename() throws URISyntaxException, IOException {
-        String url = createDownloadUrl();
-        String bodyFile = "textfile.txt";
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(
+                aResponse().withStatus(200).withBodyFile(bodyFilename).withHeader("Content-Type", "text/plain")
+                        .withHeader("Content-Disposition", String.format("filename=%s;", bodyFilename))));
+        assertEquals(Optional.of(bodyFilename), createContentObject().getFilename());
 
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBodyFile(bodyFile)//
-                .setContentType("text/plain")//
-                .putHeader("Content-Disposition", String.format("filename=" + bodyFile + ";"));
+        reset();
 
-        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
-                .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(
+                aResponse().withStatus(200).withBodyFile(bodyFilename).withHeader("Content-Type", "text/plain")
+                        .withHeader("Content-Disposition", String.format("filename=\"%s\";", bodyFilename))));
+        assertEquals(Optional.of(bodyFilename), createContentObject().getFilename());
 
-        responseBuilder.putHeader("Content-Disposition", String.format("filename=\"%s\";", bodyFile));
-        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
-                .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
+        reset();
 
-        responseBuilder.putHeader("Content-Disposition", String.format("filename=\"%s\"", bodyFile));
-        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
-                .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(
+                aResponse().withStatus(200).withBodyFile(bodyFilename).withHeader("Content-Type", "text/plain")
+                        .withHeader("Content-Disposition", String.format("filename=\"%s\"", bodyFilename))));
+        assertEquals(Optional.of(bodyFilename), createContentObject().getFilename());
 
-        responseBuilder.putHeader("Content-Disposition", String.format("filename=%s", bodyFile));
-        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
-                .runTest(createContentObject()::getFilename, Optional.of(bodyFile));
+        reset();
+
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(
+                aResponse().withStatus(200).withBodyFile(bodyFilename).withHeader("Content-Type", "text/plain")
+                        .withHeader("Content-Disposition", String.format("filename=%s", bodyFilename))));
+        assertEquals(Optional.of(bodyFilename), createContentObject().getFilename());
     }
 
     @Test
     public void getFilenameMissingContentType() throws URISyntaxException {
-        String url = createDownloadUrl();
-        String bodyFile = "textfile.txt";
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(200).setBodyFile(bodyFile);
-        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
-                .runTest(createContentObject()::getFilename, Optional.empty());
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(
+                aResponse().withStatus(200).withBodyFile(bodyFilename).withHeader("Content-Type", "text/plain")));
+        assertEquals(Optional.empty(), createContentObject().getFilename());
     }
 
     @Test
     public void getFilenameError404() throws URISyntaxException, IOException {
-        getFilenameSuccessful(404, "textfile.txt", Optional.empty());
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        assertEquals(Optional.empty(), createContentObject().getFilename());
     }
 
     @Test
     public void getFilenameError403() throws URISyntaxException, IOException {
-        getFilenameSuccessful(404, "textfile.txt", Optional.empty());
-    }
-
-    private void getFilenameSuccessful(int responseStatus, String bodyFile, Optional<String> expectedResult)
-            throws URISyntaxException {
-        String url = createDownloadUrl();
-
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(responseStatus).setBodyFile(bodyFile)//
-                .setContentType("text/plain")//
-                .putHeader("Content-Disposition", String.format("filename=%s;", bodyFile));
-
-        new TestRunnerGet<Optional<String>>(new TestRequestBuilder(url), responseBuilder)
-                .runTest(createContentObject()::getFilename, expectedResult);
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        assertEquals(Optional.empty(), createContentObject().getFilename());
     }
 
     private MatrixHttpContent createContentObject() throws URISyntaxException {
         MatrixClientContext context = createClientContext();
         return new MatrixHttpContent(context, address);
-    }
-
-    private String createDownloadUrl() {
-        return "/_matrix/media/v1/download/" + address.getHost() + address.getPath() + getAcessTokenParameter();
     }
 
 }

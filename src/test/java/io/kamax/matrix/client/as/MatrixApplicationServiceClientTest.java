@@ -27,26 +27,27 @@ import org.junit.Test;
 
 import java.net.URISyntaxException;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
+    private String createUserUrl = "/_matrix/client/r0/register" + tokenParameter;
+    private String testUser = "testUser";
 
     @Test
     public void createUser() throws URISyntaxException {
-        String url = createUserUrl();
-        String verifyBody = "\"username\":\"testuser\"";
-
-        new TestRunnerPostPut<String>(new TestRequestBuilder(url), new TestResponseBuilder(200))
-                .runPostTest(createClientObject()::createUser, "testuser", verifyBody);
+        stubFor(post(urlEqualTo(createUserUrl)).willReturn(aResponse().withStatus(200)));
+        createClientObject().createUser(testUser);
     }
 
     @Test
     public void createUserError429() throws URISyntaxException {
-        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createUserUrl()),
-                new TestResponseBuilder(429));
-        runner.runPostTestExceptionExpected(createClientObject()::createUser, "testuser");
-    }
+        stubFor(post(urlEqualTo(createUserUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
-    private String createUserUrl() throws URISyntaxException {
-        return "/_matrix/client/r0/register" + getAcessTokenParameter();
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+                () -> createClientObject().createUser(testUser));
+        checkErrorInfo429(e);
     }
 
     private MatrixApplicationServiceClient createClientObject() throws URISyntaxException {

@@ -26,29 +26,31 @@ import org.junit.Test;
 
 import java.net.URISyntaxException;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class MatrixHttpClientTest extends MatrixHttpTest {
+    private String setDisplaynameUrl = String.format("/_matrix/client/r0/profile/%s/displayname",
+            createClientContext().getUser().getId()) + tokenParameter;
+    private String displayName = "display name";
 
-    @Test
-    public void setDisplayname() throws URISyntaxException {
-        String url = createSetDisplaynameUrl();
-        TestResponseBuilder responseBuilder = new TestResponseBuilder(200);
-        String displayname = "new name";
-        String verifyBody = String.format("\"displayname\":\"%s\"", displayname);
-
-        new TestRunnerPostPut<String>(new TestRequestBuilder(url), responseBuilder)
-                .runPutTest(createClientObject()::setDisplayName, displayname, verifyBody);
+    public MatrixHttpClientTest() throws URISyntaxException {
     }
 
     @Test
-    public void setDisplaynameError429() throws URISyntaxException {
-        TestRunnerPostPut<String> runner = new TestRunnerPostPut<>(new TestRequestBuilder(createSetDisplaynameUrl()),
-                new TestResponseBuilder(429));
-        runner.runPutTestExceptionExpected(createClientObject()::setDisplayName, "new name");
+    public void setDisplayName() throws URISyntaxException {
+        stubFor(put(urlEqualTo(setDisplaynameUrl)).willReturn(aResponse().withStatus(200)));
+        createClientObject().setDisplayName(displayName);
     }
 
-    private String createSetDisplaynameUrl() throws URISyntaxException {
-        return String.format("/_matrix/client/r0/profile/%s/displayname", createClientContext().getUser().getId())
-                + getAcessTokenParameter();
+    @Test
+    public void setDisplayNameError429() throws URISyntaxException {
+        stubFor(put(urlEqualTo(setDisplaynameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+                () -> createClientObject().setDisplayName(displayName));
+        checkErrorInfo429(e);
     }
 
     private MatrixHttpClient createClientObject() throws URISyntaxException {
