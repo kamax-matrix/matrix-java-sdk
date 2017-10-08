@@ -74,7 +74,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getName404() throws URISyntaxException {
-        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(nameResponse)));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
         assertThat(createRoomObject().getName(), IsEqual.equalTo(Optional.empty()));
     }
 
