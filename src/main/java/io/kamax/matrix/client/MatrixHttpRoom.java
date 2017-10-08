@@ -31,6 +31,7 @@ import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
 import io.kamax.matrix.json.RoomMessageTextPutBody;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -43,10 +44,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
@@ -105,32 +103,12 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public Optional<String> getTopic() {
-        try {
-            URI path = getClientPath("/rooms/{roomId}/state/m.room.topic");
-
-            try (CloseableHttpResponse res = client.execute(log(new HttpGet(path)))) {
-                Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                String body = IOUtils.toString(res.getEntity().getContent(), charset);
-
-                if (res.getStatusLine().getStatusCode() != 200) {
-                    if (res.getStatusLine().getStatusCode() == 404) {
-                        // No topic has been set
-                        return Optional.empty();
-                    }
-
-                    // TODO handle rate limited
-                    if (res.getStatusLine().getStatusCode() == 429) {
-                        log.warn("Request was rate limited", new Exception());
-                    }
-                    MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    throw new MatrixClientRequestException(info, "Couldn't get topic for room " + roomId);
-                }
-
-                return Optional.of(jsonParser.parse(body).getAsJsonObject().get("topic").getAsString());
-            }
-        } catch (IOException e) {
-            throw new MatrixClientRequestException(e);
+        URI path = getClientPath("/rooms/{roomId}/state/m.room.topic");
+        String body = execute(new HttpGet(path));
+        if (StringUtils.isNotBlank(body)) {
+            return Optional.of(jsonParser.parse(body).getAsJsonObject().get("topic").getAsString());
         }
+        return Optional.empty();
     }
 
     @Override

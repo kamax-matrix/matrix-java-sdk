@@ -23,11 +23,14 @@ package io.kamax.matrix.client;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
+import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -36,8 +39,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,9 +52,10 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected MatrixClientContext context;
 
-    protected CloseableHttpClient client = HttpClients.createDefault();
     protected Gson gson = new Gson();
     protected JsonParser jsonParser = new JsonParser();
+    // TODO refactoring: make private
+    protected CloseableHttpClient client = HttpClients.createDefault();
     private Pattern accessTokenUrlPattern = Pattern.compile("\\?access_token=(?<token>[^&]*)");
 
     public AMatrixHttpClient(MatrixClientContext context) {
@@ -76,6 +82,68 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return context.getUser();
     }
 
+    protected String execute(HttpRequestBase request) {
+        log(request);
+        try (CloseableHttpResponse response = client.execute(request)) {
+
+            HttpEntity entity = response.getEntity();
+            int responseStatus = response.getStatusLine().getStatusCode();
+
+            Charset charset = ContentType.getOrDefault(entity).getCharset();
+            String body = IOUtils.toString(entity.getContent(), charset);
+
+            if (responseStatus == 200) {
+                log.debug("Request successfully executed.");
+            } else if (responseStatus == 404) {
+                log.debug("Requested resource not found.");
+            } else {
+                MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+                log.debug("Request returned with an error. Status code: {}, errcode: {}, error: {}", responseStatus,
+                        info.getErrcode(), info.getError());
+
+                body = handleError(request, responseStatus, info);
+            }
+            return body;
+
+        } catch (IOException e) {
+            throw new MatrixClientRequestException(e);
+        }
+    }
+
+    /**
+     * Default handling of errors. Can be overwritten by a custom implementation in inherited classes.
+     * 
+     * @param request
+     * @param responseStatus
+     * @param info
+     * @return body of the response of a repeated call of the request, else this methods throws a
+     *         MatrixClientRequestException
+     */
+    protected String handleError(HttpRequestBase request, int responseStatus, MatrixErrorInfo info) {
+        String message = String.format("Request failed with status code: %s", responseStatus);
+
+        if (responseStatus == 429) {
+            return handleRateLimited(request, info);
+        }
+
+        throw new MatrixClientRequestException(info, message);
+    }
+
+    /**
+     * Default handling of rate limited calls. Can be overwritten by a custom implementation in inherited classes.
+     * 
+     * @param request
+     * @param info
+     * @return body of the response of a repeated call of the request, else this methods throws a
+     *         MatrixClientRequestException
+     */
+    protected String handleRateLimited(HttpRequestBase request, MatrixErrorInfo info) {
+        throw new MatrixClientRequestException(info, "Request was rate limited.");
+        // TODO Add default handling of rate limited call, i.e. repeated call after given time interval.
+        // 1. Wait for timeout
+        // 2. return execute(request)
+    }
+
     protected HttpRequestBase log(HttpRequestBase req) {
         String reqUrl = req.getURI().toASCIIString();
         Matcher m = accessTokenUrlPattern.matcher(reqUrl);
@@ -87,8 +155,8 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
             reqUrl = b.toString();
         }
 
-        log.info("Doing {} {}", req.getMethod(), reqUrl);
-
+        log.debug("Doing {} {}", req.getMethod(), reqUrl);
+        // TODO refactoring: make private and remove return
         return req;
     }
 
@@ -131,5 +199,4 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     protected HttpEntity getJsonEntity(Object o) {
         return EntityBuilder.create().setText(gson.toJson(o)).setContentType(ContentType.APPLICATION_JSON).build();
     }
-
 }
