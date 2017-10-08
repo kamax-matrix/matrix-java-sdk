@@ -104,7 +104,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getTopicError404() throws URISyntaxException {
-        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(404).withBody(topicResponse)));
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
         assertThat(createRoomObject().getTopic(), IsEqual.equalTo(Optional.empty()));
     }
 
