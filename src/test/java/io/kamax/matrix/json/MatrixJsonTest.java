@@ -49,38 +49,22 @@ public class MatrixJsonTest {
 
     @Test
     public void encodeCanonicalJsonWithLineFeeds() {
-        String s = MatrixJson.encodeCanonical("{\n" +
-                "    \"one\": 1,\n" +
-                "    \"two\": \"Two\"\n" +
-                "}");
+        String s = MatrixJson.encodeCanonical("{\n" + "    \"one\": 1,\n" + "    \"two\": \"Two\"\n" + "}");
         assertTrue("{\"one\":1,\"two\":\"Two\"}".equals(s), s);
     }
 
     @Test
     public void encodeCanonicalComplicatedObject() {
-        String s = MatrixJson.encodeCanonical("{\n" +
-                "  \"auth\": {\n" +
-                "    \"success\": true,\n" +
-                "    \"mxid\": \"@john.doe:example.com\",\n" +
-                "    \"profile\": {\n" +
-                "      \"display_name\": \"John Doe\",\n" +
-                "      \"three_pids\": [\n" +
-                "        {\n" +
-                "          \"medium\": \"email\",\n" +
-                "          \"address\": \"john.doe@example.org\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"medium\": \"msisdn\",\n" +
-                "          \"address\": \"123456789\"\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  }\n" +
-                "}\n");
+        String s = MatrixJson.encodeCanonical("{\n" + "  \"auth\": {\n" + "    \"success\": true,\n"
+                + "    \"mxid\": \"@john.doe:example.com\",\n" + "    \"profile\": {\n"
+                + "      \"display_name\": \"John Doe\",\n" + "      \"three_pids\": [\n" + "        {\n"
+                + "          \"medium\": \"email\",\n" + "          \"address\": \"john.doe@example.org\"\n"
+                + "        },\n" + "        {\n" + "          \"medium\": \"msisdn\",\n"
+                + "          \"address\": \"123456789\"\n" + "        }\n" + "      ]\n" + "    }\n" + "  }\n" + "}\n");
 
-        assertTrue(("{\"auth\":{\"mxid\":\"@john.doe:example.com\",\"profile\":{\"display_name\":\"John Doe\"," +
-                "\"three_pids\":[{\"address\":\"john.doe@example.org\",\"medium\":\"email\"}," +
-                "{\"address\":\"123456789\",\"medium\":\"msisdn\"}]},\"success\":true}}").equals(s), s);
+        assertTrue(("{\"auth\":{\"mxid\":\"@john.doe:example.com\",\"profile\":{\"display_name\":\"John Doe\","
+                + "\"three_pids\":[{\"address\":\"john.doe@example.org\",\"medium\":\"email\"},"
+                + "{\"address\":\"123456789\",\"medium\":\"msisdn\"}]},\"success\":true}}").equals(s), s);
     }
 
     @Test

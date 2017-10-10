@@ -58,12 +58,10 @@ public class MatrixJson {
 
     private static void encodeCanonical(JsonObject el, JsonWriterUnchecked writer) throws IOException {
         writer.beginObject();
-        el.entrySet().stream()
-                .sorted(Comparator.comparing(Map.Entry::getKey))
-                .forEachOrdered(entry -> {
-                    writer.name(entry.getKey());
-                    encodeCanonicalElement(entry.getValue(), writer);
-                });
+        el.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).forEachOrdered(entry -> {
+            writer.name(entry.getKey());
+            encodeCanonicalElement(entry.getValue(), writer);
+        });
         writer.endObject();
     }
 
@@ -75,13 +73,11 @@ public class MatrixJson {
 
     private static void encodeCanonicalElement(JsonElement el, JsonWriterUnchecked writer) {
         try {
-            if (el.isJsonObject())
-                encodeCanonical(el.getAsJsonObject(), writer);
-            if (el.isJsonPrimitive())
-                writer.jsonValue(el.toString());
-            if (el.isJsonArray()) {
-                encodeCanonicalArray(el.getAsJsonArray(), writer);
-            }
+            if (el.isJsonObject()) encodeCanonical(el.getAsJsonObject(), writer);
+            else if (el.isJsonPrimitive()) writer.jsonValue(el.toString());
+            else if (el.isJsonArray()) encodeCanonicalArray(el.getAsJsonArray(), writer);
+            else if (el.isJsonNull()) return; // TODO is this right? do we ignore nulls?
+            else throw new JsonCanonicalException("Unexpected JSON type, this is a bug, report!");
         } catch (IOException e) {
             throw new JsonCanonicalException(e);
         }
