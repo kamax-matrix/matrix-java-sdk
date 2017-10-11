@@ -85,4 +85,10 @@ public class MatrixJsonTest {
         assertTrue("{\"a\":\"日\"}".equals(s), s);
     }
 
+    @Test
+    public void encodeCanonicalNull() {
+        String s = MatrixJson.encodeCanonical("{\"a\":null}");
+        assertTrue("{\"a\":null}".equals(s), s);
+    }
+
 }

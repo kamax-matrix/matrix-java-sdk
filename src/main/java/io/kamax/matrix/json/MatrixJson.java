@@ -76,7 +76,7 @@ public class MatrixJson {
             if (el.isJsonObject()) encodeCanonical(el.getAsJsonObject(), writer);
             else if (el.isJsonPrimitive()) writer.jsonValue(el.toString());
             else if (el.isJsonArray()) encodeCanonicalArray(el.getAsJsonArray(), writer);
-            else if (el.isJsonNull()) return; // TODO is this right? do we ignore nulls?
+            else if (el.isJsonNull()) writer.nullValue();
             else throw new JsonCanonicalException("Unexpected JSON type, this is a bug, report!");
         } catch (IOException e) {
             throw new JsonCanonicalException(e);
@@ -91,7 +91,6 @@ public class MatrixJson {
             writer.setIndent("");
             writer.setHtmlSafe(false);
             writer.setLenient(false);
-            writer.setSerializeNulls(false);
 
             if (!el.isJsonObject()) {
                 /*
