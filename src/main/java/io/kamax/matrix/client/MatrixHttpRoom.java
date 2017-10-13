@@ -31,7 +31,6 @@ import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
 import io.kamax.matrix.json.RoomMessageTextPutBody;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -44,7 +43,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
@@ -104,11 +106,10 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     @Override
     public Optional<String> getTopic() {
         URI path = getClientPath("/rooms/{roomId}/state/m.room.topic");
-        String body = execute(new HttpGet(path));
-        if (StringUtils.isNotBlank(body)) {
-            return Optional.of(jsonParser.parse(body).getAsJsonObject().get("topic").getAsString());
-        }
-        return Optional.empty();
+        MatrixHttpRequest matrixRequest = new MatrixHttpRequest(new HttpGet(path));
+        matrixRequest.addIgnoredErrorCode(404);
+        String body = execute(matrixRequest);
+        return extractAsStringFromBody(body, "topic");
     }
 
     @Override
