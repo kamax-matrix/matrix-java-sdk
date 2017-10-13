@@ -89,7 +89,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getNameError429() throws URISyntaxException {
-        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error403Response)));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
         // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
@@ -250,13 +250,13 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     @Test
-    public void getJoinedUsers429() throws URISyntaxException {
+    public void getJoinedUsersError429() throws URISyntaxException {
         stubFor(get(urlEqualTo(getJoinedUsersUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createRoomObject()::getJoinedUsers);
         // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
-        // checkErrorInfo404(e);
+        // checkErrorInfo429(e);
     }
 
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {
