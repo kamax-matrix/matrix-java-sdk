@@ -29,7 +29,6 @@ import io.kamax.matrix.hs._MatrixHomeserver;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -99,9 +98,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
                 log.debug("TODO");
                 return "";
             } else {
-                MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                log.debug("Request returned with an error. Status code: {}, errcode: {}, error: {}", responseStatus,
-                        info.getErrcode(), info.getError());
+                MatrixErrorInfo info = createErrorInfo(body, responseStatus);
 
                 body = handleError(matrixRequest, responseStatus, info);
             }
@@ -112,61 +109,9 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         }
     }
 
-    protected MatrixHttpByteResult executeByteRequest(MatrixHttpRequest matrixRequest) {
-        log(matrixRequest.getHttpRequest());
-        try (CloseableHttpResponse response = client.execute(matrixRequest.getHttpRequest())) {
-
-            HttpEntity entity = response.getEntity();
-            int responseStatus = response.getStatusLine().getStatusCode();
-
-            MatrixHttpByteResult result = new MatrixHttpByteResult(response);
-
-            if (responseStatus == 200) {
-                log.debug("Request successfully executed.");
-
-                if (entity == null) {
-                    log.debug("No data received.");
-                } else {
-                    Header contentType = entity.getContentType();
-                    if (contentType == null) {
-                        log.info("No content type was given, unable to process avatar data");
-                    } else {
-
-                    }
-                }
-
-            } else if (matrixRequest.getIgnoredErrorCodes().contains(responseStatus)) {
-                // TODO debug text??
-                log.debug("TODO");
-            } else {
-                MatrixErrorInfo info = gson.fromJson(getBody(entity), MatrixErrorInfo.class);
-                log.debug("Request returned with an error. Status code: {}, errcode: {}, error: {}", responseStatus,
-                        info.getErrcode(), info.getError());
-
-                // result = handleError(matrixRequest, responseStatus, info);
-            }
-            return result;
-
-        } catch (IOException e) {
-            throw new MatrixClientRequestException(e);
-        }
-    }
-
-    protected Optional<String> extractAsStringFromBody(String body, String jsonObjectName) {
-        if (StringUtils.isNotBlank(body)) {
-            return Optional.of(new JsonParser().parse(body).getAsJsonObject().get(jsonObjectName).getAsString());
-        }
-        return Optional.empty();
-    }
-
-    private String getBody(HttpEntity entity) throws IOException {
-        Charset charset = ContentType.getOrDefault(entity).getCharset();
-        return IOUtils.toString(entity.getContent(), charset);
-    }
-
     /**
      * Default handling of errors. Can be overwritten by a custom implementation in inherited classes.
-     * 
+     *
      * @param matrixRequest
      * @param responseStatus
      * @param info
@@ -185,7 +130,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     /**
      * Default handling of rate limited calls. Can be overwritten by a custom implementation in inherited classes.
-     * 
+     *
      * @param matrixRequest
      * @param info
      * @return body of the response of a repeated call of the request, else this methods throws a
@@ -196,6 +141,77 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         // TODO Add default handling of rate limited call, i.e. repeated call after given time interval.
         // 1. Wait for timeout
         // 2. return execute(request)
+    }
+
+    protected MatrixHttpByteResult executeByteRequest(MatrixHttpRequest matrixRequest) {
+        log(matrixRequest.getHttpRequest());
+        try (CloseableHttpResponse response = client.execute(matrixRequest.getHttpRequest())) {
+
+            HttpEntity entity = response.getEntity();
+            int responseStatus = response.getStatusLine().getStatusCode();
+
+            MatrixHttpByteResult result = new MatrixHttpByteResult(response);
+
+            if (responseStatus == 200) {
+                log.debug("Request successfully executed.");
+
+                if (entity == null) {
+                    log.debug("No data received.");
+                } else if (entity.getContentType() == null) {
+                    log.debug("No content type was given.");
+                }
+
+            } else if (matrixRequest.getIgnoredErrorCodes().contains(responseStatus)) {
+                // TODO debug text??
+                log.debug("TODO");
+            } else {
+                String body = getBody(entity);
+                MatrixErrorInfo info = createErrorInfo(body, responseStatus);
+
+                result = handleErrorByteRequest(matrixRequest, responseStatus, info);
+            }
+            return result;
+
+        } catch (IOException e) {
+            throw new MatrixClientRequestException(e);
+        }
+    }
+
+    protected MatrixHttpByteResult handleErrorByteRequest(MatrixHttpRequest matrixRequest, int responseStatus,
+            MatrixErrorInfo info) {
+        String message = String.format("Request failed with status code: %s", responseStatus);
+
+        if (responseStatus == 429) {
+            return handleRateLimitedByteRequest(matrixRequest, info);
+        }
+
+        throw new MatrixClientRequestException(info, message);
+    }
+
+    protected MatrixHttpByteResult handleRateLimitedByteRequest(MatrixHttpRequest matrixRequest, MatrixErrorInfo info) {
+        throw new MatrixClientRequestException(info, "Request was rate limited.");
+        // TODO Add default handling of rate limited call, i.e. repeated call after given time interval.
+        // 1. Wait for timeout
+        // 2. return execute(request)
+    }
+
+    protected Optional<String> extractAsStringFromBody(String body, String jsonObjectName) {
+        if (StringUtils.isNotBlank(body)) {
+            return Optional.of(new JsonParser().parse(body).getAsJsonObject().get(jsonObjectName).getAsString());
+        }
+        return Optional.empty();
+    }
+
+    private String getBody(HttpEntity entity) throws IOException {
+        Charset charset = ContentType.getOrDefault(entity).getCharset();
+        return IOUtils.toString(entity.getContent(), charset);
+    }
+
+    private MatrixErrorInfo createErrorInfo(String body, int responseStatus) {
+        MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+        log.debug("Request returned with an error. Status code: {}, errcode: {}, error: {}", responseStatus,
+                info.getErrcode(), info.getError());
+        return info;
     }
 
     protected HttpRequestBase log(HttpRequestBase req) {
