@@ -89,8 +89,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     @Override
     public void join() {
         URI path = getClientPath("/rooms/{roomId}/join");
-        MatrixHttpRequest request = new MatrixHttpRequest(new HttpPost(path));
-        execute(request);
+        execute(new HttpPost(path));
     }
 
     @Override
@@ -113,8 +112,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         URI path = getClientPath("/rooms/{roomId}/send/m.room.message/" + System.currentTimeMillis());
         HttpPut httpPut = new HttpPut(path);
         httpPut.setEntity(getJsonEntity(content));
-        MatrixHttpRequest request = new MatrixHttpRequest(httpPut);
-        execute(request);
+        execute(httpPut);
     }
 
     @Override
