@@ -42,6 +42,11 @@ public class MatrixHttpTest {
     protected int port = 8098;
     protected String resourcePath = "src/test/resources/wiremock";
 
+    protected String domain = "localhost";
+    protected String baseUrl = "http://localhost:" + port;
+    protected String nameOfUser = "testuser";
+    protected MatrixID user = new MatrixID(nameOfUser, domain);
+
     private String errorResponseTemplate = "{\"errcode\": \"%s\", \"error\": \"%s\"}";
 
     private String errcode403 = "M_FORBIDDEN";
@@ -60,10 +65,9 @@ public class MatrixHttpTest {
     public WireMockRule wireMockRule = new WireMockRule(options().port(port).usingFilesUnderDirectory(resourcePath));
 
     protected MatrixClientContext createClientContext() throws URISyntaxException {
-        String domain = "localhost";
-        String baseUrl = "http://localhost:" + port;
+
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        return new MatrixClientContext(hs, new MatrixID("testuser", domain), testToken);
+        return new MatrixClientContext(hs, user, testToken);
     }
 
     protected String getAcessTokenParameter() {
