@@ -28,12 +28,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-public class MatrixHttpByteResult {
+public class MatrixHttpContentResult {
     private final List<Header> headers;
     private final Optional<Header> contentType;
     private final byte[] data;
 
-    public MatrixHttpByteResult(CloseableHttpResponse response) throws IOException {
+    public MatrixHttpContentResult(CloseableHttpResponse response) throws IOException {
         HttpEntity entity = response.getEntity();
 
         if (entity != null) {

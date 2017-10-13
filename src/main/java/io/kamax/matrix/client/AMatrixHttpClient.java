@@ -143,14 +143,14 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         // 2. return execute(request)
     }
 
-    protected MatrixHttpByteResult executeByteRequest(MatrixHttpRequest matrixRequest) {
+    protected MatrixHttpContentResult executeContentRequest(MatrixHttpRequest matrixRequest) {
         log(matrixRequest.getHttpRequest());
         try (CloseableHttpResponse response = client.execute(matrixRequest.getHttpRequest())) {
 
             HttpEntity entity = response.getEntity();
             int responseStatus = response.getStatusLine().getStatusCode();
 
-            MatrixHttpByteResult result = new MatrixHttpByteResult(response);
+            MatrixHttpContentResult result = new MatrixHttpContentResult(response);
 
             if (responseStatus == 200) {
                 log.debug("Request successfully executed.");
@@ -168,7 +168,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
                 String body = getBody(entity);
                 MatrixErrorInfo info = createErrorInfo(body, responseStatus);
 
-                result = handleErrorByteRequest(matrixRequest, responseStatus, info);
+                result = handleErrorContentRequest(matrixRequest, responseStatus, info);
             }
             return result;
 
@@ -177,18 +177,19 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         }
     }
 
-    protected MatrixHttpByteResult handleErrorByteRequest(MatrixHttpRequest matrixRequest, int responseStatus,
+    protected MatrixHttpContentResult handleErrorContentRequest(MatrixHttpRequest matrixRequest, int responseStatus,
             MatrixErrorInfo info) {
         String message = String.format("Request failed with status code: %s", responseStatus);
 
         if (responseStatus == 429) {
-            return handleRateLimitedByteRequest(matrixRequest, info);
+            return handleRateLimitedContentRequest(matrixRequest, info);
         }
 
         throw new MatrixClientRequestException(info, message);
     }
 
-    protected MatrixHttpByteResult handleRateLimitedByteRequest(MatrixHttpRequest matrixRequest, MatrixErrorInfo info) {
+    protected MatrixHttpContentResult handleRateLimitedContentRequest(MatrixHttpRequest matrixRequest,
+            MatrixErrorInfo info) {
         throw new MatrixClientRequestException(info, "Request was rate limited.");
         // TODO Add default handling of rate limited call, i.e. repeated call after given time interval.
         // 1. Wait for timeout

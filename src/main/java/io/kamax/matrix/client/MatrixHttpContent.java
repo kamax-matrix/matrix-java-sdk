@@ -41,7 +41,7 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
 
     private URI address;
 
-    private Optional<MatrixHttpByteResult> result = Optional.empty();
+    private Optional<MatrixHttpContentResult> result = Optional.empty();
 
     private boolean isValid = false;
 
@@ -64,7 +64,7 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
                 URI path = getMediaPath("/download/" + address.getHost() + address.getPath());
 
                 MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
-                result = Optional.of(executeByteRequest(request));
+                result = Optional.of(executeContentRequest(request));
                 if (result.isPresent()) {
                     isValid = result.get().getContentType().isPresent();
                 }
