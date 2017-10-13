@@ -90,7 +90,6 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     public void join() {
         URI path = getClientPath("/rooms/{roomId}/join");
         MatrixHttpRequest request = new MatrixHttpRequest(new HttpPost(path));
-        request.addIgnoredErrorCode(403);
         execute(request);
     }
 
@@ -98,7 +97,6 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     public void leave() {
         URI path = getClientPath("/rooms/{roomId}/leave");
         MatrixHttpRequest request = new MatrixHttpRequest(new HttpPost(path));
-        request.addIgnoredErrorCode(403);
 
         // TODO Find a better way to handle room objects for unknown rooms
         // Maybe throw exception?
@@ -116,7 +114,6 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         HttpPut httpPut = new HttpPut(path);
         httpPut.setEntity(getJsonEntity(content));
         MatrixHttpRequest request = new MatrixHttpRequest(httpPut);
-        request.addIgnoredErrorCode(403);
         execute(request);
     }
 
