@@ -84,6 +84,10 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return context.getUser();
     }
 
+    protected String execute(HttpRequestBase request) {
+        return execute(new MatrixHttpRequest(request));
+    }
+
     protected String execute(MatrixHttpRequest matrixRequest) {
         log(matrixRequest.getHttpRequest());
         try (CloseableHttpResponse response = client.execute(matrixRequest.getHttpRequest())) {
@@ -197,7 +201,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     protected Optional<String> extractAsStringFromBody(String body, String jsonObjectName) {
-        if (StringUtils.isNotBlank(body)) {
+        if (StringUtils.isNotEmpty(body)) {
             return Optional.of(new JsonParser().parse(body).getAsJsonObject().get(jsonObjectName).getAsString());
         }
         return Optional.empty();
