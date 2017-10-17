@@ -169,11 +169,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void leaveError404() throws URISyntaxException {
         stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
-
-        // TODO After the refactoring, this test will throw a MatrixClientRequestException
         createRoomObject().leave();
-        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
-        // checkErrorInfo404(e);
     }
 
     @Test

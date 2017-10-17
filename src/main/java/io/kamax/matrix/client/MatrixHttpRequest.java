@@ -34,7 +34,6 @@ public class MatrixHttpRequest {
     }
 
     public MatrixHttpRequest addIgnoredErrorCode(int errcode) {
-        // TODO constants for error codes
         ignoredErrorCodes.add(errcode);
         return this;
     }

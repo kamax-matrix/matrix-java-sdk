@@ -20,10 +20,8 @@
 
 package io.kamax.matrix.client.as;
 
-import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix.client.MatrixClientContext;
-import io.kamax.matrix.client.MatrixClientRequestException;
 import io.kamax.matrix.client._MatrixClient;
 import io.kamax.matrix.client.regular.MatrixHttpClient;
 import io.kamax.matrix.hs._MatrixHomeserver;
@@ -34,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.util.Optional;
 
 public class MatrixApplicationServiceClient extends MatrixHttpClient implements _MatrixApplicationServiceClient {
 
@@ -55,18 +52,7 @@ public class MatrixApplicationServiceClient extends MatrixHttpClient implements 
         URI path = getClientPath("/register");
         HttpPost req = new HttpPost(path);
         req.setEntity(getJsonEntity(new VirtualUserRegistrationBody(localpart)));
-
-        try {
-            execute(req);
-        } catch (MatrixClientRequestException e) {
-            // TODO turn into dedicated exceptions, following the Spec distinct errors
-            Optional<MatrixErrorInfo> error = e.getError();
-            if (error.isPresent() && "M_USER_IN_USE".contentEquals(error.get().getErrcode())) {
-                log.debug("User {} already exists, ignoring", localpart);
-            } else {
-                throw e;
-            }
-        }
+        execute(req);
 
         return createClient(localpart);
     }
