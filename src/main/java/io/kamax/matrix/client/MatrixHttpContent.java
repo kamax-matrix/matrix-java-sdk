@@ -36,14 +36,13 @@ import java.util.regex.Pattern;
 public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixContent {
 
     private Logger log = LoggerFactory.getLogger(MatrixHttpContent.class);
-
     private final Pattern filenamePattern = Pattern.compile("filename=\"?(?<filename>[^\";]+)");
-
     private URI address;
 
-    private Optional<MatrixHttpContentResult> result = Optional.empty();
+    private MatrixHttpContentResult result;
 
-    private boolean isValid = false;
+    private boolean loaded = false;
+    private boolean valid = false;
 
     public MatrixHttpContent(MatrixClientContext context, URI address) {
         super(context);
@@ -52,27 +51,25 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
 
     // TODO switch a HTTP HEAD to fetch initial data, instead of loading in memory directly
     private synchronized void load() {
-        if (result.isPresent()) {
+        if (loaded) {
             return;
         }
 
-        // TODO do we need this try catch block? verify with test classes
         try {
             if (!StringUtils.equalsIgnoreCase("mxc", address.getScheme())) {
-                log.error("{} is not a supported protocol for avatars, ignoring", address.getScheme());
+                log.debug("{} is not a supported protocol for avatars, ignoring", address.getScheme());
             } else {
                 URI path = getMediaPath("/download/" + address.getHost() + address.getPath());
 
                 MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
-                result = Optional.of(executeContentRequest(request));
-                if (result.isPresent()) {
-                    isValid = result.get().getContentType().isPresent();
-                }
+                result = executeContentRequest(request);
+                valid = result.isValid();
             }
 
         } catch (MatrixClientRequestException e) {
-            isValid = false;
+            valid = false;
         }
+        loaded = true;
     }
 
     @Override
@@ -84,41 +81,42 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
     public boolean isValid() {
         load();
 
-        return isValid;
+        return valid;
     }
 
     @Override
-    public String getType() {
+    public Optional<String> getType() {
         load();
-        if (result.isPresent()) {
-            Optional<Header> contentType = result.get().getContentType();
-            if (contentType.isPresent()) {
-                return contentType.get().getValue();
-            }
+
+        if (!isValid()) {
+            throw new IllegalStateException("This method should only be called, if valid is true.");
         }
-        // TODO return Optional?
-        return null;
+        return result.getContentType();
     }
 
     @Override
     public byte[] getData() {
         load();
 
-        // TODO return Optional?
-        return isValid && result.isPresent() ? result.get().getData() : null;
+        if (!isValid()) {
+            throw new IllegalStateException("This method should only be called, if valid is true.");
+        }
+        return result.getData();
     }
 
     @Override
     public Optional<String> getFilename() {
         load();
 
-        if (isValid && result.isPresent()) {
-            Optional<Header> contentDisposition = result.get().getHeader("Content-Disposition");
-            if (contentDisposition.isPresent()) {
-                Matcher m = filenamePattern.matcher(contentDisposition.get().getValue());
-                if (m.find()) {
-                    return Optional.of(m.group("filename"));
-                }
+        if (!isValid()) {
+            throw new IllegalStateException("This method should only be called, if valid is true.");
+        }
+
+        Optional<Header> contentDisposition = result.getHeader("Content-Disposition");
+        if (contentDisposition.isPresent()) {
+            Matcher m = filenamePattern.matcher(contentDisposition.get().getValue());
+            if (m.find()) {
+                return Optional.of(m.group("filename"));
             }
         }
 

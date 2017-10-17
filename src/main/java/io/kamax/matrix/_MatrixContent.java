@@ -29,7 +29,7 @@ public interface _MatrixContent {
 
     boolean isValid();
 
-    String getType();
+    Optional<String> getType();
 
     byte[] getData();
 

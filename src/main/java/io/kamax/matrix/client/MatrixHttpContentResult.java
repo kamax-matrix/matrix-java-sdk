@@ -29,16 +29,23 @@ import java.io.IOException;
 import java.util.*;
 
 public class MatrixHttpContentResult {
+    private final boolean valid;
     private final List<Header> headers;
-    private final Optional<Header> contentType;
+    private final Optional<String> contentType;
     private final byte[] data;
 
     public MatrixHttpContentResult(CloseableHttpResponse response) throws IOException {
         HttpEntity entity = response.getEntity();
+        valid = entity != null && response.getStatusLine().getStatusCode() == 200;
 
         if (entity != null) {
             headers = Arrays.asList(response.getAllHeaders());
-            contentType = Optional.ofNullable(entity.getContentType());
+            Header contentTypeHeader = entity.getContentType();
+            if (contentTypeHeader != null) {
+                contentType = Optional.of(contentTypeHeader.getValue());
+            } else {
+                contentType = Optional.empty();
+            }
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();
             entity.writeTo(outStream);
             data = outStream.toByteArray();
@@ -47,6 +54,10 @@ public class MatrixHttpContentResult {
             contentType = Optional.empty();
             data = new byte[0];
         }
+    }
+
+    public boolean isValid() {
+        return valid;
     }
 
     public Optional<Header> getHeader(String name) {
@@ -58,7 +69,7 @@ public class MatrixHttpContentResult {
         return Optional.empty();
     }
 
-    public Optional<Header> getContentType() {
+    public Optional<String> getContentType() {
         return contentType;
     }
 
