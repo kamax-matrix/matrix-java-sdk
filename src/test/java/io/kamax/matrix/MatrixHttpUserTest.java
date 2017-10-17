@@ -21,6 +21,7 @@
 package io.kamax.matrix;
 
 import io.kamax.matrix.client.MatrixClientContext;
+import io.kamax.matrix.client.MatrixClientRequestException;
 import io.kamax.matrix.client.MatrixHttpTest;
 import io.kamax.matrix.client.MatrixHttpUser;
 
@@ -35,6 +36,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MatrixHttpUserTest extends MatrixHttpTest {
@@ -61,22 +63,16 @@ public class MatrixHttpUserTest extends MatrixHttpTest {
     public void getNameError403() throws URISyntaxException {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
-        assertThat(createUserObject().getName(), is(equalTo(Optional.empty())));
-        // TODO After the refactoring an exception will be thrown
-        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
-        // createUserObject()::getName);
-        // checkErrorInfo403(e);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createUserObject()::getName);
+        checkErrorInfo403(e);
     }
 
     @Test
     public void getNameError429() throws URISyntaxException {
-        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error403Response)));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
-        assertThat(createUserObject().getName(), is(equalTo(Optional.empty())));
-        // TODO After the refactoring an exception will be thrown
-        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
-        // createUserObject()::getName);
-        // checkErrorInfo429(e);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createUserObject()::getName);
+        checkErrorInfo429(e);
     }
 
     @Test
@@ -97,22 +93,18 @@ public class MatrixHttpUserTest extends MatrixHttpTest {
     public void getAvatarError403() throws URISyntaxException {
         stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
-        assertThat(createUserObject().getAvatar(), is(equalTo(Optional.empty())));
-        // TODO After the refactoring an exception will be thrown
-        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
-        // createUserObject()::getAvatar);
-        // checkErrorInfo403(e);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+                createUserObject()::getAvatar);
+        checkErrorInfo403(e);
     }
 
     @Test
     public void getAvatarError429() throws URISyntaxException {
-        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(429).withBody(error403Response)));
+        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
-        assertThat(createUserObject().getAvatar(), is(equalTo(Optional.empty())));
-        // TODO After the refactoring an exception will be thrown
-        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
-        // createUserObject()::getAvatar);
-        // checkErrorInfo429(e);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+                createUserObject()::getAvatar);
+        checkErrorInfo429(e);
     }
 
     private MatrixHttpUser createUserObject() throws URISyntaxException {
