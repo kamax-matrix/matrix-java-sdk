@@ -56,8 +56,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected Gson gson = new Gson();
     protected JsonParser jsonParser = new JsonParser();
-    // TODO refactoring: make private
-    protected CloseableHttpClient client = HttpClients.createDefault();
+    private CloseableHttpClient client = HttpClients.createDefault();
     private Pattern accessTokenUrlPattern = Pattern.compile("\\?access_token=(?<token>[^&]*)");
 
     public AMatrixHttpClient(MatrixClientContext context) {
@@ -98,8 +97,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
             if (responseStatus == 200) {
                 log.debug("Request successfully executed.");
             } else if (matrixRequest.getIgnoredErrorCodes().contains(responseStatus)) {
-                // TODO debug text??
-                log.debug("TODO");
+                log.debug("Error code ignored: " + responseStatus);
                 return "";
             } else {
                 MatrixErrorInfo info = createErrorInfo(body, responseStatus);
@@ -166,8 +164,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
                 }
 
             } else if (matrixRequest.getIgnoredErrorCodes().contains(responseStatus)) {
-                // TODO debug text??
-                log.debug("TODO");
+                log.debug("Error code ignored: " + responseStatus);
             } else {
                 String body = getBody(entity);
                 MatrixErrorInfo info = createErrorInfo(body, responseStatus);
@@ -219,7 +216,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return info;
     }
 
-    protected HttpRequestBase log(HttpRequestBase req) {
+    private void log(HttpRequestBase req) {
         String reqUrl = req.getURI().toASCIIString();
         Matcher m = accessTokenUrlPattern.matcher(reqUrl);
         if (m.find()) {
@@ -231,8 +228,6 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         }
 
         log.debug("Doing {} {}", req.getMethod(), reqUrl);
-        // TODO refactoring: make private and remove return
-        return req;
     }
 
     protected URIBuilder getPathBuilder(String module, String version, String action) {
