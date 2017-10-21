@@ -20,8 +20,6 @@
 
 package io.kamax.matrix.hs;
 
-import org.apache.http.client.utils.URIBuilder;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -41,8 +39,8 @@ public class MatrixHomeserver implements _MatrixHomeserver {
     }
 
     @Override
-    public URIBuilder getClientEndpoint() {
-        return new URIBuilder(base);
+    public URI getClientEndpoint() {
+        return base;
     }
 
 }

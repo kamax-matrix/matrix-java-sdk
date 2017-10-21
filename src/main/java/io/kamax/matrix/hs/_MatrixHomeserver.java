@@ -20,12 +20,12 @@
 
 package io.kamax.matrix.hs;
 
-import org.apache.http.client.utils.URIBuilder;
+import java.net.URI;
 
 public interface _MatrixHomeserver {
 
     String getDomain();
 
-    URIBuilder getClientEndpoint();
+    URI getClientEndpoint();
 
 }

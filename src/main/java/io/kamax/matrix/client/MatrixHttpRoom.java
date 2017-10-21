@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,8 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         this.roomId = roomId;
     }
 
-    protected URIBuilder getClientPathBuilder(String action) {
+    @Override
+    protected URIBuilder getClientPathBuilder(String action) throws URISyntaxException {
         URIBuilder builder = super.getClientPathBuilder(action);
         builder.setPath(builder.getPath().replace("{roomId}", roomId));
 

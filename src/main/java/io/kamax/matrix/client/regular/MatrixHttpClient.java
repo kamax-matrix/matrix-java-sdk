@@ -28,14 +28,10 @@ import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.UserDisplaynameSetBody;
 
 import org.apache.http.client.methods.HttpPut;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 
 public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient {
-
-    private Logger log = LoggerFactory.getLogger(MatrixHttpClient.class);
 
     public MatrixHttpClient(MatrixClientContext context) {
         super(context);
@@ -47,7 +43,7 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
 
     @Override
     public void setDisplayName(String name) {
-        URI path = getClientPath("/profile/{userId}/displayname");
+        URI path = getClientPath("/profile/" + context.getUser().getId() + "/displayname");
         HttpPut req = new HttpPut(path);
         req.setEntity(getJsonEntity(new UserDisplaynameSetBody(name)));
         execute(req);

@@ -230,11 +230,9 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         log.debug("Doing {} {}", req.getMethod(), reqUrl);
     }
 
-    protected URIBuilder getPathBuilder(String module, String version, String action) {
-        URIBuilder builder = context.getHs().getClientEndpoint();
-        builder.setPath(builder.getPath() + "/_matrix/" + module + "/" + version + action);
+    private URIBuilder getPathBuilder(URI path) {
+        URIBuilder builder = new URIBuilder(path);
         builder.setParameter("access_token", context.getToken());
-        builder.setPath(builder.getPath().replace("{userId}", context.getUser().getId()));
         if (context.isVirtualUser()) {
             builder.setParameter("user_id", context.getUser().getId());
         }
@@ -242,12 +240,16 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return builder;
     }
 
-    protected URIBuilder getClientPathBuilder(String action) {
-        return getPathBuilder("client", "r0", action);
+    private URI getPath(String module, String version, String action) throws URISyntaxException {
+        return new URI(context.getHs().getClientEndpoint() + "/_matrix/" + module + "/" + version + action);
     }
 
-    protected URIBuilder getMediaPathBuilder(String action) {
-        return getPathBuilder("media", "v1", action);
+    protected URIBuilder getClientPathBuilder(String action) throws URISyntaxException {
+        return getPathBuilder(getPath("client", "r0", action));
+    }
+
+    protected URIBuilder getMediaPathBuilder(String action) throws URISyntaxException {
+        return getPathBuilder(getPath("media", "v1", action));
     }
 
     protected URI getClientPath(String action) {
