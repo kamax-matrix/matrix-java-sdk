@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Maxime Dor
+ * Copyright (C) 2017 Arne Augenstein
  *
  * https://max.kamax.io/
  *
@@ -18,21 +18,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix;
+package io.kamax.matrix.client;
 
-import java.net.URI;
-import java.util.Optional;
+import org.apache.http.client.methods.HttpRequestBase;
 
-public interface _MatrixContent {
+import java.util.ArrayList;
+import java.util.List;
 
-    URI getAddress();
+public class MatrixHttpRequest {
+    private final HttpRequestBase httpRequest;
+    private List<Integer> ignoredErrorCodes = new ArrayList<>();
 
-    boolean isValid();
+    public MatrixHttpRequest(HttpRequestBase request) {
+        this.httpRequest = request;
+    }
 
-    Optional<String> getType();
+    public MatrixHttpRequest addIgnoredErrorCode(int errcode) {
+        ignoredErrorCodes.add(errcode);
+        return this;
+    }
 
-    byte[] getData();
+    public HttpRequestBase getHttpRequest() {
+        return httpRequest;
+    }
 
-    Optional<String> getFilename();
+    public List<Integer> getIgnoredErrorCodes() {
+        return ignoredErrorCodes;
+    }
 
 }

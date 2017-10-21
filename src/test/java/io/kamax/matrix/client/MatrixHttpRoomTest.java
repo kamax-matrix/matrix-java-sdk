@@ -83,8 +83,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
-        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
-        // checkErrorInfo403(e);
+        checkErrorInfo403(e);
     }
 
     @Test
@@ -92,8 +91,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
-        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
-        // checkErrorInfo429(e);
+        checkErrorInfo429(e);
     }
 
     @Test
@@ -142,10 +140,8 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     public void joinError403() throws URISyntaxException {
         stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
-        // TODO After the refactoring, this test will throw a MatrixClientRequestException
-        createRoomObject().join();
-        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
-        // checkErrorInfo403(e);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
+        checkErrorInfo403(e);
     }
 
     @Test
@@ -166,20 +162,14 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     public void leaveError403() throws URISyntaxException {
         stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
-        // TODO After the refactoring, this test will throw a MatrixClientRequestException
-        createRoomObject().leave();
-        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
-        // checkErrorInfo403(e);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
+        checkErrorInfo403(e);
     }
 
     @Test
     public void leaveError404() throws URISyntaxException {
         stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
-
-        // TODO After the refactoring, this test will throw a MatrixClientRequestException
         createRoomObject().leave();
-        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
-        // checkErrorInfo404(e);
     }
 
     @Test
@@ -200,11 +190,9 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     public void sendTextError403() throws URISyntaxException {
         stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
-        // TODO After the refactoring, this test will throw a MatrixClientRequestException
-        createRoomObject().sendText(testText);
-        // MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
-        // () -> createRoomObject().sendText(testText));
-        // checkErrorInfo404(e);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+                () -> createRoomObject().sendText(testText));
+        checkErrorInfo403(e);
     }
 
     @Test
@@ -213,8 +201,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createRoomObject().sendText(testText));
-        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
-        // checkErrorInfo404(e);
+        checkErrorInfo404(e);
     }
 
     @Test
@@ -223,8 +210,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createRoomObject().sendText(testText));
-        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
-        // checkErrorInfo429(e);
+        checkErrorInfo429(e);
     }
 
     @Test
@@ -245,8 +231,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createRoomObject()::getJoinedUsers);
-        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
-        // checkErrorInfo404(e);
+        checkErrorInfo404(e);
     }
 
     @Test
@@ -255,8 +240,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createRoomObject()::getJoinedUsers);
-        // TODO After the refactoring, the exception will contain a proper MatrixErrorInfo object
-        // checkErrorInfo429(e);
+        checkErrorInfo429(e);
     }
 
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {

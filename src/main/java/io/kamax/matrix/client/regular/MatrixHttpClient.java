@@ -20,7 +20,6 @@
 
 package io.kamax.matrix.client.regular;
 
-import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
@@ -28,16 +27,11 @@ import io.kamax.matrix.client.*;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.UserDisplaynameSetBody;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.Charset;
 
 public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient {
 
@@ -53,29 +47,10 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
 
     @Override
     public void setDisplayName(String name) {
-        try {
-            URI path = getClientPath("/profile/{userId}/displayname");
-            HttpPut req = new HttpPut(path);
-            req.setEntity(getJsonEntity(new UserDisplaynameSetBody(name)));
-
-            try (CloseableHttpResponse res = client.execute(log(req))) {
-                if (res.getStatusLine().getStatusCode() == 200) {
-                    log.info("Successfully set user {} displayname to {}", getUser(), name);
-                } else {
-                    if (res.getStatusLine().getStatusCode() == 429) {
-                        // TODO handle rate limited
-                        log.warn("Request was rate limited", new Exception());
-                    }
-
-                    Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                    String body = IOUtils.toString(res.getEntity().getContent(), charset);
-                    MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    throw new MatrixClientRequestException(info, "Error changing display name for " + getUser());
-                }
-            }
-        } catch (IOException e) {
-            throw new MatrixClientRequestException(e);
-        }
+        URI path = getClientPath("/profile/{userId}/displayname");
+        HttpPut req = new HttpPut(path);
+        req.setEntity(getJsonEntity(new UserDisplaynameSetBody(name)));
+        execute(req);
     }
 
     @Override

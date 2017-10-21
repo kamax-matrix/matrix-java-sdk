@@ -23,26 +23,21 @@ package io.kamax.matrix.client;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
 import io.kamax.matrix.json.RoomMessageTextPutBody;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -74,166 +69,50 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public Optional<String> getName() {
-        try {
-            URI path = getClientPath("/rooms/{roomId}/state/m.room.name");
+        URI path = getClientPath("/rooms/{roomId}/state/m.room.name");
 
-            try (CloseableHttpResponse res = client.execute(log(new HttpGet(path)))) {
-                Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                String body = IOUtils.toString(res.getEntity().getContent(), charset);
-
-                if (res.getStatusLine().getStatusCode() != 200) {
-                    if (res.getStatusLine().getStatusCode() == 404) {
-                        // No name has been set
-                        return Optional.empty();
-                    }
-
-                    // TODO handle rate limited
-                    if (res.getStatusLine().getStatusCode() == 429) {
-                        log.warn("Request was rate limited", new Exception());
-                    }
-                    MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    throw new IOException("Couldn't get name for room " + roomId + " - " + info.getErrcode() + ": "
-                            + info.getError());
-                }
-
-                return Optional.of(jsonParser.parse(body).getAsJsonObject().get("name").getAsString());
-            }
-        } catch (IOException e) {
-            throw new MatrixClientRequestException(e);
-        }
+        MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
+        request.addIgnoredErrorCode(404);
+        String body = execute(request);
+        return extractAsStringFromBody(body, "name");
     }
 
     @Override
     public Optional<String> getTopic() {
-        try {
-            URI path = getClientPath("/rooms/{roomId}/state/m.room.topic");
-
-            try (CloseableHttpResponse res = client.execute(log(new HttpGet(path)))) {
-                Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                String body = IOUtils.toString(res.getEntity().getContent(), charset);
-
-                if (res.getStatusLine().getStatusCode() != 200) {
-                    if (res.getStatusLine().getStatusCode() == 404) {
-                        // No topic has been set
-                        return Optional.empty();
-                    }
-
-                    // TODO handle rate limited
-                    if (res.getStatusLine().getStatusCode() == 429) {
-                        log.warn("Request was rate limited", new Exception());
-                    }
-                    MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    throw new MatrixClientRequestException(info, "Couldn't get topic for room " + roomId);
-                }
-
-                return Optional.of(jsonParser.parse(body).getAsJsonObject().get("topic").getAsString());
-            }
-        } catch (IOException e) {
-            throw new MatrixClientRequestException(e);
-        }
+        URI path = getClientPath("/rooms/{roomId}/state/m.room.topic");
+        MatrixHttpRequest matrixRequest = new MatrixHttpRequest(new HttpGet(path));
+        matrixRequest.addIgnoredErrorCode(404);
+        String body = execute(matrixRequest);
+        return extractAsStringFromBody(body, "topic");
     }
 
     @Override
     public void join() {
-        try {
-            URI path = getClientPath("/rooms/{roomId}/join");
-
-            try (CloseableHttpResponse res = client.execute(log(new HttpPost(path)))) {
-                if (res.getStatusLine().getStatusCode() == 200) {
-                    log.info("Successfully joined room {} as {}", roomId, getUser());
-                    return;
-                }
-
-                if (res.getStatusLine().getStatusCode() == 429) {
-                    // TODO handle rate limited
-                    log.warn("Request was rate limited", new Exception());
-                }
-
-                Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                String body = IOUtils.toString(res.getEntity().getContent(), charset);
-                MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-
-                if (res.getStatusLine().getStatusCode() == 403) {
-                    log.error("Failed to join room, we are not allowed: {} - {}", info.getErrcode(), info.getError());
-                } else {
-                    throw new MatrixClientRequestException(info, "Error joining for " + getUser());
-                }
-            }
-        } catch (IOException e) {
-            throw new MatrixClientRequestException(e);
-        }
+        URI path = getClientPath("/rooms/{roomId}/join");
+        execute(new HttpPost(path));
     }
 
     @Override
     public void leave() {
-        try {
-            URI path = getClientPath("/rooms/{roomId}/leave");
+        URI path = getClientPath("/rooms/{roomId}/leave");
+        MatrixHttpRequest request = new MatrixHttpRequest(new HttpPost(path));
 
-            try (CloseableHttpResponse res = client.execute(log(new HttpPost(path)))) {
-                if (res.getStatusLine().getStatusCode() == 200) {
-                    log.info("Successfully left room {} as {}", roomId, getUser());
-                } else {
-                    if (res.getStatusLine().getStatusCode() == 429) {
-                        // TODO handle rate limited
-                        log.warn("Request was rate limited", new Exception());
-                    }
-
-                    // TODO Find a better way to handle room objects for unknown rooms
-                    // Maybe throw exception?
-                    // TODO implement method to check room existence - isValid() ?
-                    if (res.getStatusLine().getStatusCode() == 404) {
-                        log.warn("Room {} is not joined, ignoring call", roomId);
-                        return;
-                    }
-
-                    Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                    String body = IOUtils.toString(res.getEntity().getContent(), charset);
-                    MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-
-                    if (res.getStatusLine().getStatusCode() == 403) {
-                        log.debug("Failed to leave room, we are not allowed, most likely already left: {} - {}",
-                                info.getErrcode(), info.getError());
-                    } else {
-                        throw new MatrixClientRequestException(info,
-                                "Error when leaving room " + roomId + " as " + getUser());
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new MatrixClientRequestException(e);
-        }
+        // TODO Find a better way to handle room objects for unknown rooms
+        // Maybe throw exception?
+        // TODO implement method to check room existence - isValid() ?
+        // if (res.getStatusLine().getStatusCode() == 404) {
+        // log.warn("Room {} is not joined, ignoring call", roomId);
+        // return;
+        // }
+        request.addIgnoredErrorCode(404);
+        execute(request);
     }
 
     private void sendMessage(RoomMessageTextPutBody content) {
-        try {
-            URI path = getClientPath("/rooms/{roomId}/send/m.room.message/" + System.currentTimeMillis());
-            HttpPut req = new HttpPut(path);
-            req.setEntity(getJsonEntity(content));
-
-            try (CloseableHttpResponse res = client.execute(log(req))) {
-                if (res.getStatusLine().getStatusCode() == 200) {
-                    log.info("Successfully sent message in room {} as {}", roomId, getUser());
-                } else {
-                    if (res.getStatusLine().getStatusCode() == 429) {
-                        // TODO handle rate limited
-                        log.warn("Request was rate limited", new Exception());
-                    }
-
-                    Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                    String body = IOUtils.toString(res.getEntity().getContent(), charset);
-                    MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-
-                    if (res.getStatusLine().getStatusCode() == 403) {
-                        log.error("Failed send message, we are not allowed: {}", info.getError());
-                    } else {
-                        throw new IOException("Error sending message for " + getUser() + " - " + info.getErrcode()
-                                + ": " + info.getError());
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new MatrixClientRequestException(e);
-        }
+        URI path = getClientPath("/rooms/{roomId}/send/m.room.message/" + System.currentTimeMillis());
+        HttpPut httpPut = new HttpPut(path);
+        httpPut.setEntity(getJsonEntity(content));
+        execute(httpPut);
     }
 
     @Override
@@ -266,34 +145,16 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public List<_MatrixID> getJoinedUsers() {
-        try {
-            URI path = getClientPath("/rooms/{roomId}/joined_members");
+        URI path = getClientPath("/rooms/{roomId}/joined_members");
+        String body = execute(new HttpGet(path));
 
-            try (CloseableHttpResponse res = client.execute(log(new HttpGet(path)))) {
-                Charset charset = ContentType.getOrDefault(res.getEntity()).getCharset();
-                String body = IOUtils.toString(res.getEntity().getContent(), charset);
-
-                if (res.getStatusLine().getStatusCode() != 200) {
-                    // TODO handle rate limited
-                    if (res.getStatusLine().getStatusCode() == 429) {
-                        log.warn("Request was rate limited", new Exception());
-                    }
-                    MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-                    throw new IOException("Couldn't list joined users in " + roomId + " - " + info.getErrcode() + ": "
-                            + info.getError());
-                }
-
-                JsonObject joinedUsers = jsonParser.parse(body).getAsJsonObject().get("joined").getAsJsonObject();
-                List<_MatrixID> ids = new ArrayList<>();
-                for (Map.Entry<String, JsonElement> entry : joinedUsers.entrySet()) {
-                    ids.add(new MatrixID(entry.getKey()));
-                }
-
-                return ids;
+        List<_MatrixID> ids = new ArrayList<>();
+        if (StringUtils.isNotEmpty(body)) {
+            JsonObject joinedUsers = jsonParser.parse(body).getAsJsonObject().get("joined").getAsJsonObject();
+            for (Map.Entry<String, JsonElement> entry : joinedUsers.entrySet()) {
+                ids.add(new MatrixID(entry.getKey()));
             }
-        } catch (IOException e) {
-            throw new MatrixClientRequestException(e);
         }
+        return ids;
     }
-
 }

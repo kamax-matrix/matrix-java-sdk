@@ -58,7 +58,7 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
     @Test
     public void isValidMissingContentType() throws URISyntaxException {
         stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(200).withBodyFile(bodyFilename)));
-        assertFalse(createContentObject().isValid());
+        assertTrue(createContentObject().isValid());
     }
 
     @Test
@@ -77,27 +77,29 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
     public void getType() throws URISyntaxException, IOException {
         stubFor(get(urlEqualTo(downloadUrl)).willReturn(
                 aResponse().withStatus(200).withBodyFile(bodyFilename).withHeader("Content-Type", "text/plain")));
-        assertEquals("text/plain", createContentObject().getType());
+        assertEquals(Optional.of("text/plain"), createContentObject().getType());
     }
 
     @Test
     public void getTypeMissingContentType() throws URISyntaxException {
         stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(200).withBodyFile(bodyFilename)));
-        assertNull(createContentObject().getType());
+        assertEquals(Optional.empty(), createContentObject().getType());
     }
 
     @Test
     public void getTypeError404() throws URISyntaxException, IOException {
-        stubFor(get(urlEqualTo(downloadUrl))
-                .willReturn(aResponse().withStatus(404).withStatus(404).withBody(error404Response)));
-        assertNull(createContentObject().getType());
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        MatrixHttpContent contentObject = createContentObject();
+        assertFalse(contentObject.isValid());
+        assertThrows(IllegalStateException.class, contentObject::getType);
     }
 
     @Test
     public void getTypeError403() throws URISyntaxException, IOException {
-        stubFor(get(urlEqualTo(downloadUrl))
-                .willReturn(aResponse().withStatus(403).withStatus(403).withBody(error403Response)));
-        assertNull(createContentObject().getType());
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        MatrixHttpContent contentObject = createContentObject();
+        assertFalse(contentObject.isValid());
+        assertThrows(IllegalStateException.class, createContentObject()::getType);
     }
 
     @Test
@@ -111,21 +113,30 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
     }
 
     @Test
-    public void getDataMissingContentType() throws URISyntaxException {
+    public void getDataMissingContentType() throws URISyntaxException, IOException {
         stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(200).withBodyFile(bodyFilename)));
-        assertNull(createContentObject().getData());
+
+        byte[] expectedResult = Files.readAllBytes(Paths.get(ClassLoader
+                .getSystemResource("wiremock" + File.separator + "__files" + File.separator + bodyFilename).toURI()));
+        assertThat(createContentObject().getData(), IsEqual.equalTo(expectedResult));
     }
 
     @Test
     public void getDataError404() throws URISyntaxException, IOException {
         stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
-        assertNull(createContentObject().getData());
+
+        MatrixHttpContent contentObject = createContentObject();
+        assertFalse(contentObject.isValid());
+        assertThrows(IllegalStateException.class, contentObject::getData);
     }
 
     @Test
     public void getDataError403() throws URISyntaxException, IOException {
         stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
-        assertNull(createContentObject().getData());
+
+        MatrixHttpContent contentObject = createContentObject();
+        assertFalse(contentObject.isValid());
+        assertThrows(IllegalStateException.class, contentObject::getData);
     }
 
     @Test
@@ -167,13 +178,18 @@ public class MatrixHttpContentTest extends MatrixHttpTest {
     @Test
     public void getFilenameError404() throws URISyntaxException, IOException {
         stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
-        assertEquals(Optional.empty(), createContentObject().getFilename());
+
+        MatrixHttpContent contentObject = createContentObject();
+        assertFalse(contentObject.isValid());
+        assertThrows(IllegalStateException.class, contentObject::getFilename);
     }
 
     @Test
     public void getFilenameError403() throws URISyntaxException, IOException {
         stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
-        assertEquals(Optional.empty(), createContentObject().getFilename());
+        MatrixHttpContent contentObject = createContentObject();
+        assertFalse(contentObject.isValid());
+        assertThrows(IllegalStateException.class, contentObject::getFilename);
     }
 
     private MatrixHttpContent createContentObject() throws URISyntaxException {
