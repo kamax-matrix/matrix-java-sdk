@@ -249,7 +249,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         log.debug("Doing {} {}", req.getMethod(), reqUrl);
     }
 
-    private URIBuilder getPathBuilder(URI path) {
+    private URIBuilder getClientPathBuilder(URI path) {
         URIBuilder builder = new URIBuilder(path);
 
         Optional<String> token = context.getToken();
@@ -268,7 +268,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected URI getClientPath(String action) {
         try {
-            return getPathBuilder(getPath("client", "r0", action)).build();
+            return getClientPathBuilder(getPath("client", "r0", action)).build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
@@ -276,7 +276,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected URI getMediaPath(String action) {
         try {
-            return getPathBuilder(getPath("media", "v1", action)).build();
+            return getClientPathBuilder(getPath("media", "v1", action)).build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
