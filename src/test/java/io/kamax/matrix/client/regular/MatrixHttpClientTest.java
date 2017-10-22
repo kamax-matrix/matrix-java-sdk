@@ -115,6 +115,22 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
     }
 
     @Test
+    public void loginWrongPassword() throws URISyntaxException {
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"}"))
+                .willReturn(aResponse().withStatus(403).withBody(error403Response)));
+
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixHttpLoginCredentials credentials = new MatrixHttpLoginCredentials(user, password);
+        MatrixClientContext context = new MatrixClientContext(hs, credentials);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+                () -> new MatrixHttpClient(context));
+        checkErrorInfo403(e);
+    }
+
+    @Test
     public void setDisplayName() throws URISyntaxException {
         stubFor(put(urlEqualTo(setDisplaynameUrl)).willReturn(aResponse().withStatus(200)));
         createClientObject().setDisplayName(displayName);
