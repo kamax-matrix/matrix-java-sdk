@@ -249,7 +249,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         log.debug("Doing {} {}", req.getMethod(), reqUrl);
     }
 
-    private URIBuilder getPathBuilderWithToken(URI path) {
+    private URIBuilder getPathBuilder(URI path) {
         URIBuilder builder = new URIBuilder(path);
 
         Optional<String> token = context.getToken();
@@ -268,15 +268,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected URI getClientPath(String action) {
         try {
-            return getPathBuilderWithToken(getPath("client", "r0", action)).build();
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    protected URI getBareClientPath(String action) {
-        try {
-            return new URIBuilder(getPath("client", "r0", action)).build();
+            return getPathBuilder(getPath("client", "r0", action)).build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
@@ -284,7 +276,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected URI getMediaPath(String action) {
         try {
-            return getPathBuilderWithToken(getPath("media", "v1", action)).build();
+            return getPathBuilder(getPath("media", "v1", action)).build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
@@ -295,7 +287,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     private void login() {
-        HttpPost request = new HttpPost(getBareClientPath("/login"));
+        HttpPost request = new HttpPost(getLoginClientPath());
         _MatrixID user = context.getUser();
         String password = context.getPassword()
                 .orElseThrow(() -> new IllegalStateException("You have to provide a password to be able to login."));
@@ -310,6 +302,14 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         LoginResponse response = gson.fromJson(body, LoginResponse.class);
         context.setToken(response.getAccessToken());
         context.setDeviceId(response.getDeviceId());
+    }
+
+    private URI getLoginClientPath() {
+        try {
+            return new URIBuilder(getPath("client", "r0", "/login")).build();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
 }
