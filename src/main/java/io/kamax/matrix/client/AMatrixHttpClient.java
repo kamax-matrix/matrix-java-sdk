@@ -26,12 +26,15 @@ import com.google.gson.JsonParser;
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
+import io.kamax.matrix.json.LoginPostBody;
+import io.kamax.matrix.json.LoginResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -61,6 +64,9 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     public AMatrixHttpClient(MatrixClientContext context) {
         this.context = context;
+        if (!context.getToken().isPresent()) {
+            login();
+        }
     }
 
     @Override
@@ -75,12 +81,25 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     @Override
     public String getAccessToken() {
-        return context.getToken();
+        return context.getToken()
+                .orElseThrow(() -> new IllegalStateException("This method can only be used with a valid token."));
     }
 
     @Override
     public _MatrixID getUser() {
         return context.getUser();
+    }
+
+    @Override
+    public Optional<String> getDeviceId() {
+        return context.getDeviceId();
+    }
+
+    @Override
+    public void logout() {
+        URI path = getClientPath("/logout");
+        HttpPost req = new HttpPost(path);
+        execute(req);
     }
 
     protected String execute(HttpRequestBase request) {
@@ -230,31 +249,34 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         log.debug("Doing {} {}", req.getMethod(), reqUrl);
     }
 
-    private URIBuilder getPathBuilder(URI path) {
+    private URIBuilder getPathBuilderWithToken(URI path) {
         URIBuilder builder = new URIBuilder(path);
-        builder.setParameter("access_token", context.getToken());
-        if (context.isVirtualUser()) {
-            builder.setParameter("user_id", context.getUser().getId());
-        }
 
+        Optional<String> token = context.getToken();
+        builder.setParameter("access_token",
+                token.orElseThrow(() -> new IllegalStateException("This method can only be used with a valid token.")));
+
+        if (context.isVirtualUser()) {
+            builder.addParameter("user_id", context.getUser().getId());
+        }
         return builder;
     }
 
-    private URI getPath(String module, String version, String action) throws URISyntaxException {
+    protected URI getPath(String module, String version, String action) throws URISyntaxException {
         return new URI(context.getHs().getClientEndpoint() + "/_matrix/" + module + "/" + version + action);
-    }
-
-    protected URIBuilder getClientPathBuilder(String action) throws URISyntaxException {
-        return getPathBuilder(getPath("client", "r0", action));
-    }
-
-    protected URIBuilder getMediaPathBuilder(String action) throws URISyntaxException {
-        return getPathBuilder(getPath("media", "v1", action));
     }
 
     protected URI getClientPath(String action) {
         try {
-            return getClientPathBuilder(action).build();
+            return getPathBuilderWithToken(getPath("client", "r0", action)).build();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    protected URI getBareClientPath(String action) {
+        try {
+            return new URIBuilder(getPath("client", "r0", action)).build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
@@ -262,7 +284,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected URI getMediaPath(String action) {
         try {
-            return getMediaPathBuilder(action).build();
+            return getPathBuilderWithToken(getPath("media", "v1", action)).build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
@@ -271,4 +293,23 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     protected HttpEntity getJsonEntity(Object o) {
         return EntityBuilder.create().setText(gson.toJson(o)).setContentType(ContentType.APPLICATION_JSON).build();
     }
+
+    private void login() {
+        HttpPost request = new HttpPost(getBareClientPath("/login"));
+        _MatrixID user = context.getUser();
+        String password = context.getPassword()
+                .orElseThrow(() -> new IllegalStateException("You have to provide a password to be able to login."));
+        if (context.getDeviceId().isPresent()) {
+            request.setEntity(
+                    getJsonEntity(new LoginPostBody(user.getLocalPart(), password, context.getDeviceId().get())));
+        } else {
+            request.setEntity(getJsonEntity(new LoginPostBody(user.getLocalPart(), password)));
+        }
+
+        String body = execute(request);
+        LoginResponse response = gson.fromJson(body, LoginResponse.class);
+        context.setToken(response.getAccessToken());
+        context.setDeviceId(response.getDeviceId());
+    }
+
 }

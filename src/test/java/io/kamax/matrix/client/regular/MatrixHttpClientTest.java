@@ -20,7 +20,11 @@
 
 package io.kamax.matrix.client.regular;
 
-import io.kamax.matrix.client.*;
+import io.kamax.matrix.client.MatrixClientContext;
+import io.kamax.matrix.client.MatrixClientRequestException;
+import io.kamax.matrix.client.MatrixHttpLoginCredentials;
+import io.kamax.matrix.client.MatrixHttpTest;
+import io.kamax.matrix.hs.MatrixHomeserver;
 
 import org.junit.Test;
 
@@ -28,14 +32,86 @@ import java.net.URISyntaxException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MatrixHttpClientTest extends MatrixHttpTest {
+    private String loginUrl = "/_matrix/client/r0/login";
+    private String password = "MostSecretPasswordEver";
+    private String deviceId = "testDeviceId_892377";
+
+    private String logoutUrl = "/_matrix/client/r0/logout" + tokenParameter;
+
     private String setDisplaynameUrl = String.format("/_matrix/client/r0/profile/%s/displayname",
             createClientContext().getUser().getId()) + tokenParameter;
     private String displayName = "display name";
 
     public MatrixHttpClientTest() throws URISyntaxException {
+    }
+
+    @Test
+    public void loginWithDeviceId() throws URISyntaxException {
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"," + //
+                        "\"device_id\": \"" + deviceId + "\"}"))
+                .willReturn(aResponse().withStatus(200)
+                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
+                                "\"access_token\": \"" + testToken + "\"," + //
+                                "\"home_server\": \"" + new MatrixHomeserver(domain, baseUrl) + "\"," + //
+                                "\"device_id\": \"" + deviceId + "\"}")));
+
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixHttpLoginCredentials credentials = new MatrixHttpLoginCredentials(user, password);
+        MatrixClientContext context = new MatrixClientContext(hs, credentials, deviceId);
+        MatrixHttpClient client = new MatrixHttpClient(context);
+
+        assertEquals(deviceId, client.getDeviceId().get());
+    }
+
+    @Test
+    public void loginWithDeviceIdAndLogout() throws URISyntaxException {
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"," + //
+                        "\"device_id\": \"" + deviceId + "\"}"))
+                .willReturn(aResponse().withStatus(200)
+                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
+                                "\"access_token\": \"" + testToken + "\"," + //
+                                "\"home_server\": \"" + new MatrixHomeserver(domain, baseUrl) + "\"," + //
+                                "\"device_id\": \"" + deviceId + "\"}")));
+
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixHttpLoginCredentials credentials = new MatrixHttpLoginCredentials(user, password);
+        MatrixClientContext context = new MatrixClientContext(hs, credentials, deviceId);
+        MatrixHttpClient client = new MatrixHttpClient(context);
+
+        assertEquals(deviceId, client.getDeviceId().get());
+
+        stubFor(post(urlEqualTo(logoutUrl)));
+        client.logout();
+    }
+
+    @Test
+    public void login() throws URISyntaxException {
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"}"))
+                .willReturn(aResponse().withStatus(200)
+                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
+                                "\"access_token\": \"" + testToken + "\"," + //
+                                "\"home_server\": \"" + new MatrixHomeserver(domain, baseUrl) + "\"," + //
+                                "\"device_id\": \"" + deviceId + "\"}")));
+
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixHttpLoginCredentials credentials = new MatrixHttpLoginCredentials(user, password);
+        MatrixClientContext context = new MatrixClientContext(hs, credentials);
+        MatrixHttpClient client = new MatrixHttpClient(context);
+
+        assertEquals(deviceId, client.getDeviceId().get());
     }
 
     @Test
