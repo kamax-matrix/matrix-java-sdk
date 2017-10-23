@@ -69,6 +69,10 @@ public class MatrixClientContext {
         return user;
     }
 
+    public void setUser(_MatrixID user) {
+        this.user = user;
+    }
+
     public String getToken() {
         return token;
     }
