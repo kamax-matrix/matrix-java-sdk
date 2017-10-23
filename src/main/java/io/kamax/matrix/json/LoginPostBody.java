@@ -21,7 +21,6 @@
 package io.kamax.matrix.json;
 
 public class LoginPostBody {
-
     private String type = "m.login.password";
     private String user;
     private String password;
@@ -35,21 +34,5 @@ public class LoginPostBody {
     public LoginPostBody(String user, String password, String device_id) {
         this(user, password);
         this.device_id = device_id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getDevice_id() {
-        return device_id;
     }
 }
