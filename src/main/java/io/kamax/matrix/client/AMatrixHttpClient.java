@@ -266,8 +266,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected URI getClientPath(String action) {
         try {
-            URIBuilder builder = getClientPathBuilder(action);
-            return builder.build();
+            return getClientPathBuilder(action).build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
@@ -285,8 +284,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected URI getMediaPath(String action) {
         try {
-            URIBuilder builder = getMediaPathBuilder(action);
-            return builder.build();
+            return getMediaPathBuilder(action).build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
