@@ -30,23 +30,11 @@ public class MatrixClientContext {
     private _MatrixHomeserver hs;
     private _MatrixID user;
     private String token;
-    private Optional<String> password = Optional.empty();
     private boolean isVirtualUser;
-
     private String deviceId;
 
     public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token) {
         this(hs, user, token, false);
-    }
-
-    public MatrixClientContext(_MatrixHomeserver hs, MatrixHttpLoginCredentials credentials) {
-        this(hs, credentials.getUser(), false);
-        this.password = Optional.of(credentials.getPassword());
-    }
-
-    public MatrixClientContext(_MatrixHomeserver hs, MatrixHttpLoginCredentials credentials, String deviceId) {
-        this(hs, credentials);
-        this.deviceId = deviceId;
     }
 
     public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token, boolean isVirtualUser) {
@@ -54,9 +42,22 @@ public class MatrixClientContext {
         this.token = token;
     }
 
+    public MatrixClientContext(_MatrixHomeserver hs) {
+        this(hs, false);
+    }
+
+    public MatrixClientContext(_MatrixHomeserver hs, String deviceId) {
+        this(hs, false);
+        this.deviceId = deviceId;
+    }
+
     private MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, boolean isVirtualUser) {
-        this.hs = hs;
+        this(hs, isVirtualUser);
         this.user = user;
+    }
+
+    private MatrixClientContext(_MatrixHomeserver hs, boolean isVirtualUser) {
+        this.hs = hs;
         this.isVirtualUser = isVirtualUser;
     }
 
@@ -76,19 +77,15 @@ public class MatrixClientContext {
         this.token = token;
     }
 
-    public Optional<String> getPassword() {
-        return password;
-    }
-
     public boolean isVirtualUser() {
         return isVirtualUser;
     }
 
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
-    }
-
     public Optional<String> getDeviceId() {
         return Optional.ofNullable(deviceId);
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 }

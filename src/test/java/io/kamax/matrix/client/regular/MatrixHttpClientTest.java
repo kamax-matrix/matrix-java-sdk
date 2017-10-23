@@ -22,8 +22,8 @@ package io.kamax.matrix.client.regular;
 
 import io.kamax.matrix.client.MatrixClientContext;
 import io.kamax.matrix.client.MatrixClientRequestException;
-import io.kamax.matrix.client.MatrixHttpLoginCredentials;
 import io.kamax.matrix.client.MatrixHttpTest;
+import io.kamax.matrix.client.MatrixPasswordLoginCredentials;
 import io.kamax.matrix.hs.MatrixHomeserver;
 
 import org.junit.Test;
@@ -63,9 +63,11 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
                                 "\"device_id\": \"" + deviceId + "\"}")));
 
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        MatrixHttpLoginCredentials credentials = new MatrixHttpLoginCredentials(user, password);
-        MatrixClientContext context = new MatrixClientContext(hs, credentials, deviceId);
+        MatrixClientContext context = new MatrixClientContext(hs, deviceId);
         MatrixHttpClient client = new MatrixHttpClient(context);
+
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user, password);
+        client.login(credentials);
 
         assertEquals(deviceId, client.getDeviceId().get());
     }
@@ -84,9 +86,11 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
                                 "\"device_id\": \"" + deviceId + "\"}")));
 
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        MatrixHttpLoginCredentials credentials = new MatrixHttpLoginCredentials(user, password);
-        MatrixClientContext context = new MatrixClientContext(hs, credentials, deviceId);
+        MatrixClientContext context = new MatrixClientContext(hs, deviceId);
         MatrixHttpClient client = new MatrixHttpClient(context);
+
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user, password);
+        client.login(credentials);
 
         assertEquals(deviceId, client.getDeviceId().get());
 
@@ -107,9 +111,11 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
                                 "\"device_id\": \"" + deviceId + "\"}")));
 
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        MatrixHttpLoginCredentials credentials = new MatrixHttpLoginCredentials(user, password);
-        MatrixClientContext context = new MatrixClientContext(hs, credentials);
+        MatrixClientContext context = new MatrixClientContext(hs);
         MatrixHttpClient client = new MatrixHttpClient(context);
+
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user, password);
+        client.login(credentials);
 
         assertEquals(deviceId, client.getDeviceId().get());
     }
@@ -123,10 +129,12 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
                 .willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        MatrixHttpLoginCredentials credentials = new MatrixHttpLoginCredentials(user, password);
-        MatrixClientContext context = new MatrixClientContext(hs, credentials);
+        MatrixClientContext context = new MatrixClientContext(hs);
+        MatrixHttpClient client = new MatrixHttpClient(context);
+
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user, password);
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
-                () -> new MatrixHttpClient(context));
+                () -> client.login(credentials));
         checkErrorInfo403(e);
     }
 

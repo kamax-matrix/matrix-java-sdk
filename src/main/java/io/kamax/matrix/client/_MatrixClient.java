@@ -36,8 +36,8 @@ public interface _MatrixClient extends _MatrixClientRaw {
 
     Optional<String> getDeviceId();
 
-    void logout();
+    void login(MatrixPasswordLoginCredentials credentials);
 
-    void login();
+    void logout();
 
 }

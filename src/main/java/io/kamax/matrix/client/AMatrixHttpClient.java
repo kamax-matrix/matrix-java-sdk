@@ -239,7 +239,6 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     protected URIBuilder getPathBuilder(String module, String version, String action) {
         URIBuilder builder = context.getHs().getClientEndpoint();
         builder.setPath(builder.getPath() + "/_matrix/" + module + "/" + version + action);
-        builder.setPath(builder.getPath().replace("{userId}", context.getUser().getId()));
         if (context.isVirtualUser()) {
             builder.setParameter("user_id", context.getUser().getId());
         }

@@ -22,11 +22,11 @@ package io.kamax.matrix.client;
 
 import io.kamax.matrix._MatrixID;
 
-public class MatrixHttpLoginCredentials {
+public class MatrixPasswordLoginCredentials {
     private final _MatrixID user;
     private final String password;
 
-    public MatrixHttpLoginCredentials(_MatrixID user, String password) {
+    public MatrixPasswordLoginCredentials(_MatrixID user, String password) {
         this.user = user;
         this.password = password;
     }
