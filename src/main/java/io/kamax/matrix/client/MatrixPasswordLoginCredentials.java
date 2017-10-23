@@ -20,19 +20,17 @@
 
 package io.kamax.matrix.client;
 
-import io.kamax.matrix._MatrixID;
-
 public class MatrixPasswordLoginCredentials {
-    private final _MatrixID user;
+    private final String localPart;
     private final String password;
 
-    public MatrixPasswordLoginCredentials(_MatrixID user, String password) {
-        this.user = user;
+    public MatrixPasswordLoginCredentials(String localPart, String password) {
+        this.localPart = localPart;
         this.password = password;
     }
 
-    public _MatrixID getUser() {
-        return user;
+    public String getLocalPart() {
+        return localPart;
     }
 
     public String getPassword() {

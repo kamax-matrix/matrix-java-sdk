@@ -66,7 +66,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
         MatrixClientContext context = new MatrixClientContext(hs, deviceId);
         MatrixHttpClient client = new MatrixHttpClient(context);
 
-        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user, password);
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
         client.login(credentials);
 
         assertEquals(deviceId, client.getDeviceId().get());
@@ -89,7 +89,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
         MatrixClientContext context = new MatrixClientContext(hs, deviceId);
         MatrixHttpClient client = new MatrixHttpClient(context);
 
-        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user, password);
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
         client.login(credentials);
 
         assertEquals(deviceId, client.getDeviceId().get());
@@ -114,7 +114,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
         MatrixClientContext context = new MatrixClientContext(hs);
         MatrixHttpClient client = new MatrixHttpClient(context);
 
-        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user, password);
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
         client.login(credentials);
 
         assertEquals(deviceId, client.getDeviceId().get());
@@ -132,7 +132,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
         MatrixClientContext context = new MatrixClientContext(hs);
         MatrixHttpClient client = new MatrixHttpClient(context);
 
-        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user, password);
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> client.login(credentials));
         checkErrorInfo403(e);

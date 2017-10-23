@@ -71,13 +71,11 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     @Override
     public void login(MatrixPasswordLoginCredentials credentials) {
         HttpPost request = new HttpPost(getClientPath("/login"));
-        _MatrixID user = credentials.getUser();
-        String password = credentials.getPassword();
         if (context.getDeviceId().isPresent()) {
-            request.setEntity(
-                    getJsonEntity(new LoginPostBody(user.getLocalPart(), password, context.getDeviceId().get())));
+            request.setEntity(getJsonEntity(new LoginPostBody(credentials.getLocalPart(), credentials.getPassword(),
+                    context.getDeviceId().get())));
         } else {
-            request.setEntity(getJsonEntity(new LoginPostBody(user.getLocalPart(), password)));
+            request.setEntity(getJsonEntity(new LoginPostBody(credentials.getLocalPart(), credentials.getPassword())));
         }
 
         String body = execute(request);
