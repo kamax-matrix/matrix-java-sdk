@@ -26,15 +26,12 @@ import com.google.gson.JsonParser;
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
-import io.kamax.matrix.json.LoginPostBody;
-import io.kamax.matrix.json.LoginResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -64,9 +61,6 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     public AMatrixHttpClient(MatrixClientContext context) {
         this.context = context;
-        if (!context.getToken().isPresent()) {
-            login();
-        }
     }
 
     @Override
@@ -80,26 +74,19 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     @Override
-    public String getAccessToken() {
-        return context.getToken()
+    public Optional<String> getAccessToken() {
+        return Optional.ofNullable(context.getToken());
+    }
+
+    @Override
+    public String getAccessTokenOrThrow() {
+        return getAccessToken()
                 .orElseThrow(() -> new IllegalStateException("This method can only be used with a valid token."));
     }
 
     @Override
     public _MatrixID getUser() {
         return context.getUser();
-    }
-
-    @Override
-    public Optional<String> getDeviceId() {
-        return context.getDeviceId();
-    }
-
-    @Override
-    public void logout() {
-        URI path = getClientPath("/logout");
-        HttpPost req = new HttpPost(path);
-        execute(req);
     }
 
     protected String execute(HttpRequestBase request) {
@@ -249,26 +236,49 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         log.debug("Doing {} {}", req.getMethod(), reqUrl);
     }
 
-    private URIBuilder getPathBuilder(URI path) {
-        URIBuilder builder = new URIBuilder(path);
-
-        Optional<String> token = context.getToken();
-        builder.setParameter("access_token",
-                token.orElseThrow(() -> new IllegalStateException("This method can only be used with a valid token.")));
-
+    protected URIBuilder getPathBuilder(String module, String version, String action) {
+        URIBuilder builder = context.getHs().getClientEndpoint();
+        builder.setPath(builder.getPath() + "/_matrix/" + module + "/" + version + action);
+        builder.setPath(builder.getPath().replace("{userId}", context.getUser().getId()));
         if (context.isVirtualUser()) {
-            builder.addParameter("user_id", context.getUser().getId());
+            builder.setParameter("user_id", context.getUser().getId());
         }
+
         return builder;
     }
 
-    protected URI getPath(String module, String version, String action) throws URISyntaxException {
-        return new URI(context.getHs().getClientEndpoint() + "/_matrix/" + module + "/" + version + action);
+    protected URIBuilder getClientPathBuilder(String action) {
+        return getPathBuilder("client", "r0", action);
+    }
+
+    protected URIBuilder getMediaPathBuilder(String action) {
+        return getPathBuilder("media", "v1", action);
+    }
+
+    protected URI getClientPathWithAccessToken(String action) {
+        try {
+            URIBuilder builder = getClientPathBuilder(action);
+            builder.setParameter("access_token", getAccessTokenOrThrow());
+            return builder.build();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     protected URI getClientPath(String action) {
         try {
-            return getPathBuilder(getPath("client", "r0", action)).build();
+            URIBuilder builder = getClientPathBuilder(action);
+            return builder.build();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    protected URI getMediaPathWithAccessToken(String action) {
+        try {
+            URIBuilder builder = getMediaPathBuilder(action);
+            builder.setParameter("access_token", getAccessTokenOrThrow());
+            return builder.build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
@@ -276,7 +286,8 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected URI getMediaPath(String action) {
         try {
-            return getPathBuilder(getPath("media", "v1", action)).build();
+            URIBuilder builder = getMediaPathBuilder(action);
+            return builder.build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
@@ -285,31 +296,4 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     protected HttpEntity getJsonEntity(Object o) {
         return EntityBuilder.create().setText(gson.toJson(o)).setContentType(ContentType.APPLICATION_JSON).build();
     }
-
-    private void login() {
-        HttpPost request = new HttpPost(getLoginClientPath());
-        _MatrixID user = context.getUser();
-        String password = context.getPassword()
-                .orElseThrow(() -> new IllegalStateException("You have to provide a password to be able to login."));
-        if (context.getDeviceId().isPresent()) {
-            request.setEntity(
-                    getJsonEntity(new LoginPostBody(user.getLocalPart(), password, context.getDeviceId().get())));
-        } else {
-            request.setEntity(getJsonEntity(new LoginPostBody(user.getLocalPart(), password)));
-        }
-
-        String body = execute(request);
-        LoginResponse response = gson.fromJson(body, LoginResponse.class);
-        context.setToken(response.getAccessToken());
-        context.setDeviceId(response.getDeviceId());
-    }
-
-    private URI getLoginClientPath() {
-        try {
-            return new URIBuilder(getPath("client", "r0", "/login")).build();
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
 }

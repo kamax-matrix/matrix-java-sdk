@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,13 +55,21 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
+    protected URIBuilder getClientPathBuilder(String action) {
+        URIBuilder builder = super.getClientPathBuilder(action);
+        builder.setPath(builder.getPath().replace("{roomId}", roomId));
+
+        return builder;
+    }
+
+    @Override
     public String getAddress() {
         return roomId;
     }
 
     @Override
     public Optional<String> getName() {
-        URI path = getClientPath("/rooms/" + roomId + "/state/m.room.name");
+        URI path = getClientPathWithAccessToken("/rooms/{roomId}/state/m.room.name");
 
         MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
         request.addIgnoredErrorCode(404);
@@ -70,7 +79,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public Optional<String> getTopic() {
-        URI path = getClientPath("/rooms/" + roomId + "/state/m.room.topic");
+        URI path = getClientPathWithAccessToken("/rooms/{roomId}/state/m.room.topic");
         MatrixHttpRequest matrixRequest = new MatrixHttpRequest(new HttpGet(path));
         matrixRequest.addIgnoredErrorCode(404);
         String body = execute(matrixRequest);
@@ -79,13 +88,13 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public void join() {
-        URI path = getClientPath("/rooms/" + roomId + "/join");
+        URI path = getClientPathWithAccessToken("/rooms/{roomId}/join");
         execute(new HttpPost(path));
     }
 
     @Override
     public void leave() {
-        URI path = getClientPath("/rooms/" + roomId + "/leave");
+        URI path = getClientPathWithAccessToken("/rooms/{roomId}/leave");
         MatrixHttpRequest request = new MatrixHttpRequest(new HttpPost(path));
 
         // TODO Find a better way to handle room objects for unknown rooms
@@ -100,7 +109,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     private void sendMessage(RoomMessageTextPutBody content) {
-        URI path = getClientPath("/rooms/" + roomId + "/send/m.room.message/" + System.currentTimeMillis());
+        URI path = getClientPathWithAccessToken("/rooms/{roomId}/send/m.room.message/" + System.currentTimeMillis());
         HttpPut httpPut = new HttpPut(path);
         httpPut.setEntity(getJsonEntity(content));
         execute(httpPut);
@@ -136,7 +145,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public List<_MatrixID> getJoinedUsers() {
-        URI path = getClientPath("/rooms/" + roomId + "/joined_members");
+        URI path = getClientPathWithAccessToken("/rooms/{roomId}/joined_members");
         String body = execute(new HttpGet(path));
 
         List<_MatrixID> ids = new ArrayList<>();

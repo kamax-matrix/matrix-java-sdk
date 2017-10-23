@@ -51,7 +51,7 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
 
     @Override
     public Optional<String> getName() {
-        URI path = getClientPath("/profile/" + mxId.getId() + "/displayname");
+        URI path = getClientPathWithAccessToken("/profile/" + mxId.getId() + "/displayname");
 
         MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
         request.addIgnoredErrorCode(404);
@@ -61,7 +61,7 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
 
     @Override
     public Optional<_MatrixContent> getAvatar() {
-        URI path = getClientPath("/profile/" + mxId.getId() + "/avatar_url");
+        URI path = getClientPathWithAccessToken("/profile/" + mxId.getId() + "/avatar_url");
 
         MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
         request.addIgnoredErrorCode(404);

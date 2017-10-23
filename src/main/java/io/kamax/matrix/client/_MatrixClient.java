@@ -24,6 +24,8 @@ import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
 import io.kamax.matrix.hs._MatrixRoom;
 
+import java.util.Optional;
+
 public interface _MatrixClient extends _MatrixClientRaw {
 
     void setDisplayName(String name);
@@ -31,5 +33,11 @@ public interface _MatrixClient extends _MatrixClientRaw {
     _MatrixRoom getRoom(String roomId);
 
     _MatrixUser getUser(_MatrixID mxId);
+
+    Optional<String> getDeviceId();
+
+    void logout();
+
+    void login();
 
 }

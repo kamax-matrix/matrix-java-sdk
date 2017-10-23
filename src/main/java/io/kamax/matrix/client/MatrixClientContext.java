@@ -29,11 +29,11 @@ public class MatrixClientContext {
 
     private _MatrixHomeserver hs;
     private _MatrixID user;
-    private Optional<String> token = Optional.empty();
+    private String token;
     private Optional<String> password = Optional.empty();
     private boolean isVirtualUser;
 
-    private Optional<String> deviceId = Optional.empty();
+    private String deviceId;
 
     public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token) {
         this(hs, user, token, false);
@@ -46,12 +46,12 @@ public class MatrixClientContext {
 
     public MatrixClientContext(_MatrixHomeserver hs, MatrixHttpLoginCredentials credentials, String deviceId) {
         this(hs, credentials);
-        this.deviceId = Optional.of(deviceId);
+        this.deviceId = deviceId;
     }
 
     public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token, boolean isVirtualUser) {
         this(hs, user, isVirtualUser);
-        this.token = Optional.of(token);
+        this.token = token;
     }
 
     private MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, boolean isVirtualUser) {
@@ -68,12 +68,12 @@ public class MatrixClientContext {
         return user;
     }
 
-    public Optional<String> getToken() {
+    public String getToken() {
         return token;
     }
 
     public void setToken(String token) {
-        this.token = Optional.of(token);
+        this.token = token;
     }
 
     public Optional<String> getPassword() {
@@ -85,10 +85,10 @@ public class MatrixClientContext {
     }
 
     public void setDeviceId(String deviceId) {
-        this.deviceId = Optional.of(deviceId);
+        this.deviceId = deviceId;
     }
 
     public Optional<String> getDeviceId() {
-        return deviceId;
+        return Optional.ofNullable(deviceId);
     }
 }

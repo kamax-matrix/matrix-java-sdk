@@ -31,12 +31,9 @@ public interface _MatrixClientRaw {
 
     _MatrixHomeserver getHomeserver();
 
-    String getAccessToken();
+    Optional<String> getAccessToken();
+
+    String getAccessTokenOrThrow();
 
     _MatrixID getUser();
-
-    Optional<String> getDeviceId();
-
-    void logout();
-
 }

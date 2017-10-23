@@ -25,11 +25,15 @@ import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
 import io.kamax.matrix.client.*;
 import io.kamax.matrix.hs._MatrixRoom;
+import io.kamax.matrix.json.LoginPostBody;
+import io.kamax.matrix.json.LoginResponse;
 import io.kamax.matrix.json.UserDisplaynameSetBody;
 
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 
 import java.net.URI;
+import java.util.Optional;
 
 public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient {
 
@@ -43,7 +47,7 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
 
     @Override
     public void setDisplayName(String name) {
-        URI path = getClientPath("/profile/" + context.getUser().getId() + "/displayname");
+        URI path = getClientPathWithAccessToken("/profile/" + context.getUser().getId() + "/displayname");
         HttpPut req = new HttpPut(path);
         req.setEntity(getJsonEntity(new UserDisplaynameSetBody(name)));
         execute(req);
@@ -57,6 +61,37 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     @Override
     public _MatrixUser getUser(_MatrixID mxId) {
         return new MatrixHttpUser(getContext(), mxId);
+    }
+
+    @Override
+    public Optional<String> getDeviceId() {
+        return context.getDeviceId();
+    }
+
+    @Override
+    public void login() {
+        HttpPost request = new HttpPost(getClientPath("/login"));
+        _MatrixID user = context.getUser();
+        String password = context.getPassword()
+                .orElseThrow(() -> new IllegalStateException("You have to provide a password to be able to login."));
+        if (context.getDeviceId().isPresent()) {
+            request.setEntity(
+                    getJsonEntity(new LoginPostBody(user.getLocalPart(), password, context.getDeviceId().get())));
+        } else {
+            request.setEntity(getJsonEntity(new LoginPostBody(user.getLocalPart(), password)));
+        }
+
+        String body = execute(request);
+        LoginResponse response = gson.fromJson(body, LoginResponse.class);
+        context.setToken(response.getAccessToken());
+        context.setDeviceId(response.getDeviceId());
+    }
+
+    @Override
+    public void logout() {
+        URI path = getClientPathWithAccessToken("/logout");
+        HttpPost req = new HttpPost(path);
+        execute(req);
     }
 
 }
