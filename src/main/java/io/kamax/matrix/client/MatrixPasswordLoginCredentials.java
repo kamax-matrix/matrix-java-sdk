@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Maxime Dor
+ * Copyright (C) 2017 Arne Augenstein
  *
  * https://max.kamax.io/
  *
@@ -20,18 +20,20 @@
 
 package io.kamax.matrix.client;
 
-import io.kamax.matrix._MatrixID;
-import io.kamax.matrix.hs._MatrixHomeserver;
+public class MatrixPasswordLoginCredentials {
+    private final String localPart;
+    private final String password;
 
-import java.util.Optional;
+    public MatrixPasswordLoginCredentials(String localPart, String password) {
+        this.localPart = localPart;
+        this.password = password;
+    }
 
-public interface _MatrixClientRaw {
+    public String getLocalPart() {
+        return localPart;
+    }
 
-    MatrixClientContext getContext();
-
-    _MatrixHomeserver getHomeserver();
-
-    Optional<String> getAccessToken();
-
-    Optional<_MatrixID> getUser();
+    public String getPassword() {
+        return password;
+    }
 }

@@ -74,12 +74,17 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     @Override
-    public String getAccessToken() {
-        return context.getToken();
+    public Optional<String> getAccessToken() {
+        return Optional.ofNullable(context.getToken());
+    }
+
+    public String getAccessTokenOrThrow() {
+        return getAccessToken()
+                .orElseThrow(() -> new IllegalStateException("This method can only be used with a valid token."));
     }
 
     @Override
-    public _MatrixID getUser() {
+    public Optional<_MatrixID> getUser() {
         return context.getUser();
     }
 
@@ -233,10 +238,8 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     protected URIBuilder getPathBuilder(String module, String version, String action) {
         URIBuilder builder = context.getHs().getClientEndpoint();
         builder.setPath(builder.getPath() + "/_matrix/" + module + "/" + version + action);
-        builder.setParameter("access_token", context.getToken());
-        builder.setPath(builder.getPath().replace("{userId}", context.getUser().getId()));
         if (context.isVirtualUser()) {
-            builder.setParameter("user_id", context.getUser().getId());
+            context.getUser().ifPresent(user -> builder.setParameter("user_id", user.getId()));
         }
 
         return builder;
@@ -250,6 +253,16 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return getPathBuilder("media", "v1", action);
     }
 
+    protected URI getClientPathWithAccessToken(String action) {
+        try {
+            URIBuilder builder = getClientPathBuilder(action);
+            builder.setParameter("access_token", getAccessTokenOrThrow());
+            return builder.build();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     protected URI getClientPath(String action) {
         try {
             return getClientPathBuilder(action).build();
@@ -260,7 +273,9 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected URI getMediaPath(String action) {
         try {
-            return getMediaPathBuilder(action).build();
+            URIBuilder builder = getMediaPathBuilder(action);
+            builder.setParameter("access_token", getAccessTokenOrThrow());
+            return builder.build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }

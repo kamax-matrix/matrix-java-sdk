@@ -25,17 +25,18 @@ import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
 import io.kamax.matrix.client.*;
 import io.kamax.matrix.hs._MatrixRoom;
+import io.kamax.matrix.json.LoginPostBody;
+import io.kamax.matrix.json.LoginResponse;
 import io.kamax.matrix.json.UserDisplaynameSetBody;
 
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
+import java.util.Optional;
 
 public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient {
-
-    private Logger log = LoggerFactory.getLogger(MatrixHttpClient.class);
 
     public MatrixHttpClient(MatrixClientContext context) {
         super(context);
@@ -46,8 +47,15 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     }
 
     @Override
+    protected URIBuilder getClientPathBuilder(String action) {
+        URIBuilder builder = super.getClientPathBuilder(action);
+        context.getUser().ifPresent(user -> builder.setPath(builder.getPath().replace("{userId}", user.getId())));
+        return builder;
+    }
+
+    @Override
     public void setDisplayName(String name) {
-        URI path = getClientPath("/profile/{userId}/displayname");
+        URI path = getClientPathWithAccessToken("/profile/{userId}/displayname");
         HttpPut req = new HttpPut(path);
         req.setEntity(getJsonEntity(new UserDisplaynameSetBody(name)));
         execute(req);
@@ -61,6 +69,41 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     @Override
     public _MatrixUser getUser(_MatrixID mxId) {
         return new MatrixHttpUser(getContext(), mxId);
+    }
+
+    @Override
+    public Optional<String> getDeviceId() {
+        return context.getDeviceId();
+    }
+
+    @Override
+    public void login(MatrixPasswordLoginCredentials credentials) {
+        HttpPost request = new HttpPost(getClientPath("/login"));
+        if (context.getDeviceId().isPresent()) {
+            request.setEntity(getJsonEntity(new LoginPostBody(credentials.getLocalPart(), credentials.getPassword(),
+                    context.getDeviceId().get())));
+        } else {
+            request.setEntity(getJsonEntity(new LoginPostBody(credentials.getLocalPart(), credentials.getPassword())));
+        }
+
+        String body = execute(request);
+        LoginResponse response = gson.fromJson(body, LoginResponse.class);
+        context.setToken(response.getAccessToken());
+        context.setDeviceId(response.getDeviceId());
+        context.setUser(new MatrixID(response.getUserId()));
+
+        // FIXME spec returns hostname which we might not be the same as what has been used in baseUrl to login. Must
+        // update internals accordingly
+    }
+
+    @Override
+    public void logout() {
+        URI path = getClientPathWithAccessToken("/logout");
+        HttpPost req = new HttpPost(path);
+        execute(req);
+        context.setToken(null);
+        context.setUser(null);
+        context.setDeviceId(null);
     }
 
 }

@@ -23,21 +23,41 @@ package io.kamax.matrix.client;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
 
+import java.util.Optional;
+
 public class MatrixClientContext {
 
     private _MatrixHomeserver hs;
     private _MatrixID user;
     private String token;
     private boolean isVirtualUser;
+    private String deviceId;
 
     public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token) {
         this(hs, user, token, false);
     }
 
     public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token, boolean isVirtualUser) {
-        this.hs = hs;
-        this.user = user;
+        this(hs, user, isVirtualUser);
         this.token = token;
+    }
+
+    public MatrixClientContext(_MatrixHomeserver hs) {
+        this(hs, false);
+    }
+
+    public MatrixClientContext(_MatrixHomeserver hs, String deviceId) {
+        this(hs, false);
+        this.deviceId = deviceId;
+    }
+
+    private MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, boolean isVirtualUser) {
+        this(hs, isVirtualUser);
+        this.user = user;
+    }
+
+    private MatrixClientContext(_MatrixHomeserver hs, boolean isVirtualUser) {
+        this.hs = hs;
         this.isVirtualUser = isVirtualUser;
     }
 
@@ -45,16 +65,31 @@ public class MatrixClientContext {
         return hs;
     }
 
-    public _MatrixID getUser() {
-        return user;
+    public Optional<_MatrixID> getUser() {
+        return Optional.ofNullable(user);
+    }
+
+    public void setUser(_MatrixID user) {
+        this.user = user;
     }
 
     public String getToken() {
         return token;
     }
 
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public boolean isVirtualUser() {
         return isVirtualUser;
     }
 
+    public Optional<String> getDeviceId() {
+        return Optional.ofNullable(deviceId);
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
 }

@@ -43,13 +43,13 @@ public class MatrixApplicationServiceClient extends MatrixHttpClient implements 
 
     private MatrixHttpClient createClient(String localpart) {
         return new MatrixHttpClient(
-                new MatrixClientContext(getHomeserver(), getMatrixId(localpart), getAccessToken(), true));
+                new MatrixClientContext(getHomeserver(), getMatrixId(localpart), getAccessTokenOrThrow(), true));
     }
 
     @Override
     public _MatrixClient createUser(String localpart) {
         log.debug("Creating new user {}", localpart);
-        URI path = getClientPath("/register");
+        URI path = getClientPathWithAccessToken("/register");
         HttpPost req = new HttpPost(path);
         req.setEntity(getJsonEntity(new VirtualUserRegistrationBody(localpart)));
         execute(req);

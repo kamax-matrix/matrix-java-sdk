@@ -20,22 +20,148 @@
 
 package io.kamax.matrix.client.regular;
 
-import io.kamax.matrix.client.*;
+import io.kamax.matrix.client.MatrixClientContext;
+import io.kamax.matrix.client.MatrixClientRequestException;
+import io.kamax.matrix.client.MatrixHttpTest;
+import io.kamax.matrix.client.MatrixPasswordLoginCredentials;
+import io.kamax.matrix.hs.MatrixHomeserver;
 
 import org.junit.Test;
+import org.junit.platform.commons.util.StringUtils;
 
 import java.net.URISyntaxException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MatrixHttpClientTest extends MatrixHttpTest {
+    private String loginUrl = "/_matrix/client/r0/login";
+    private String password = "MostSecretPasswordEver";
+    private String deviceId = "testDeviceId_892377";
+
+    private String logoutUrl = "/_matrix/client/r0/logout" + tokenParameter;
+
     private String setDisplaynameUrl = String.format("/_matrix/client/r0/profile/%s/displayname",
-            createClientContext().getUser().getId()) + tokenParameter;
+            createClientContext().getUser().get().getId()) + tokenParameter;
     private String displayName = "display name";
 
     public MatrixHttpClientTest() throws URISyntaxException {
+    }
+
+    @Test
+    public void loginWithDeviceId() throws URISyntaxException {
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"," + //
+                        "\"device_id\": \"" + deviceId + "\"}"))
+                .willReturn(aResponse().withStatus(200)
+                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
+                                "\"access_token\": \"" + testToken + "\"," + //
+                                "\"home_server\": \"" + hostname + "\"," + //
+                                "\"device_id\": \"" + deviceId + "\"}")));
+
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixClientContext context = new MatrixClientContext(hs, deviceId);
+        MatrixHttpClient client = new MatrixHttpClient(context);
+
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
+        client.login(credentials);
+
+        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
+        assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
+        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
+
+        /*
+         * TODO The spec is not clear if the returned device id is always the same as the one you pass to the server.
+         * If it can be different this assertion has to be removed.
+         */
+        assertEquals(deviceId, client.getDeviceId().get());
+    }
+
+    @Test
+    public void loginWithDeviceIdAndLogout() throws URISyntaxException {
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"," + //
+                        "\"device_id\": \"" + deviceId + "\"}"))
+                .willReturn(aResponse().withStatus(200)
+                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
+                                "\"access_token\": \"" + testToken + "\"," + //
+                                "\"home_server\": \"" + new MatrixHomeserver(domain, baseUrl) + "\"," + //
+                                "\"device_id\": \"" + deviceId + "\"}")));
+
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixClientContext context = new MatrixClientContext(hs, deviceId);
+        MatrixHttpClient client = new MatrixHttpClient(context);
+
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
+        client.login(credentials);
+
+        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
+        assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
+        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
+
+        /*
+         * TODO The spec is not clear if the returned device id is always the same as the one you pass to the server.
+         * If it can be different this assertion has to be removed.
+         */
+        assertEquals(deviceId, client.getDeviceId().get());
+
+        stubFor(post(urlEqualTo(logoutUrl)));
+        client.logout();
+    }
+
+    @Test
+    public void login() throws URISyntaxException {
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"}"))
+                .willReturn(aResponse().withStatus(200)
+                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
+                                "\"access_token\": \"" + testToken + "\"," + //
+                                "\"home_server\": \"" + new MatrixHomeserver(domain, baseUrl) + "\"," + //
+                                "\"device_id\": \"" + deviceId + "\"}")));
+
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixClientContext context = new MatrixClientContext(hs);
+        MatrixHttpClient client = new MatrixHttpClient(context);
+
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
+        client.login(credentials);
+
+        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
+        assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
+        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
+
+        /*
+         * TODO The spec is not clear if the returned device id is always the same as the one you pass to the server.
+         * If it can be different this assertion has to be removed.
+         */
+        assertEquals(deviceId, client.getDeviceId().get());
+    }
+
+    @Test
+    public void loginWrongPassword() throws URISyntaxException {
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"}"))
+                .willReturn(aResponse().withStatus(403).withBody(error403Response)));
+
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixClientContext context = new MatrixClientContext(hs);
+        MatrixHttpClient client = new MatrixHttpClient(context);
+
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
+        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
+                () -> client.login(credentials));
+        checkErrorInfo403(e);
     }
 
     @Test
