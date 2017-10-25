@@ -65,8 +65,8 @@ public class MatrixClientContext {
         return hs;
     }
 
-    public _MatrixID getUser() {
-        return user;
+    public Optional<_MatrixID> getUser() {
+        return Optional.ofNullable(user);
     }
 
     public void setUser(_MatrixID user) {

@@ -109,6 +109,6 @@ public class MatrixHttpUserTest extends MatrixHttpTest {
 
     private MatrixHttpUser createUserObject() throws URISyntaxException {
         MatrixClientContext context = createClientContext();
-        return new MatrixHttpUser(context, context.getUser());
+        return new MatrixHttpUser(context, context.getUser().get());
     }
 }

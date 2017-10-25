@@ -78,14 +78,13 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return Optional.ofNullable(context.getToken());
     }
 
-    @Override
     public String getAccessTokenOrThrow() {
         return getAccessToken()
                 .orElseThrow(() -> new IllegalStateException("This method can only be used with a valid token."));
     }
 
     @Override
-    public _MatrixID getUser() {
+    public Optional<_MatrixID> getUser() {
         return context.getUser();
     }
 
@@ -240,7 +239,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         URIBuilder builder = context.getHs().getClientEndpoint();
         builder.setPath(builder.getPath() + "/_matrix/" + module + "/" + version + action);
         if (context.isVirtualUser()) {
-            builder.setParameter("user_id", context.getUser().getId());
+            context.getUser().ifPresent(user -> builder.setParameter("user_id", user.getId()));
         }
 
         return builder;
@@ -272,19 +271,11 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         }
     }
 
-    protected URI getMediaPathWithAccessToken(String action) {
+    protected URI getMediaPath(String action) {
         try {
             URIBuilder builder = getMediaPathBuilder(action);
             builder.setParameter("access_token", getAccessTokenOrThrow());
             return builder.build();
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    protected URI getMediaPath(String action) {
-        try {
-            return getMediaPathBuilder(action).build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }

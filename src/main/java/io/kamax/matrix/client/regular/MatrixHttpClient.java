@@ -31,6 +31,7 @@ import io.kamax.matrix.json.UserDisplaynameSetBody;
 
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
 import java.util.Optional;
@@ -46,8 +47,15 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     }
 
     @Override
+    protected URIBuilder getClientPathBuilder(String action) {
+        URIBuilder builder = super.getClientPathBuilder(action);
+        context.getUser().ifPresent(user -> builder.setPath(builder.getPath().replace("{userId}", user.getId())));
+        return builder;
+    }
+
+    @Override
     public void setDisplayName(String name) {
-        URI path = getClientPathWithAccessToken("/profile/" + context.getUser().getId() + "/displayname");
+        URI path = getClientPathWithAccessToken("/profile/{userId}/displayname");
         HttpPut req = new HttpPut(path);
         req.setEntity(getJsonEntity(new UserDisplaynameSetBody(name)));
         execute(req);
@@ -82,7 +90,10 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         LoginResponse response = gson.fromJson(body, LoginResponse.class);
         context.setToken(response.getAccessToken());
         context.setDeviceId(response.getDeviceId());
-        context.setUser(new MatrixID(credentials.getLocalPart(), context.getHs().getDomain()));
+        context.setUser(new MatrixID(response.getUserId()));
+
+        // FIXME spec returns hostname which we might not be the same as what has been used in baseUrl to login. Must
+        // update internals accordingly
     }
 
     @Override
@@ -91,6 +102,8 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         HttpPost req = new HttpPost(path);
         execute(req);
         context.setToken(null);
+        context.setUser(null);
+        context.setDeviceId(null);
     }
 
 }

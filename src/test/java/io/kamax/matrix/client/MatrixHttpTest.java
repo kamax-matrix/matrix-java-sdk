@@ -43,7 +43,8 @@ public class MatrixHttpTest {
     protected String resourcePath = "src/test/resources/wiremock";
 
     protected String domain = "localhost";
-    protected String baseUrl = "http://localhost:" + port;
+    protected String hostname = "localhost";
+    protected String baseUrl = "http://" + hostname + ":" + port;
     protected String nameOfUser = "testuser";
     protected MatrixID user = new MatrixID(nameOfUser, domain);
 

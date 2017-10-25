@@ -27,6 +27,7 @@ import io.kamax.matrix.client.MatrixPasswordLoginCredentials;
 import io.kamax.matrix.hs.MatrixHomeserver;
 
 import org.junit.Test;
+import org.junit.platform.commons.util.StringUtils;
 
 import java.net.URISyntaxException;
 
@@ -34,6 +35,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MatrixHttpClientTest extends MatrixHttpTest {
     private String loginUrl = "/_matrix/client/r0/login";
@@ -43,7 +45,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
     private String logoutUrl = "/_matrix/client/r0/logout" + tokenParameter;
 
     private String setDisplaynameUrl = String.format("/_matrix/client/r0/profile/%s/displayname",
-            createClientContext().getUser().getId()) + tokenParameter;
+            createClientContext().getUser().get().getId()) + tokenParameter;
     private String displayName = "display name";
 
     public MatrixHttpClientTest() throws URISyntaxException {
@@ -59,7 +61,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
                 .willReturn(aResponse().withStatus(200)
                         .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
                                 "\"access_token\": \"" + testToken + "\"," + //
-                                "\"home_server\": \"" + new MatrixHomeserver(domain, baseUrl) + "\"," + //
+                                "\"home_server\": \"" + hostname + "\"," + //
                                 "\"device_id\": \"" + deviceId + "\"}")));
 
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
@@ -69,6 +71,14 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
         MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
         client.login(credentials);
 
+        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
+        assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
+        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
+
+        /*
+         * TODO The spec is not clear if the returned device id is always the same as the one you pass to the server.
+         * If it can be different this assertion has to be removed.
+         */
         assertEquals(deviceId, client.getDeviceId().get());
     }
 
@@ -92,6 +102,14 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
         MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
         client.login(credentials);
 
+        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
+        assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
+        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
+
+        /*
+         * TODO The spec is not clear if the returned device id is always the same as the one you pass to the server.
+         * If it can be different this assertion has to be removed.
+         */
         assertEquals(deviceId, client.getDeviceId().get());
 
         stubFor(post(urlEqualTo(logoutUrl)));
@@ -117,6 +135,14 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
         MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
         client.login(credentials);
 
+        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
+        assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
+        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
+
+        /*
+         * TODO The spec is not clear if the returned device id is always the same as the one you pass to the server.
+         * If it can be different this assertion has to be removed.
+         */
         assertEquals(deviceId, client.getDeviceId().get());
     }
 

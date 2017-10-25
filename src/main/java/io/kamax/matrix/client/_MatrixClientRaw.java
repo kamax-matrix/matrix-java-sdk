@@ -33,7 +33,5 @@ public interface _MatrixClientRaw {
 
     Optional<String> getAccessToken();
 
-    String getAccessTokenOrThrow();
-
-    _MatrixID getUser();
+    Optional<_MatrixID> getUser();
 }
