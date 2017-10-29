@@ -83,32 +83,33 @@ public class MatrixJson {
         }
     }
 
-    public static String encodeCanonical(String data) {
+    public static String encodeCanonical(JsonObject obj) {
         try {
-            JsonElement el = parser.parse(data);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             JsonWriterUnchecked writer = new JsonWriterUnchecked(new OutputStreamWriter(out, StandardCharsets.UTF_8));
             writer.setIndent("");
             writer.setHtmlSafe(false);
             writer.setLenient(false);
 
-            if (!el.isJsonObject()) {
-                /*
-                 * TODO seems implied because of how signing/checking signatures is done and because of
-                 * https://matrix.to/#/!XqBunHwQIXUiqCaoxq:matrix.org/$15075894901530229RWcIi:matrix.org
-                 * with the "whole object".
-                 */
-                throw new JsonCanonicalException("Not a JSON object, cannot encode canonical");
-            }
-
-            encodeCanonical(el.getAsJsonObject(), writer);
-
+            encodeCanonical(obj, writer);
             writer.close();
-
             return out.toString(StandardCharsets.UTF_8.name());
         } catch (IOException e) {
             throw new JsonCanonicalException(e);
         }
+    }
+
+    public static String encodeCanonical(String data) {
+        JsonElement el = parser.parse(data);
+        if (!el.isJsonObject()) {
+            /*
+             * TODO seems implied because of how signing/checking signatures is done and because of
+             * https://matrix.to/#/!XqBunHwQIXUiqCaoxq:matrix.org/$15075894901530229RWcIi:matrix.org
+             * with the "whole object".
+             */
+            throw new JsonCanonicalException("Not a JSON object, cannot encode canonical");
+        }
+        return encodeCanonical(el.getAsJsonObject());
     }
 
 }
