@@ -1,0 +1,72 @@
+/*
+ * matrix-java-sdk - Matrix Client SDK for Java
+ * Copyright (C) 2017 Maxime Dor
+ *
+ * https://max.kamax.io/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package io.kamax.matrix.sign;
+
+import com.google.gson.JsonObject;
+import net.i2p.crypto.eddsa.EdDSAEngine;
+
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.util.Base64;
+
+public class SignatureManager {
+
+    private KeyManager keyMgr;
+    private String domain;
+
+    private EdDSAEngine signEngine;
+
+    public SignatureManager(KeyManager keyMgr, String domain) {
+        this.keyMgr = keyMgr;
+        this.domain = domain;
+
+        try {
+            signEngine = new EdDSAEngine(MessageDigest.getInstance(keyMgr.getSpecs().getHashAlgorithm()));
+            signEngine.initSign(keyMgr.getPrivateKey(keyMgr.getCurrentIndex()));
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String sign(String message) {
+        try {
+            byte[] signRaw = signEngine.signOneShot(message.getBytes());
+            return Base64.getEncoder().encodeToString(signRaw);
+        } catch (SignatureException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public JsonObject signMessageGson(String message) {
+        String sign = sign(message);
+
+        JsonObject keySignature = new JsonObject();
+        // FIXME should create a signing key object what would give this ed and index values
+        keySignature.addProperty("ed25519:" + keyMgr.getCurrentIndex(), sign);
+        JsonObject signature = new JsonObject();
+        signature.add(domain, keySignature);
+
+        return signature;
+    }
+
+}

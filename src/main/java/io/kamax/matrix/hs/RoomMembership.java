@@ -34,6 +34,10 @@ public enum RoomMembership {
         this.id = id;
     }
 
+    public String get() {
+        return id;
+    }
+
     public boolean is(String id) {
         return this.id.contentEquals(id);
     }
