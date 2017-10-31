@@ -21,13 +21,15 @@
 package io.kamax.matrix.sign;
 
 import com.google.gson.JsonObject;
-import net.i2p.crypto.eddsa.EdDSAEngine;
 
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.util.Base64;
+
+
+import net.i2p.crypto.eddsa.EdDSAEngine;
 
 public class SignatureManager {
 
