@@ -73,13 +73,13 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     @Test
-    public void getName404() throws URISyntaxException {
+    public void getEmptyName() throws URISyntaxException {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
         assertThat(createRoomObject().getName(), IsEqual.equalTo(Optional.empty()));
     }
 
     @Test
-    public void getNameError403() throws URISyntaxException {
+    public void getNameAccessDenied() throws URISyntaxException {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
@@ -87,7 +87,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     @Test
-    public void getNameError429() throws URISyntaxException {
+    public void getNameRateLimited() throws URISyntaxException {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
@@ -101,13 +101,13 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     @Test
-    public void getTopicError404() throws URISyntaxException {
+    public void getEmptyTopic() throws URISyntaxException {
         stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
         assertThat(createRoomObject().getTopic(), IsEqual.equalTo(Optional.empty()));
     }
 
     @Test
-    public void getTopicError403() throws URISyntaxException {
+    public void getTopicAccessDenied() throws URISyntaxException {
         stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getTopic);
@@ -115,7 +115,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     @Test
-    public void getTopicError429() throws URISyntaxException {
+    public void getTopicRateLimited() throws URISyntaxException {
         stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getTopic);
