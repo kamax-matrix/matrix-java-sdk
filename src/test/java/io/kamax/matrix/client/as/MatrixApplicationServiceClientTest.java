@@ -42,7 +42,7 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
     }
 
     @Test
-    public void createUserError429() throws URISyntaxException {
+    public void createUserErrorRateLimited() throws URISyntaxException {
         stubFor(post(urlEqualTo(createUserUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
