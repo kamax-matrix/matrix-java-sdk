@@ -171,7 +171,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
     }
 
     @Test
-    public void setDisplayNameError429() throws URISyntaxException {
+    public void setDisplayNameErrorRateLimited() throws URISyntaxException {
         stubFor(put(urlEqualTo(setDisplaynameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,

@@ -71,10 +71,6 @@ public class MatrixHttpTest {
         return new MatrixClientContext(hs, user, testToken);
     }
 
-    protected String getAcessTokenParameter() {
-        return "?access_token=" + testToken;
-    }
-
     protected void checkErrorInfo403(MatrixClientRequestException e) {
         checkErrorInfo(errcode403, error403, e.getError());
     }
