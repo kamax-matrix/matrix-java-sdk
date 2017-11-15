@@ -20,16 +20,26 @@
 
 package io.kamax.matrix.client;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.WireMockServer;
 
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix.MatrixID;
+import io.kamax.matrix.client.regular.MatrixHttpClient;
 import io.kamax.matrix.hs.MatrixHomeserver;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static junit.framework.TestCase.assertEquals;
@@ -45,8 +55,8 @@ public class MatrixHttpTest {
     protected String domain = "localhost";
     protected String hostname = "localhost";
     protected String baseUrl = "http://" + hostname + ":" + port;
-    protected String nameOfUser = "testuser";
-    protected MatrixID user = new MatrixID(nameOfUser, domain);
+    protected String username = "testuser";
+    protected MatrixID user = new MatrixID(username, domain);
 
     private String errorResponseTemplate = "{\"errcode\": \"%s\", \"error\": \"%s\"}";
 
@@ -62,11 +72,10 @@ public class MatrixHttpTest {
     private String error429 = "Too many requests have been sent in a short period of time. Wait a while then try again.";
     protected String error429Response = String.format(errorResponseTemplate, errcode429, error429);
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(options().port(port).usingFilesUnderDirectory(resourcePath));
+    protected WireMockServer server;
+    private MatrixHttpClient client;
 
     protected MatrixClientContext createClientContext() throws URISyntaxException {
-
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
         return new MatrixClientContext(hs, user, testToken);
     }
@@ -87,5 +96,54 @@ public class MatrixHttpTest {
         assertTrue(errorOptional.isPresent());
         assertEquals(errorOptional.get().getErrcode(), errcode);
         assertEquals(errorOptional.get().getError(), error);
+    }
+
+    @BeforeEach
+    protected void init() throws URISyntaxException {
+        // TODO It's probably a good idea to move the config file to another location
+        InputStream configFile = this.getClass().getResourceAsStream("/test.conf");
+        if (configFile != null) {
+            try (BufferedReader buffer = new BufferedReader(new InputStreamReader(configFile))) {
+                Map<String, String> configValues = buffer.lines().filter(line -> !line.startsWith("#")).collect(
+                        Collectors.toMap(line -> line.split("=")[0].trim(), line -> line.split("=")[1].trim()));
+
+                String portKey = "Port";
+                port = Integer.valueOf(configValues.get(portKey));
+                hostname = configValues.get("Hostname");
+                domain = configValues.get("Domain");
+                baseUrl = "https://" + hostname + ":" + port;
+                MatrixHomeserver homeserver = new MatrixHomeserver(domain, baseUrl);
+
+                username = configValues.get("Username");
+                MatrixClientContext context = new MatrixClientContext(homeserver);
+                MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(username,
+                        configValues.get("Password"));
+
+                client = new MatrixHttpClient(context);
+                client.login(credentials);
+                testToken = client.getAccessTokenOrThrow();
+            } catch (IOException e) {
+                throw new ParameterResolutionException("Config file could not be read", e);
+            }
+        } else {
+            server = new WireMockServer(options().port(port).usingFilesUnderDirectory(resourcePath));
+            server.start();
+        }
+    }
+
+    @AfterEach
+    protected void tearDown() {
+        if (server != null) {
+            server.resetAll();
+            server.stop();
+        } else {
+            client.logout();
+        }
+    }
+
+    public void configureWiremock(Consumer<WireMockServer> var1) {
+        if (server != null) {
+            var1.accept(server);
+        }
     }
 }

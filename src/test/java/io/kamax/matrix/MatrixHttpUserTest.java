@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MatrixHttpUserTest extends MatrixHttpTest {
     private String nameUrl = String.format("/_matrix/client/r0/profile/%s/displayname", user.getId()) + tokenParameter;
-    private String nameResponse = String.format("{\"displayname\": \"%s\"}", nameOfUser);
+    private String nameResponse = String.format("{\"displayname\": \"%s\"}", username);
 
     private String avatarUrl = String.format("/_matrix/client/r0/profile/%s/avatar_url", user.getId()) + tokenParameter;
     private String avatarMediaUrl = "mxc://matrix.org/wefh34uihSDRGhw34";
@@ -50,7 +50,7 @@ public class MatrixHttpUserTest extends MatrixHttpTest {
     @Test
     public void getName() throws URISyntaxException {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(200).withBody(nameResponse)));
-        assertThat(createUserObject().getName(), is(equalTo(Optional.of(nameOfUser))));
+        assertThat(createUserObject().getName(), is(equalTo(Optional.of(username))));
     }
 
     @Test

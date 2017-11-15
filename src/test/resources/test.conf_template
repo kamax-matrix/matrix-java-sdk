@@ -1,0 +1,11 @@
+# If you want to run these tests against a real homeserver, please fill out the necessary information below and
+# rename this file to test.conf
+
+# Server information
+Domain = localhost
+Hostname = localhost
+Port = 443
+
+# User credentials
+Username = xxx
+Password = xxx
