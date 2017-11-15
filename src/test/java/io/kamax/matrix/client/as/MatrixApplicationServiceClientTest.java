@@ -20,10 +20,11 @@
 
 package io.kamax.matrix.client.as;
 
-import io.kamax.matrix.client.*;
+import io.kamax.matrix.client.MatrixClientRequestException;
+import io.kamax.matrix.client.MatrixHttpTest;
 import io.kamax.matrix.hs.MatrixHomeserver;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.URISyntaxException;
 
@@ -37,13 +38,14 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
 
     @Test
     public void createUser() throws URISyntaxException {
-        stubFor(post(urlEqualTo(createUserUrl)).willReturn(aResponse().withStatus(200)));
+        callIfNotNull(s -> s.stubFor(post(urlEqualTo(createUserUrl)).willReturn(aResponse().withStatus(200))));
         createClientObject().createUser(testUser);
     }
 
     @Test
     public void createUserErrorRateLimited() throws URISyntaxException {
-        stubFor(post(urlEqualTo(createUserUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+        callIfNotNull(s -> s.stubFor(
+                post(urlEqualTo(createUserUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response))));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createClientObject().createUser(testUser));

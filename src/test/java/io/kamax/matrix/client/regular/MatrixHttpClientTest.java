@@ -26,16 +26,14 @@ import io.kamax.matrix.client.MatrixHttpTest;
 import io.kamax.matrix.client.MatrixPasswordLoginCredentials;
 import io.kamax.matrix.hs.MatrixHomeserver;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
 
 import java.net.URISyntaxException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MatrixHttpClientTest extends MatrixHttpTest {
     private String loginUrl = "/_matrix/client/r0/login";
@@ -53,7 +51,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
 
     @Test
     public void loginWithDeviceId() throws URISyntaxException {
-        stubFor(post(urlEqualTo(loginUrl))
+        callIfNotNull(s -> s.stubFor(post(urlEqualTo(loginUrl))
                 .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
                         "\"user\": \"" + user.getLocalPart() + "\"," + //
                         "\"password\": \"" + password + "\"," + //
@@ -62,7 +60,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
                         .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
                                 "\"access_token\": \"" + testToken + "\"," + //
                                 "\"home_server\": \"" + hostname + "\"," + //
-                                "\"device_id\": \"" + deviceId + "\"}")));
+                                "\"device_id\": \"" + deviceId + "\"}"))));
 
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
         MatrixClientContext context = new MatrixClientContext(hs, deviceId);
@@ -84,7 +82,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
 
     @Test
     public void loginWithDeviceIdAndLogout() throws URISyntaxException {
-        stubFor(post(urlEqualTo(loginUrl))
+        callIfNotNull(s -> s.stubFor(post(urlEqualTo(loginUrl))
                 .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
                         "\"user\": \"" + user.getLocalPart() + "\"," + //
                         "\"password\": \"" + password + "\"," + //
@@ -93,7 +91,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
                         .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
                                 "\"access_token\": \"" + testToken + "\"," + //
                                 "\"home_server\": \"" + hostname + "\"," + //
-                                "\"device_id\": \"" + deviceId + "\"}")));
+                                "\"device_id\": \"" + deviceId + "\"}"))));
 
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
         MatrixClientContext context = new MatrixClientContext(hs, deviceId);
@@ -112,13 +110,13 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
          */
         assertEquals(deviceId, client.getDeviceId().get());
 
-        stubFor(post(urlEqualTo(logoutUrl)));
+        callIfNotNull(s -> s.stubFor(post(urlEqualTo(logoutUrl))));
         client.logout();
     }
 
     @Test
     public void login() throws URISyntaxException {
-        stubFor(post(urlEqualTo(loginUrl))
+        callIfNotNull(s -> s.stubFor(post(urlEqualTo(loginUrl))
                 .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
                         "\"user\": \"" + user.getLocalPart() + "\"," + //
                         "\"password\": \"" + password + "\"}"))
@@ -126,7 +124,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
                         .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
                                 "\"access_token\": \"" + testToken + "\"," + //
                                 "\"home_server\": \"" + hostname + "\"," + //
-                                "\"device_id\": \"" + deviceId + "\"}")));
+                                "\"device_id\": \"" + deviceId + "\"}"))));
 
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
         MatrixClientContext context = new MatrixClientContext(hs);
@@ -148,11 +146,11 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
 
     @Test
     public void loginWrongPassword() throws URISyntaxException {
-        stubFor(post(urlEqualTo(loginUrl))
+        callIfNotNull(s -> s.stubFor(post(urlEqualTo(loginUrl))
                 .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
                         "\"user\": \"" + user.getLocalPart() + "\"," + //
                         "\"password\": \"" + password + "\"}"))
-                .willReturn(aResponse().withStatus(403).withBody(error403Response)));
+                .willReturn(aResponse().withStatus(403).withBody(error403Response))));
 
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
         MatrixClientContext context = new MatrixClientContext(hs);
@@ -166,13 +164,14 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
 
     @Test
     public void setDisplayName() throws URISyntaxException {
-        stubFor(put(urlEqualTo(setDisplaynameUrl)).willReturn(aResponse().withStatus(200)));
+        callIfNotNull(s -> s.stubFor(put(urlEqualTo(setDisplaynameUrl)).willReturn(aResponse().withStatus(200))));
         createClientObject().setDisplayName(displayName);
     }
 
     @Test
     public void setDisplayNameErrorRateLimited() throws URISyntaxException {
-        stubFor(put(urlEqualTo(setDisplaynameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+        callIfNotNull(s -> s.stubFor(
+                put(urlEqualTo(setDisplaynameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response))));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createClientObject().setDisplayName(displayName));

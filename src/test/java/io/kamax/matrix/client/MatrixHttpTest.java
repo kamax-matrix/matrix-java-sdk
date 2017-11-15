@@ -141,7 +141,7 @@ public class MatrixHttpTest {
         }
     }
 
-    public void configureWiremock(Consumer<WireMockServer> var1) {
+    public void callIfNotNull(Consumer<WireMockServer> var1) {
         if (server != null) {
             var1.accept(server);
         }
