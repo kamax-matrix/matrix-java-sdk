@@ -92,7 +92,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
                 .willReturn(aResponse().withStatus(200)
                         .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
                                 "\"access_token\": \"" + testToken + "\"," + //
-                                "\"home_server\": \"" + new MatrixHomeserver(domain, baseUrl) + "\"," + //
+                                "\"home_server\": \"" + hostname + "\"," + //
                                 "\"device_id\": \"" + deviceId + "\"}")));
 
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
@@ -125,7 +125,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
                 .willReturn(aResponse().withStatus(200)
                         .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
                                 "\"access_token\": \"" + testToken + "\"," + //
-                                "\"home_server\": \"" + new MatrixHomeserver(domain, baseUrl) + "\"," + //
+                                "\"home_server\": \"" + hostname + "\"," + //
                                 "\"device_id\": \"" + deviceId + "\"}")));
 
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
