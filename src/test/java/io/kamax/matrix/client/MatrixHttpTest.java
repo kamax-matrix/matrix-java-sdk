@@ -112,6 +112,7 @@ public class MatrixHttpTest {
                 baseUrl = "https://" + hostname + ":" + port;
                 username = configValues.get("Username");
                 password = configValues.get("Password");
+                user = new MatrixID(username, domain);
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
