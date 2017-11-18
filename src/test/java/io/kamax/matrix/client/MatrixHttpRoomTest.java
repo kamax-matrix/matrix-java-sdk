@@ -24,7 +24,7 @@ import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -68,201 +68,233 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
 
     @Test
     public void getName() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(200).withBody(nameResponse))));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(200).withBody(nameResponse)));
+
+        login();
         assertThat(createRoomObject().getName(), IsEqual.equalTo(Optional.of(nameOfRoom)));
+        logout();
     }
 
     @Test
     public void getEmptyName() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response))));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+
+        login();
         assertThat(createRoomObject().getName(), IsEqual.equalTo(Optional.empty()));
+        logout();
     }
 
     @Test
     public void getNameAccessDenied() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response))));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
         checkErrorInfo403(e);
+        logout();
     }
 
     @Test
     public void getNameRateLimited() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response))));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
         checkErrorInfo429(e);
+        logout();
     }
 
     @Test
     public void getTopic() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(200).withBody(topicResponse))));
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(200).withBody(topicResponse)));
+
+        login();
         assertThat(createRoomObject().getTopic(), IsEqual.equalTo(Optional.of(testTopic)));
+        logout();
     }
 
     @Test
     public void getEmptyTopic() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response))));
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+
+        login();
         assertThat(createRoomObject().getTopic(), IsEqual.equalTo(Optional.empty()));
+        logout();
     }
 
     @Test
     public void getTopicAccessDenied() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response))));
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getTopic);
         checkErrorInfo403(e);
+        logout();
     }
 
     @Test
     public void getTopicRateLimited() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response))));
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getTopic);
         checkErrorInfo429(e);
+        logout();
     }
 
     @Test
     public void join() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(200).withBody(joinResponse))));
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(200).withBody(joinResponse)));
+
+        login();
         createRoomObject().join();
+        logout();
     }
 
     @Test
     public void joinRoomNotFound() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response))));
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
         checkErrorInfo404(e);
+        logout();
     }
 
     @Test
     public void joinAccessDenied() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response))));
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
         checkErrorInfo403(e);
+        logout();
     }
 
     @Test
     public void joinRateLimited() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response))));
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
         checkErrorInfo429(e);
+        logout();
     }
 
     @Test
     public void leave() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(200).withBody(leaveResponse))));
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(200).withBody(leaveResponse)));
+
+        login();
         createRoomObject().leave();
+        logout();
     }
 
     @Test
     public void leaveAccessDenied() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response))));
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
         checkErrorInfo403(e);
+        logout();
     }
 
     @Test
     public void leaveRoomNotFound() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response))));
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+
+        login();
         createRoomObject().leave();
+        logout();
     }
 
     @Test
     public void leaveRateLimited() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response))));
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
         checkErrorInfo429(e);
+        logout();
     }
 
     @Test
     public void sendText() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(200).withBody(sendTextResponse))));
+        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(200).withBody(sendTextResponse)));
+
+        login();
         createRoomObject().sendText(testText);
+        logout();
     }
 
     @Test
     public void sendTextAccessDenied() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response))));
+        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createRoomObject().sendText(testText));
         checkErrorInfo403(e);
+        logout();
     }
 
     @Test
     public void sendTextRoomNotFound() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response))));
+        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createRoomObject().sendText(testText));
         checkErrorInfo404(e);
+        logout();
     }
 
     @Test
     public void sendTextRateLimited() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response))));
+        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createRoomObject().sendText(testText));
         checkErrorInfo429(e);
+        logout();
     }
 
     @Test
     public void getJoinedUsers() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(get(urlEqualTo(getJoinedUsersUrl))
-                .willReturn(aResponse().withStatus(200).withBody(getJoinedUsersResponse))));
+        stubFor(get(urlEqualTo(getJoinedUsersUrl))
+                .willReturn(aResponse().withStatus(200).withBody(getJoinedUsersResponse)));
 
         List<_MatrixID> expectedResult = new ArrayList<>();
         expectedResult.add(new MatrixID(joinedUser1));
         expectedResult.add(new MatrixID(joinedUser2));
 
+        login();
         assertThat(createRoomObject().getJoinedUsers(), IsEqual.equalTo(expectedResult));
+        logout();
     }
 
     @Test
     public void getJoinedUsersRoomNotFound() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                get(urlEqualTo(getJoinedUsersUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response))));
+        stubFor(get(urlEqualTo(getJoinedUsersUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createRoomObject()::getJoinedUsers);
         checkErrorInfo404(e);
+        logout();
     }
 
     @Test
     public void getJoinedUsersRateLimited() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                get(urlEqualTo(getJoinedUsersUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response))));
+        stubFor(get(urlEqualTo(getJoinedUsersUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
+        login();
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createRoomObject()::getJoinedUsers);
         checkErrorInfo429(e);
+        logout();
     }
 
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {

@@ -25,7 +25,7 @@ import io.kamax.matrix.client.MatrixClientRequestException;
 import io.kamax.matrix.client.MatrixHttpTest;
 import io.kamax.matrix.client.MatrixHttpUser;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -49,22 +49,19 @@ public class MatrixHttpUserTest extends MatrixHttpTest {
 
     @Test
     public void getName() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(200).withBody(nameResponse))));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(200).withBody(nameResponse)));
         assertThat(createUserObject().getName(), is(equalTo(Optional.of(username))));
     }
 
     @Test
     public void getName404() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response))));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
         assertThat(createUserObject().getName(), is(equalTo(Optional.empty())));
     }
 
     @Test
     public void getNameError403() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response))));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createUserObject()::getName);
         checkErrorInfo403(e);
@@ -72,8 +69,7 @@ public class MatrixHttpUserTest extends MatrixHttpTest {
 
     @Test
     public void getNameError429() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response))));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createUserObject()::getName);
         checkErrorInfo429(e);
@@ -81,8 +77,7 @@ public class MatrixHttpUserTest extends MatrixHttpTest {
 
     @Test
     public void getAvatar() throws URISyntaxException {
-        callIfNotNull(s -> s
-                .stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(200).withBody(avatarResponse))));
+        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(200).withBody(avatarResponse)));
         Optional<_MatrixContent> matrixContent = createUserObject().getAvatar();
         assertTrue(matrixContent.isPresent());
         assertThat(matrixContent.get().getAddress(), is(equalTo(new URI(avatarMediaUrl))));
@@ -90,15 +85,13 @@ public class MatrixHttpUserTest extends MatrixHttpTest {
 
     @Test
     public void getAvatar404() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response))));
+        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
         assertThat(createUserObject().getAvatar(), is(equalTo(Optional.empty())));
     }
 
     @Test
     public void getAvatarError403() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response))));
+        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createUserObject()::getAvatar);
@@ -107,8 +100,7 @@ public class MatrixHttpUserTest extends MatrixHttpTest {
 
     @Test
     public void getAvatarError429() throws URISyntaxException {
-        callIfNotNull(s -> s.stubFor(
-                get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response))));
+        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createUserObject()::getAvatar);
