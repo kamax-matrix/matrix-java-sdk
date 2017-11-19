@@ -145,7 +145,7 @@ public class MatrixHttpTest {
 
     private void checkErrorInfo(String errcode, String error, Optional<MatrixErrorInfo> errorOptional) {
         assertTrue(errorOptional.isPresent());
-        assertEquals(errorOptional.get().getErrcode(), errcode);
-        assertEquals(errorOptional.get().getError(), error);
+        assertEquals(errcode, errorOptional.get().getErrcode());
+        assertEquals(error, errorOptional.get().getError());
     }
 }
