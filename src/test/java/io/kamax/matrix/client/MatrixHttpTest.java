@@ -100,7 +100,6 @@ public class MatrixHttpTest {
             try {
                 MatrixHomeserver homeserver = new MatrixHomeserver(domain, baseUrl);
                 MatrixClientContext context = new MatrixClientContext(homeserver);
-                createClientContext();
                 MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(username, password);
 
                 client = new MatrixHttpClient(context);
@@ -126,9 +125,13 @@ public class MatrixHttpTest {
     public WireMockRule wireMockRule = new WireMockRule(options().port(port).usingFilesUnderDirectory(resourcePath));
     private MatrixHttpClient client;
 
-    protected MatrixClientContext createClientContext() throws URISyntaxException {
-        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        return new MatrixClientContext(hs, user, testToken);
+    protected MatrixClientContext getOrCreateClientContext() throws URISyntaxException {
+        if (client != null) {
+            return client.getContext();
+        } else {
+            MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+            return new MatrixClientContext(hs, user, testToken);
+        }
     }
 
     protected void checkErrorInfo403(MatrixClientRequestException e) {

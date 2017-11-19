@@ -183,7 +183,7 @@ public class MatrixHttpRoomTest extends MatrixHttpTest {
     }
 
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {
-        MatrixClientContext context = createClientContext();
+        MatrixClientContext context = getOrCreateClientContext();
         return new MatrixHttpRoom(context, roomId);
     }
 }

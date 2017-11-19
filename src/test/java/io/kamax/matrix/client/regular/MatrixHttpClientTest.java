@@ -46,7 +46,7 @@ public class MatrixHttpClientTest extends MatrixHttpTest {
     }
 
     private MatrixHttpClient createClientObject() throws URISyntaxException {
-        MatrixClientContext context = createClientContext();
+        MatrixClientContext context = getOrCreateClientContext();
         return new MatrixHttpClient(context);
     }
 }
