@@ -72,6 +72,56 @@ public class MatrixHttpTest {
     private String error429 = "Too many requests have been sent in a short period of time. Wait a while then try again.";
     protected String error429Response = String.format(errorResponseTemplate, errcode429, error429);
 
+    /**
+     * This method logs in to a homeserver, if the appropriate config file is present. It has to be commented out in
+     * Wiremock test cases.
+     * 
+     * @throws URISyntaxException
+     */
+    @Before
+    public void login() throws URISyntaxException {
+        // TODO Is the location of the config file alright?
+        InputStream configFile = this.getClass().getResourceAsStream("/test.conf");
+        if (configFile != null) {
+            try (BufferedReader buffer = new BufferedReader(new InputStreamReader(configFile))) {
+                Map<String, String> configValues = buffer.lines().filter(line -> !line.startsWith("#")).collect(
+                        Collectors.toMap(line -> line.split("=")[0].trim(), line -> line.split("=")[1].trim()));
+
+                port = Integer.valueOf(configValues.get("Port"));
+                hostname = configValues.get("Hostname");
+                domain = configValues.get("Domain");
+                baseUrl = "https://" + hostname + ":" + port;
+                username = configValues.get("Username");
+                password = configValues.get("Password");
+                user = new MatrixID(username, domain);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+            try {
+                MatrixHomeserver homeserver = new MatrixHomeserver(domain, baseUrl);
+                MatrixClientContext context = new MatrixClientContext(homeserver);
+                createClientContext();
+                MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(username, password);
+
+                client = new MatrixHttpClient(context);
+                client.login(credentials);
+                testToken = client.getAccessTokenOrThrow();
+            } catch (URISyntaxException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
+    /**
+     * This method logs out of a homeserver, if the appropriate config file is present. It has to be commented out in
+     * Wiremock test cases.
+     */
+    @After
+    public void logout() {
+        client.logout();
+        client = null;
+    }
+
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(options().port(port).usingFilesUnderDirectory(resourcePath));
     private MatrixHttpClient client;
@@ -97,55 +147,5 @@ public class MatrixHttpTest {
         assertTrue(errorOptional.isPresent());
         assertEquals(errorOptional.get().getErrcode(), errcode);
         assertEquals(errorOptional.get().getError(), error);
-    }
-
-    @Before
-    public void setUp() {
-        getConfigFileStream().ifPresent(configFile -> {
-            try (BufferedReader buffer = new BufferedReader(new InputStreamReader(configFile))) {
-                Map<String, String> configValues = buffer.lines().filter(line -> !line.startsWith("#")).collect(
-                        Collectors.toMap(line -> line.split("=")[0].trim(), line -> line.split("=")[1].trim()));
-
-                port = Integer.valueOf(configValues.get("Port"));
-                hostname = configValues.get("Hostname");
-                domain = configValues.get("Domain");
-                baseUrl = "https://" + hostname + ":" + port;
-                username = configValues.get("Username");
-                password = configValues.get("Password");
-                user = new MatrixID(username, domain);
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
-        });
-    }
-
-    private Optional<InputStream> getConfigFileStream() {
-        // TODO Is the location of the config file alright?
-        return Optional.ofNullable(this.getClass().getResourceAsStream("/test.conf"));
-    }
-
-    protected void login() throws URISyntaxException {
-        getConfigFileStream().ifPresent((InputStream configFile) -> {
-            try {
-                MatrixHomeserver homeserver = new MatrixHomeserver(domain, baseUrl);
-                MatrixClientContext context = new MatrixClientContext(homeserver);
-                createClientContext();
-                MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(username, password);
-
-                client = new MatrixHttpClient(context);
-                client.login(credentials);
-                testToken = client.getAccessTokenOrThrow();
-            } catch (URISyntaxException e) {
-                throw new IllegalStateException(e);
-            }
-        });
-    }
-
-    @After
-    public void logout() {
-        if (client != null) {
-            client.logout();
-            client = null;
-        }
     }
 }

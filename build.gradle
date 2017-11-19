@@ -116,3 +116,12 @@ spotless {
 junitPlatform {
     enableStandardTestTask true
 }
+
+test {
+    // Exclude homeserver tests
+    exclude 'io/kamax/matrix/MatrixHttpUserTest*'
+    exclude 'io/kamax/matrix/client/MatrixHttpRoomTest*'
+    exclude 'io/kamax/matrix/client/MatrixHttpContentTest*'
+    exclude 'io/kamax/matrix/client/regular/MatrixHttpClientLoginTest*'
+    exclude 'io/kamax/matrix/client/regular/MatrixHttpClientTest*'
+}

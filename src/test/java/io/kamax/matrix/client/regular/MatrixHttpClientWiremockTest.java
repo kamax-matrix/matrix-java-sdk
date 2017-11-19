@@ -20,33 +20,36 @@
 
 package io.kamax.matrix.client.regular;
 
-import io.kamax.matrix.client.MatrixClientContext;
-import io.kamax.matrix.client.MatrixClientRequestException;
-import io.kamax.matrix.client.MatrixHttpTest;
-
 import org.junit.Test;
 
 import java.net.URISyntaxException;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-public class MatrixHttpClientTest extends MatrixHttpTest {
-    protected String displayName = "display name";
+public class MatrixHttpClientWiremockTest extends MatrixHttpClientTest {
+    private String setDisplaynameUrl = String.format("/_matrix/client/r0/profile/%s/displayname",
+            createClientContext().getUser().get().getId()) + tokenParameter;
+
+    public MatrixHttpClientWiremockTest() throws URISyntaxException {
+    }
+
+    @Override
+    public void login() throws URISyntaxException {
+    }
+
+    @Override
+    public void logout() {
+    }
 
     @Test
     public void setDisplayName() throws URISyntaxException {
-        createClientObject().setDisplayName(displayName);
+        stubFor(put(urlEqualTo(setDisplaynameUrl)).willReturn(aResponse().withStatus(200)));
+        super.setDisplayName();
     }
 
     @Test
     public void setDisplayNameErrorRateLimited() throws URISyntaxException {
-        MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
-                () -> createClientObject().setDisplayName(displayName));
-        checkErrorInfo429(e);
-    }
-
-    private MatrixHttpClient createClientObject() throws URISyntaxException {
-        MatrixClientContext context = createClientContext();
-        return new MatrixHttpClient(context);
+        stubFor(put(urlEqualTo(setDisplaynameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+        super.setDisplayNameErrorRateLimited();
     }
 }
