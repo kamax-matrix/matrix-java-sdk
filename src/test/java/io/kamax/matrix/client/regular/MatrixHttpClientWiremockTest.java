@@ -26,7 +26,7 @@ import java.net.URISyntaxException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-public class MatrixHttpClientWiremockTest extends MatrixHttpClientTest {
+public class MatrixHttpClientWiremockTest extends AMatrixHttpClientTest {
     private String setDisplaynameUrl = String.format("/_matrix/client/r0/profile/%s/displayname",
             getOrCreateClientContext().getUser().get().getId()) + tokenParameter;
 

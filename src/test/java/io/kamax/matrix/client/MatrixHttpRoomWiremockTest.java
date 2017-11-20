@@ -26,7 +26,7 @@ import java.net.URISyntaxException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-public class MatrixHttpRoomWiremockTest extends MatrixHttpRoomTest {
+public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
     private String nameUrl = String.format("/_matrix/client/r0/rooms/%s/state/m.room.name", roomId) + tokenParameter;
     private String nameResponse = String.format("{\"name\": \"%s\"}", nameOfRoom);
 

@@ -30,7 +30,7 @@ import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class MatrixHttpClientTest extends MatrixHttpTest {
+public abstract class AMatrixHttpClientTest extends MatrixHttpTest {
     protected String displayName = "display name";
 
     @Test

@@ -34,7 +34,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class MatrixHttpRoomTest extends MatrixHttpTest {
+public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     protected String roomId = "roomId892347847";
     protected String eventId = "YUwRidLecu";
 
