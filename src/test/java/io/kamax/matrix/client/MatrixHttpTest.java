@@ -80,7 +80,6 @@ public class MatrixHttpTest {
      */
     @Before
     public void login() throws URISyntaxException {
-        // TODO Is the location of the config file alright?
         InputStream configFile = this.getClass().getResourceAsStream("/test.conf");
         if (configFile != null) {
             try (BufferedReader buffer = new BufferedReader(new InputStreamReader(configFile))) {
