@@ -80,7 +80,7 @@ public class MatrixHttpTest {
      */
     @Before
     public void login() throws URISyntaxException {
-        InputStream configFile = this.getClass().getResourceAsStream("/test.conf");
+        InputStream configFile = this.getClass().getResourceAsStream("/HomeserverTest.conf");
         if (configFile != null) {
             try (BufferedReader buffer = new BufferedReader(new InputStreamReader(configFile))) {
                 Map<String, String> configValues = buffer.lines().filter(line -> !line.startsWith("#")).collect(
