@@ -35,6 +35,14 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
     private String createUserUrl = "/_matrix/client/r0/register" + tokenParameter;
     private String testUser = "testUser";
 
+    @Override
+    public void login() throws URISyntaxException {
+    }
+
+    @Override
+    public void logout() {
+    }
+
     @Test
     public void createUser() throws URISyntaxException {
         stubFor(post(urlEqualTo(createUserUrl)).willReturn(aResponse().withStatus(200)));

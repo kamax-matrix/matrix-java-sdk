@@ -59,6 +59,14 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    testInt {
+        compileClasspath += sourceSets.test.compileClasspath
+        runtimeClasspath += sourceSets.test.runtimeClasspath
+    }
+}
+
+
 dependencies {
     compile 'org.slf4j:log4j-over-slf4j:1.7.25'
     compile 'commons-lang:commons-lang:2.6'
@@ -71,6 +79,15 @@ dependencies {
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.0.0"
     testCompile "com.github.tomakehurst:wiremock:2.8.0"
     testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.25'
+
+    testIntCompile sourceSets.main.output
+    testIntCompile sourceSets.test.output
+
+    testIntCompile configurations.compile
+    testIntCompile configurations.testCompile
+
+    testIntRuntime configurations.runtime
+    testIntRuntime configurations.testRuntime
 
     deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
 }
@@ -115,4 +132,10 @@ spotless {
 
 junitPlatform {
     enableStandardTestTask true
+}
+
+task testInt(type: Test) {
+    description = "Integration tests which require a Homeserver"
+    testClassesDir = sourceSets.testInt.output.classesDir
+    classpath = sourceSets.testInt.runtimeClasspath
 }
