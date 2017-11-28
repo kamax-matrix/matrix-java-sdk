@@ -116,7 +116,7 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
         MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> client.login(credentials));
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
 }

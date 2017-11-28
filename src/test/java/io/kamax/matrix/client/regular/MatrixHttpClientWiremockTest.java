@@ -49,7 +49,8 @@ public class MatrixHttpClientWiremockTest extends AMatrixHttpClientTest {
 
     @Test
     public void setDisplayNameErrorRateLimited() throws URISyntaxException {
-        stubFor(put(urlEqualTo(setDisplaynameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+        stubFor(put(urlEqualTo(setDisplaynameUrl))
+                .willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
         super.setDisplayNameErrorRateLimited();
     }
 }

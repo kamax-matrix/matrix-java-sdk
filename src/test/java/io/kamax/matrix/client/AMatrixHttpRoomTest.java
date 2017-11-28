@@ -57,13 +57,13 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void getNameAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
     public void getNameRateLimited() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
-        checkErrorInfo429(e);
+        checkErrorInfoRateLimited(e);
     }
 
     @Test
@@ -79,13 +79,13 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void getTopicAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getTopic);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
     public void getTopicRateLimited() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getTopic);
-        checkErrorInfo429(e);
+        checkErrorInfoRateLimited(e);
     }
 
     @Test
@@ -96,19 +96,19 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void joinRoomNotFound() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
-        checkErrorInfo404(e);
+        checkErrorInfoNotFound(e);
     }
 
     @Test
     public void joinAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
     public void joinRateLimited() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
-        checkErrorInfo429(e);
+        checkErrorInfoRateLimited(e);
     }
 
     @Test
@@ -119,7 +119,7 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void leaveAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
@@ -130,7 +130,7 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void leaveRateLimited() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
-        checkErrorInfo429(e);
+        checkErrorInfoRateLimited(e);
     }
 
     @Test
@@ -142,21 +142,21 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     public void sendTextAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createRoomObject().sendText(testText));
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
     public void sendTextRoomNotFound() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createRoomObject().sendText(testText));
-        checkErrorInfo404(e);
+        checkErrorInfoNotFound(e);
     }
 
     @Test
     public void sendTextRateLimited() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createRoomObject().sendText(testText));
-        checkErrorInfo429(e);
+        checkErrorInfoRateLimited(e);
     }
 
     @Test
@@ -172,14 +172,14 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     public void getJoinedUsersRoomNotFound() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createRoomObject()::getJoinedUsers);
-        checkErrorInfo404(e);
+        checkErrorInfoNotFound(e);
     }
 
     @Test
     public void getJoinedUsersRateLimited() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createRoomObject()::getJoinedUsers);
-        checkErrorInfo429(e);
+        checkErrorInfoRateLimited(e);
     }
 
     private MatrixHttpRoom createRoomObject() throws URISyntaxException {
