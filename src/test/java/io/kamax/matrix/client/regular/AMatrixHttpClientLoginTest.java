@@ -30,65 +30,22 @@ import org.junit.platform.commons.util.StringUtils;
 
 import java.net.URISyntaxException;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
-    protected String loginUrl = "/_matrix/client/r0/login";
-    protected String password = "MostSecretPasswordEver";
-    protected String deviceId = "testDeviceId_892377";
-    private String logoutUrl = "/_matrix/client/r0/logout" + tokenParameter;
+    protected String wrongPassword = "wrongPassword";
+
+    protected String errorInvalidPassword = "Invalid password";
+    protected String errorInvalidPasswordResponse = String.format(errorResponseTemplate, errcodeForbidden,
+            errorInvalidPassword);
 
     @Override
     public void logout() {
     }
 
     @Test
-    public void loginWithDeviceId() throws URISyntaxException {
-        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        MatrixClientContext context = new MatrixClientContext(hs, deviceId);
-        MatrixHttpClient client = new MatrixHttpClient(context);
-
-        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
-        client.login(credentials);
-
-        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
-        assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
-        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
-
-        /*
-         * TODO The spec is not clear if the returned device id is always the same as the one you pass to the server.
-         * If it can be different this assertion has to be removed.
-         */
-        assertEquals(deviceId, client.getDeviceId().get());
-    }
-
-    @Test
-    public void loginWithDeviceIdAndLogout() throws URISyntaxException {
-        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        MatrixClientContext context = new MatrixClientContext(hs, deviceId);
-        MatrixHttpClient client = new MatrixHttpClient(context);
-
-        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
-        client.login(credentials);
-
-        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
-        assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
-        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
-
-        /*
-         * TODO The spec is not clear if the returned device id is always the same as the one you pass to the server.
-         * If it can be different this assertion has to be removed.
-         */
-        assertEquals(deviceId, client.getDeviceId().get());
-
-        stubFor(post(urlEqualTo(logoutUrl)));
-        client.logout();
-    }
-
-    @Test
-    public void login() throws URISyntaxException {
+    public void loginAndLogout() throws URISyntaxException {
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
         MatrixClientContext context = new MatrixClientContext(hs);
         MatrixHttpClient client = new MatrixHttpClient(context);
@@ -100,11 +57,7 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
         assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
         assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
 
-        /*
-         * TODO The spec is not clear if the returned device id is always the same as the one you pass to the server.
-         * If it can be different this assertion has to be removed.
-         */
-        assertEquals(deviceId, client.getDeviceId().get());
+        client.logout();
     }
 
     @Test
@@ -113,10 +66,11 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
         MatrixClientContext context = new MatrixClientContext(hs);
         MatrixHttpClient client = new MatrixHttpClient(context);
 
-        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(),
+                wrongPassword);
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> client.login(credentials));
-        checkErrorInfo403(e);
+        checkErrorInfo(errcodeForbidden, "Invalid password", e.getError());
     }
 
 }

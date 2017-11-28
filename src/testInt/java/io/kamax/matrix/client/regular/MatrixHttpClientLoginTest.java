@@ -19,6 +19,14 @@
  */
 package io.kamax.matrix.client.regular;
 
+import org.junit.Before;
+
+import java.net.URISyntaxException;
+
 public class MatrixHttpClientLoginTest extends AMatrixHttpClientLoginTest {
+    @Before
+    public void prepareLogin() throws URISyntaxException {
+        readConfigFile();
+    }
 
 }

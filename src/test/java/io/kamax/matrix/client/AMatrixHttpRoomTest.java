@@ -57,7 +57,7 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void getNameAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getName);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
@@ -79,7 +79,7 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void getTopicAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::getTopic);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
@@ -102,7 +102,7 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void joinAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::join);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
@@ -119,7 +119,7 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     @Test
     public void leaveAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createRoomObject()::leave);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
@@ -142,7 +142,7 @@ public abstract class AMatrixHttpRoomTest extends MatrixHttpTest {
     public void sendTextAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createRoomObject().sendText(testText));
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test

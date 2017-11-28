@@ -55,14 +55,15 @@ public class MatrixHttpTest {
     protected String hostname = "localhost";
     protected String baseUrl = "http://" + hostname + ":" + port;
     protected String username = "testuser";
-    protected String password = "";
+    protected String password = "MostSecretPasswordEver";
     protected MatrixID user = new MatrixID(username, domain);
 
-    private String errorResponseTemplate = "{\"errcode\": \"%s\", \"error\": \"%s\"}";
+    protected String errorResponseTemplate = "{\"errcode\": \"%s\", \"error\": \"%s\"}";
 
-    private String errcode403 = "M_FORBIDDEN";
-    private String error403 = "Access denied.";
-    protected String error403Response = String.format(errorResponseTemplate, errcode403, error403);
+    protected String errcodeForbidden = "M_FORBIDDEN";
+    private String errorAccessDenied = "Access denied.";
+    protected String errorAccessDeniedResponse = String.format(errorResponseTemplate, errcodeForbidden,
+            errorAccessDenied);
 
     private String errcode404 = "M_NOT_FOUND";
     private String error404 = "Element not found.";
@@ -75,11 +76,28 @@ public class MatrixHttpTest {
     /**
      * This method logs in to a homeserver, if the appropriate config file is present. It has to be commented out in
      * Wiremock test cases.
-     * 
+     *
      * @throws URISyntaxException
      */
     @Before
     public void login() throws URISyntaxException {
+        InputStream configFile = readConfigFile();
+        if (configFile != null) {
+            try {
+                MatrixHomeserver homeserver = new MatrixHomeserver(domain, baseUrl);
+                MatrixClientContext context = new MatrixClientContext(homeserver);
+                MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(username, password);
+
+                client = new MatrixHttpClient(context);
+                client.login(credentials);
+                testToken = client.getAccessTokenOrThrow();
+            } catch (URISyntaxException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
+    protected InputStream readConfigFile() {
         InputStream configFile = this.getClass().getResourceAsStream("/HomeserverTest.conf");
         if (configFile != null) {
             try (BufferedReader buffer = new BufferedReader(new InputStreamReader(configFile))) {
@@ -96,18 +114,8 @@ public class MatrixHttpTest {
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
-            try {
-                MatrixHomeserver homeserver = new MatrixHomeserver(domain, baseUrl);
-                MatrixClientContext context = new MatrixClientContext(homeserver);
-                MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(username, password);
-
-                client = new MatrixHttpClient(context);
-                client.login(credentials);
-                testToken = client.getAccessTokenOrThrow();
-            } catch (URISyntaxException e) {
-                throw new IllegalStateException(e);
-            }
         }
+        return configFile;
     }
 
     /**
@@ -133,8 +141,8 @@ public class MatrixHttpTest {
         }
     }
 
-    protected void checkErrorInfo403(MatrixClientRequestException e) {
-        checkErrorInfo(errcode403, error403, e.getError());
+    protected void checkErrorInfoAccessDenied(MatrixClientRequestException e) {
+        checkErrorInfo(errcodeForbidden, errorAccessDenied, e.getError());
     }
 
     protected void checkErrorInfo404(MatrixClientRequestException e) {
@@ -145,7 +153,7 @@ public class MatrixHttpTest {
         checkErrorInfo(errcode429, error429, e.getError());
     }
 
-    private void checkErrorInfo(String errcode, String error, Optional<MatrixErrorInfo> errorOptional) {
+    protected void checkErrorInfo(String errcode, String error, Optional<MatrixErrorInfo> errorOptional) {
         assertTrue(errorOptional.isPresent());
         assertEquals(errcode, errorOptional.get().getErrcode());
         assertEquals(error, errorOptional.get().getError());

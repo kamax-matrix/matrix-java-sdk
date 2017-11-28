@@ -26,41 +26,12 @@ import java.net.URISyntaxException;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class MatrixHttpClientLoginWiremockTest extends AMatrixHttpClientLoginTest {
+    private String loginUrl = "/_matrix/client/r0/login";
+    private String logoutUrl = "/_matrix/client/r0/logout" + tokenParameter;
+    private String deviceId = "testDeviceId_892377";
 
     @Test
-    public void loginWithDeviceId() throws URISyntaxException {
-        stubFor(post(urlEqualTo(loginUrl))
-                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
-                        "\"user\": \"" + user.getLocalPart() + "\"," + //
-                        "\"password\": \"" + password + "\"," + //
-                        "\"device_id\": \"" + deviceId + "\"}"))
-                .willReturn(aResponse().withStatus(200)
-                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
-                                "\"access_token\": \"" + testToken + "\"," + //
-                                "\"home_server\": \"" + hostname + "\"," + //
-                                "\"device_id\": \"" + deviceId + "\"}")));
-
-        super.loginWithDeviceId();
-    }
-
-    @Test
-    public void loginWithDeviceIdAndLogout() throws URISyntaxException {
-        stubFor(post(urlEqualTo(loginUrl))
-                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
-                        "\"user\": \"" + user.getLocalPart() + "\"," + //
-                        "\"password\": \"" + password + "\"," + //
-                        "\"device_id\": \"" + deviceId + "\"}"))
-                .willReturn(aResponse().withStatus(200)
-                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
-                                "\"access_token\": \"" + testToken + "\"," + //
-                                "\"home_server\": \"" + hostname + "\"," + //
-                                "\"device_id\": \"" + deviceId + "\"}")));
-
-        super.loginWithDeviceIdAndLogout();
-    }
-
-    @Test
-    public void login() throws URISyntaxException {
+    public void loginAndLogout() throws URISyntaxException {
         stubFor(post(urlEqualTo(loginUrl))
                 .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
                         "\"user\": \"" + user.getLocalPart() + "\"," + //
@@ -71,7 +42,9 @@ public class MatrixHttpClientLoginWiremockTest extends AMatrixHttpClientLoginTes
                                 "\"home_server\": \"" + hostname + "\"," + //
                                 "\"device_id\": \"" + deviceId + "\"}")));
 
-        super.login();
+        stubFor(post(urlEqualTo(logoutUrl)));
+
+        super.loginAndLogout();
     }
 
     @Test
@@ -79,8 +52,8 @@ public class MatrixHttpClientLoginWiremockTest extends AMatrixHttpClientLoginTes
         stubFor(post(urlEqualTo(loginUrl))
                 .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
                         "\"user\": \"" + user.getLocalPart() + "\"," + //
-                        "\"password\": \"" + password + "\"}"))
-                .willReturn(aResponse().withStatus(403).withBody(error403Response)));
+                        "\"password\": \"" + wrongPassword + "\"}"))
+                .willReturn(aResponse().withStatus(403).withBody(errorInvalidPasswordResponse)));
 
         super.loginWrongPassword();
     }

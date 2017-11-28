@@ -55,7 +55,7 @@ public class MatrixHttpUserWiremockTest extends AMatrixHttpUserTest {
 
     @Test
     public void getNameError403() throws URISyntaxException {
-        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.getNameError403();
     }
 
@@ -79,7 +79,7 @@ public class MatrixHttpUserWiremockTest extends AMatrixHttpUserTest {
 
     @Test
     public void getAvatarError403() throws URISyntaxException {
-        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.getAvatarError403();
     }
 

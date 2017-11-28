@@ -70,7 +70,7 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     @Test
     public void getNameAccessDenied() throws URISyntaxException {
-        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.getNameAccessDenied();
     }
 
@@ -94,7 +94,7 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     @Test
     public void getTopicAccessDenied() throws URISyntaxException {
-        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.getTopicAccessDenied();
     }
 
@@ -118,7 +118,7 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     @Test
     public void joinAccessDenied() throws URISyntaxException {
-        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.joinAccessDenied();
     }
 
@@ -136,7 +136,7 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     @Test
     public void leaveAccessDenied() throws URISyntaxException {
-        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.leaveAccessDenied();
     }
 
@@ -160,7 +160,8 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     @Test
     public void sendTextAccessDenied() throws URISyntaxException {
-        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(put(urlMatching(sendTextUrl))
+                .willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.sendTextAccessDenied();
     }
 

@@ -53,7 +53,7 @@ public abstract class AMatrixHttpUserTest extends MatrixHttpTest {
     @Test
     public void getNameError403() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createUserObject()::getName);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
@@ -78,7 +78,7 @@ public abstract class AMatrixHttpUserTest extends MatrixHttpTest {
     public void getAvatarError403() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createUserObject()::getAvatar);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
