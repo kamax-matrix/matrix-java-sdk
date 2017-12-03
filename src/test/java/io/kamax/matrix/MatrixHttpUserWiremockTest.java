@@ -54,15 +54,15 @@ public class MatrixHttpUserWiremockTest extends AMatrixHttpUserTest {
     }
 
     @Test
-    public void getNameErrorAccessDenied() throws URISyntaxException {
+    public void getNameAccessDenied() throws URISyntaxException {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
-        super.getNameErrorAccessDenied();
+        super.getNameAccessDenied();
     }
 
     @Test
-    public void getNameErrorRateLimited() throws URISyntaxException {
+    public void getNameRateLimited() throws URISyntaxException {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
-        super.getNameErrorRateLimited();
+        super.getNameRateLimited();
     }
 
     @Test
@@ -78,15 +78,15 @@ public class MatrixHttpUserWiremockTest extends AMatrixHttpUserTest {
     }
 
     @Test
-    public void getAvatarErrorAccessDenied() throws URISyntaxException {
+    public void getAvatarAccessDenied() throws URISyntaxException {
         stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
-        super.getAvatarErrorAccessDenied();
+        super.getAvatarAccessDenied();
     }
 
     @Test
-    public void getAvatarErrorRateLimited() throws URISyntaxException {
+    public void getAvatarRateLimited() throws URISyntaxException {
         stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
-        super.getAvatarErrorRateLimited();
+        super.getAvatarRateLimited();
     }
 
 }

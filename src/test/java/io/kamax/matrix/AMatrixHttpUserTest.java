@@ -51,13 +51,13 @@ public abstract class AMatrixHttpUserTest extends MatrixHttpTest {
     }
 
     @Test
-    public void getNameErrorAccessDenied() throws URISyntaxException {
+    public void getNameAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createUserObject()::getName);
         checkErrorInfoAccessDenied(e);
     }
 
     @Test
-    public void getNameErrorRateLimited() throws URISyntaxException {
+    public void getNameRateLimited() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createUserObject()::getName);
         checkErrorInfoRateLimited(e);
     }
@@ -75,14 +75,14 @@ public abstract class AMatrixHttpUserTest extends MatrixHttpTest {
     }
 
     @Test
-    public void getAvatarErrorAccessDenied() throws URISyntaxException {
+    public void getAvatarAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createUserObject()::getAvatar);
         checkErrorInfoAccessDenied(e);
     }
 
     @Test
-    public void getAvatarErrorRateLimited() throws URISyntaxException {
+    public void getAvatarRateLimited() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createUserObject()::getAvatar);
         checkErrorInfoRateLimited(e);
