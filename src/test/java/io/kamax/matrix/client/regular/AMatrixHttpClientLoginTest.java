@@ -30,8 +30,7 @@ import org.junit.platform.commons.util.StringUtils;
 
 import java.net.URISyntaxException;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
     protected String wrongPassword = "wrongPassword";
@@ -42,6 +41,10 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
 
     @Override
     public void logout() {
+    }
+
+    @Override
+    public void login() {
     }
 
     @Test
@@ -56,6 +59,31 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
         assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
         assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
         assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
+
+        client.logout();
+    }
+
+    @Test
+    public void loginWithDeviceIdAndLogout() throws URISyntaxException {
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixClientContext context = new MatrixClientContext(hs);
+        MatrixHttpClient client = new MatrixHttpClient(context);
+
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
+        client.login(credentials);
+
+        String deviceId = client.getDeviceId().get();
+
+        client.logout();
+
+        context = new MatrixClientContext(hs, deviceId);
+        client = new MatrixHttpClient(context);
+        client.login(credentials);
+
+        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
+        assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
+        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
+        assertEquals(deviceId, client.getDeviceId().get());
 
         client.logout();
     }

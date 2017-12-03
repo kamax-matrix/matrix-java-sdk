@@ -31,6 +31,7 @@ public class MatrixHttpClientLoginWiremockTest extends AMatrixHttpClientLoginTes
     private String deviceId = "testDeviceId_892377";
 
     @Test
+    @Override
     public void loginAndLogout() throws URISyntaxException {
         stubFor(post(urlEqualTo(loginUrl))
                 .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
@@ -48,6 +49,36 @@ public class MatrixHttpClientLoginWiremockTest extends AMatrixHttpClientLoginTes
     }
 
     @Test
+    @Override
+    public void loginWithDeviceIdAndLogout() throws URISyntaxException {
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"}"))
+                .willReturn(aResponse().withStatus(200)
+                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
+                                "\"access_token\": \"" + testToken + "\"," + //
+                                "\"home_server\": \"" + hostname + "\"," + //
+                                "\"device_id\": \"" + deviceId + "\"}")));
+
+        stubFor(post(urlEqualTo(logoutUrl)));
+
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"," + //
+                        "\"device_id\": \"" + deviceId + "\"}"))
+                .willReturn(aResponse().withStatus(200)
+                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
+                                "\"access_token\": \"" + testToken + "\"," + //
+                                "\"home_server\": \"" + hostname + "\"," + //
+                                "\"device_id\": \"" + deviceId + "\"}")));
+
+        super.loginWithDeviceIdAndLogout();
+    }
+
+    @Test
+    @Override
     public void loginWrongPassword() throws URISyntaxException {
         stubFor(post(urlEqualTo(loginUrl))
                 .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
