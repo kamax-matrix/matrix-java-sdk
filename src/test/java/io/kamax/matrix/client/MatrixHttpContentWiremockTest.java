@@ -56,13 +56,14 @@ public class MatrixHttpContentWiremockTest extends AMatrixHttpContentTest {
 
     @Test
     public void isValidContentNotFound() throws URISyntaxException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.isValidContentNotFound();
     }
 
     @Test
     public void isValidErrorAccessDenied() throws URISyntaxException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(get(urlEqualTo(downloadUrl))
+                .willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.isValidErrorAccessDenied();
     }
 
@@ -81,13 +82,14 @@ public class MatrixHttpContentWiremockTest extends AMatrixHttpContentTest {
 
     @Test
     public void getTypeErrorContentNotFound() throws URISyntaxException, IOException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.getTypeErrorContentNotFound();
     }
 
     @Test
     public void getTypeErrorAccessDenied() throws URISyntaxException, IOException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(get(urlEqualTo(downloadUrl))
+                .willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.getTypeErrorAccessDenied();
     }
 
@@ -106,13 +108,14 @@ public class MatrixHttpContentWiremockTest extends AMatrixHttpContentTest {
 
     @Test
     public void getDataErrorContentNotFound() throws URISyntaxException, IOException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.getDataErrorContentNotFound();
     }
 
     @Test
     public void getDataErrorAccessDenied() throws URISyntaxException, IOException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(get(urlEqualTo(downloadUrl))
+                .willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.getDataErrorAccessDenied();
     }
 
@@ -158,13 +161,14 @@ public class MatrixHttpContentWiremockTest extends AMatrixHttpContentTest {
 
     @Test
     public void getFilenameErrorContentNotFound() throws URISyntaxException, IOException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.getFilenameErrorContentNotFound();
     }
 
     @Test
     public void getFilenameErrorAccessDenied() throws URISyntaxException, IOException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(get(urlEqualTo(downloadUrl))
+                .willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.getFilenameErrorAccessDenied();
     }
 

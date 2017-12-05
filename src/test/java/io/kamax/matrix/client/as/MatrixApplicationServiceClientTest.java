@@ -51,11 +51,12 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
 
     @Test
     public void createUserErrorRateLimited() throws URISyntaxException {
-        stubFor(post(urlEqualTo(createUserUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+        stubFor(post(urlEqualTo(createUserUrl))
+                .willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
 
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createClientObject().createUser(testUser));
-        checkErrorInfo429(e);
+        checkErrorInfoRateLimited(e);
     }
 
     private MatrixApplicationServiceClient createClientObject() throws URISyntaxException {

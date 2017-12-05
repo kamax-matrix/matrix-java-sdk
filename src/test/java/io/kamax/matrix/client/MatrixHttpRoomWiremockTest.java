@@ -64,19 +64,19 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     @Test
     public void getEmptyName() throws URISyntaxException {
-        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.getEmptyName();
     }
 
     @Test
     public void getNameAccessDenied() throws URISyntaxException {
-        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.getNameAccessDenied();
     }
 
     @Test
     public void getNameRateLimited() throws URISyntaxException {
-        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
         super.getNameRateLimited();
     }
 
@@ -88,19 +88,19 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     @Test
     public void getEmptyTopic() throws URISyntaxException {
-        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.getEmptyTopic();
     }
 
     @Test
     public void getTopicAccessDenied() throws URISyntaxException {
-        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.getTopicAccessDenied();
     }
 
     @Test
     public void getTopicRateLimited() throws URISyntaxException {
-        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+        stubFor(get(urlEqualTo(topicUrl)).willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
         super.getTopicRateLimited();
     }
 
@@ -112,19 +112,19 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     @Test
     public void joinRoomNotFound() throws URISyntaxException {
-        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.joinRoomNotFound();
     }
 
     @Test
     public void joinAccessDenied() throws URISyntaxException {
-        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.joinAccessDenied();
     }
 
     @Test
     public void joinRateLimited() throws URISyntaxException {
-        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+        stubFor(post(urlEqualTo(joinUrl)).willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
         super.joinRateLimited();
     }
 
@@ -136,19 +136,19 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     @Test
     public void leaveAccessDenied() throws URISyntaxException {
-        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.leaveAccessDenied();
     }
 
     @Test
     public void leaveRoomNotFound() throws URISyntaxException {
-        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.leaveRoomNotFound();
     }
 
     @Test
     public void leaveRateLimited() throws URISyntaxException {
-        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+        stubFor(post(urlEqualTo(leaveUrl)).willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
         super.leaveRateLimited();
     }
 
@@ -160,19 +160,21 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     @Test
     public void sendTextAccessDenied() throws URISyntaxException {
-        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(403).withBody(error403Response)));
+        stubFor(put(urlMatching(sendTextUrl))
+                .willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
         super.sendTextAccessDenied();
     }
 
     @Test
     public void sendTextRoomNotFound() throws URISyntaxException {
-        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.sendTextRoomNotFound();
     }
 
     @Test
     public void sendTextRateLimited() throws URISyntaxException {
-        stubFor(put(urlMatching(sendTextUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+        stubFor(put(urlMatching(sendTextUrl))
+                .willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
         super.sendTextRateLimited();
     }
 
@@ -185,13 +187,15 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     @Test
     public void getJoinedUsersRoomNotFound() throws URISyntaxException {
-        stubFor(get(urlEqualTo(getJoinedUsersUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(get(urlEqualTo(getJoinedUsersUrl))
+                .willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.getJoinedUsersRoomNotFound();
     }
 
     @Test
     public void getJoinedUsersRateLimited() throws URISyntaxException {
-        stubFor(get(urlEqualTo(getJoinedUsersUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
+        stubFor(get(urlEqualTo(getJoinedUsersUrl))
+                .willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
         super.getJoinedUsersRateLimited();
     }
 }

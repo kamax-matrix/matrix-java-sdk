@@ -80,7 +80,7 @@ public class MatrixHttpClientLoginWiremockTest extends AMatrixHttpClientLoginTes
                 .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
                         "\"user\": \"" + user.getLocalPart() + "\"," + //
                         "\"password\": \"" + password + "\"}"))
-                .willReturn(aResponse().withStatus(403).withBody(error403Response)));
+                .willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
 
         super.loginWrongPassword();
     }

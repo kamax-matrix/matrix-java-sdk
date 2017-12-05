@@ -60,17 +60,19 @@ public class MatrixHttpTest {
 
     private String errorResponseTemplate = "{\"errcode\": \"%s\", \"error\": \"%s\"}";
 
-    private String errcode403 = "M_FORBIDDEN";
-    private String error403 = "Access denied.";
-    protected String error403Response = String.format(errorResponseTemplate, errcode403, error403);
+    private String errcodeForbidden = "M_FORBIDDEN";
+    private String errorAccessDenied = "Access denied.";
+    protected String errorAccessDeniedResponse = String.format(errorResponseTemplate, errcodeForbidden,
+            errorAccessDenied);
 
-    private String errcode404 = "M_NOT_FOUND";
-    private String error404 = "Element not found.";
-    protected String error404Response = String.format(errorResponseTemplate, errcode404, error404);
+    private String errcodeNotFound = "M_NOT_FOUND";
+    private String errorNotFound = "Element not found.";
+    protected String errorNotFoundResponse = String.format(errorResponseTemplate, errcodeNotFound, errorNotFound);
 
-    private String errcode429 = "M_LIMIT_EXCEEDED";
-    private String error429 = "Too many requests have been sent in a short period of time. Wait a while then try again.";
-    protected String error429Response = String.format(errorResponseTemplate, errcode429, error429);
+    private String errcodeRateLimited = "M_LIMIT_EXCEEDED";
+    private String errorRateLimited = "Too many requests have been sent in a short period of time. Wait a while then try again.";
+    protected String errorRateLimitedResponse = String.format(errorResponseTemplate, errcodeRateLimited,
+            errorRateLimited);
 
     /**
      * This method logs in to a homeserver, if the appropriate config file is present. It has to be commented out in
@@ -133,16 +135,16 @@ public class MatrixHttpTest {
         }
     }
 
-    protected void checkErrorInfo403(MatrixClientRequestException e) {
-        checkErrorInfo(errcode403, error403, e.getError());
+    protected void checkErrorInfoAccessDenied(MatrixClientRequestException e) {
+        checkErrorInfo(errcodeForbidden, errorAccessDenied, e.getError());
     }
 
-    protected void checkErrorInfo404(MatrixClientRequestException e) {
-        checkErrorInfo(errcode404, error404, e.getError());
+    protected void checkErrorInfoNotFound(MatrixClientRequestException e) {
+        checkErrorInfo(errcodeNotFound, errorNotFound, e.getError());
     }
 
-    protected void checkErrorInfo429(MatrixClientRequestException e) {
-        checkErrorInfo(errcode429, error429, e.getError());
+    protected void checkErrorInfoRateLimited(MatrixClientRequestException e) {
+        checkErrorInfo(errcodeRateLimited, errorRateLimited, e.getError());
     }
 
     private void checkErrorInfo(String errcode, String error, Optional<MatrixErrorInfo> errorOptional) {

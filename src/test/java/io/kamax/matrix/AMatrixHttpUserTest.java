@@ -46,20 +46,20 @@ public abstract class AMatrixHttpUserTest extends MatrixHttpTest {
     }
 
     @Test
-    public void getName404() throws URISyntaxException {
+    public void getNameNotFound() throws URISyntaxException {
         assertThat(createUserObject().getName(), is(equalTo(Optional.empty())));
     }
 
     @Test
-    public void getNameError403() throws URISyntaxException {
+    public void getNameAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createUserObject()::getName);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
-    public void getNameError429() throws URISyntaxException {
+    public void getNameRateLimited() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class, createUserObject()::getName);
-        checkErrorInfo429(e);
+        checkErrorInfoRateLimited(e);
     }
 
     @Test
@@ -70,22 +70,22 @@ public abstract class AMatrixHttpUserTest extends MatrixHttpTest {
     }
 
     @Test
-    public void getAvatar404() throws URISyntaxException {
+    public void getAvatarNotFound() throws URISyntaxException {
         assertThat(createUserObject().getAvatar(), is(equalTo(Optional.empty())));
     }
 
     @Test
-    public void getAvatarError403() throws URISyntaxException {
+    public void getAvatarAccessDenied() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createUserObject()::getAvatar);
-        checkErrorInfo403(e);
+        checkErrorInfoAccessDenied(e);
     }
 
     @Test
-    public void getAvatarError429() throws URISyntaxException {
+    public void getAvatarRateLimited() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 createUserObject()::getAvatar);
-        checkErrorInfo429(e);
+        checkErrorInfoRateLimited(e);
     }
 
     private MatrixHttpUser createUserObject() throws URISyntaxException {
