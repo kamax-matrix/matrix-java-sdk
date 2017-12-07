@@ -42,7 +42,7 @@ public abstract class AMatrixHttpClientTest extends MatrixHttpTest {
     public void setDisplayNameErrorRateLimited() throws URISyntaxException {
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> createClientObject().setDisplayName(displayName));
-        checkErrorInfo429(e);
+        checkErrorInfoRateLimited(e);
     }
 
     private MatrixHttpClient createClientObject() throws URISyntaxException {

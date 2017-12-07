@@ -56,7 +56,7 @@ public class MatrixHttpContentWiremockTest extends AMatrixHttpContentTest {
 
     @Test
     public void isValidContentNotFound() throws URISyntaxException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.isValidContentNotFound();
     }
 
@@ -82,7 +82,7 @@ public class MatrixHttpContentWiremockTest extends AMatrixHttpContentTest {
 
     @Test
     public void getTypeErrorContentNotFound() throws URISyntaxException, IOException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.getTypeErrorContentNotFound();
     }
 
@@ -108,7 +108,7 @@ public class MatrixHttpContentWiremockTest extends AMatrixHttpContentTest {
 
     @Test
     public void getDataErrorContentNotFound() throws URISyntaxException, IOException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.getDataErrorContentNotFound();
     }
 
@@ -161,7 +161,7 @@ public class MatrixHttpContentWiremockTest extends AMatrixHttpContentTest {
 
     @Test
     public void getFilenameErrorContentNotFound() throws URISyntaxException, IOException {
-        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
+        stubFor(get(urlEqualTo(downloadUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
         super.getFilenameErrorContentNotFound();
     }
 

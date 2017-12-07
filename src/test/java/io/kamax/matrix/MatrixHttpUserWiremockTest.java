@@ -48,21 +48,21 @@ public class MatrixHttpUserWiremockTest extends AMatrixHttpUserTest {
     }
 
     @Test
-    public void getName404() throws URISyntaxException {
-        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
-        super.getName404();
+    public void getNameNotFound() throws URISyntaxException {
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
+        super.getNameNotFound();
     }
 
     @Test
-    public void getNameError403() throws URISyntaxException {
+    public void getNameAccessDenied() throws URISyntaxException {
         stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
-        super.getNameError403();
+        super.getNameAccessDenied();
     }
 
     @Test
-    public void getNameError429() throws URISyntaxException {
-        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
-        super.getNameError429();
+    public void getNameRateLimited() throws URISyntaxException {
+        stubFor(get(urlEqualTo(nameUrl)).willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
+        super.getNameRateLimited();
     }
 
     @Test
@@ -72,21 +72,21 @@ public class MatrixHttpUserWiremockTest extends AMatrixHttpUserTest {
     }
 
     @Test
-    public void getAvatar404() throws URISyntaxException {
-        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(404).withBody(error404Response)));
-        super.getAvatar404();
+    public void getAvatarNotFound() throws URISyntaxException {
+        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(404).withBody(errorNotFoundResponse)));
+        super.getAvatarNotFound();
     }
 
     @Test
-    public void getAvatarError403() throws URISyntaxException {
+    public void getAvatarAccessDenied() throws URISyntaxException {
         stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(403).withBody(errorAccessDeniedResponse)));
-        super.getAvatarError403();
+        super.getAvatarAccessDenied();
     }
 
     @Test
-    public void getAvatarError429() throws URISyntaxException {
-        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(429).withBody(error429Response)));
-        super.getAvatarError429();
+    public void getAvatarRateLimited() throws URISyntaxException {
+        stubFor(get(urlEqualTo(avatarUrl)).willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
+        super.getAvatarRateLimited();
     }
 
 }
