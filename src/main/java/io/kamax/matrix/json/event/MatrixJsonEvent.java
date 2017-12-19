@@ -21,7 +21,6 @@
 package io.kamax.matrix.json.event;
 
 import com.google.gson.JsonObject;
-
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.event._MatrixEvent;
@@ -44,7 +43,7 @@ public class MatrixJsonEvent extends MatrixJsonObject implements _MatrixEvent {
         type = getString("type");
         time = Instant.ofEpochMilli(obj.get("origin_server_ts").getAsLong());
         age = getInt("age", -1);
-        sender = new MatrixID(getString("sender"));
+        sender = MatrixID.from(getString("sender")).acceptable();
     }
 
     @Override

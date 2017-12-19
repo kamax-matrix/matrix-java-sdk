@@ -25,8 +25,32 @@ import java.util.regex.Pattern;
 
 public class MatrixID implements _MatrixID {
 
-    private static final Pattern matrixIdLaxPattern = Pattern.compile("@(.*?):(.+)");
-    private static final Pattern matrixIdStrictPattern = Pattern.compile("@([0-9a-z-.=_]+):(.+)");
+    public static class Builder {
+
+        private MatrixID mxId;
+
+        public Builder(String id) {
+            mxId = MatrixID.parse(id);
+        }
+
+        public MatrixID valid() {
+            if (!mxId.isValid()) {
+                throw new IllegalArgumentException(mxId + " is not a valid Matrix ID");
+            }
+            return mxId;
+        }
+
+        public MatrixID acceptable() {
+            if (!mxId.isValid()) {
+                throw new IllegalArgumentException(mxId + " is not an acceptable Matrix ID");
+            }
+            return mxId;
+        }
+
+    }
+
+    private static final Pattern LAX_PATTERN = Pattern.compile("@(.*?):(.+)");
+    private static final Pattern STRICT_PATTERN = Pattern.compile("@([0-9a-z-.=_]+):(.+)");
 
     private String id;
 
@@ -37,19 +61,53 @@ public class MatrixID implements _MatrixID {
         return "@" + localpart + ":" + domain;
     }
 
-    public MatrixID(String mxId) {
-        Matcher m = matrixIdLaxPattern.matcher(mxId);
+    private static MatrixID parse(String id) {
+        Matcher m = LAX_PATTERN.matcher(id);
         if (!m.matches()) {
-            throw new IllegalArgumentException(mxId + " is not a possible Matrix ID");
+            throw new IllegalArgumentException(id + " is not a Matrix ID");
         }
 
-        this.id = mxId;
-        this.localpart = m.group(1);
-        this.domain = m.group(2);
+        MatrixID mxId = new MatrixID();
+        mxId.id = id;
+        mxId.localpart = m.group(1);
+        mxId.domain = m.group(2);
+        return mxId;
     }
 
+    public static Builder from(String id) {
+        return new Builder(id);
+    }
+
+    public static Builder from(String local, String domain) {
+        return from(buildRaw(local, domain));
+    }
+
+    public static MatrixID asValid(String id) {
+        return new Builder(id).valid();
+    }
+
+    public static MatrixID asAcceptable(String id) {
+        return new Builder(id).acceptable();
+    }
+
+    private MatrixID() {
+        // not for public consumption
+    }
+
+    private MatrixID(MatrixID mxId) {
+        this.id = mxId.id;
+        this.localpart = mxId.localpart;
+        this.domain = mxId.domain;
+    }
+
+    @Deprecated
+    public MatrixID(String mxId) {
+        this(parse(mxId));
+    }
+
+    @Deprecated
     public MatrixID(String localpart, String domain) {
-        this(buildRaw(localpart, domain));
+        this(parse(buildRaw(localpart, domain)));
     }
 
     @Override
@@ -68,13 +126,13 @@ public class MatrixID implements _MatrixID {
     }
 
     @Override
-    public _MatrixID canonicalize() {
-        return new MatrixID(getId().toLowerCase());
+    public MatrixID canonicalize() {
+        return parse(getId().toLowerCase());
     }
 
     @Override
     public boolean isValid() {
-        return isAcceptable() && matrixIdStrictPattern.matcher(id).matches();
+        return isAcceptable() && STRICT_PATTERN.matcher(id).matches();
     }
 
     @Override
