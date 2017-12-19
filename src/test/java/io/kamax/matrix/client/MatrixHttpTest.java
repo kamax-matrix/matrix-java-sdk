@@ -102,8 +102,9 @@ public class MatrixHttpTest {
         InputStream configFile = this.getClass().getResourceAsStream("/HomeserverTest.conf");
         if (configFile != null) {
             try (BufferedReader buffer = new BufferedReader(new InputStreamReader(configFile))) {
-                Map<String, String> configValues = buffer.lines().filter(line -> !line.startsWith("#")).collect(
-                        Collectors.toMap(line -> line.split("=")[0].trim(), line -> line.split("=")[1].trim()));
+                Map<String, String> configValues = buffer.lines()
+                        .filter(line -> !line.startsWith("#") && !line.isEmpty()).collect(
+                                Collectors.toMap(line -> line.split("=")[0].trim(), line -> line.split("=")[1].trim()));
 
                 port = Integer.valueOf(configValues.get("Port"));
                 hostname = configValues.get("Hostname");
