@@ -20,6 +20,7 @@
 
 package io.kamax.matrix.client;
 
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpRequestBase;
 
 import java.util.ArrayList;
@@ -31,6 +32,14 @@ public class MatrixHttpRequest {
 
     public MatrixHttpRequest(HttpRequestBase request) {
         this.httpRequest = request;
+        RequestConfig.Builder configBuilder = request.getConfig().custom();
+        if (request.getConfig() != null) {
+            configBuilder = RequestConfig.copy(request.getConfig());
+        }
+        configBuilder.setConnectionRequestTimeout(2000);
+        configBuilder.setConnectTimeout(2000);
+        configBuilder.setSocketTimeout(2000);
+        httpRequest.setConfig(configBuilder.build());
     }
 
     public MatrixHttpRequest addIgnoredErrorCode(int errcode) {
