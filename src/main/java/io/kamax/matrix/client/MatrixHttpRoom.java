@@ -29,7 +29,7 @@ import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
 import io.kamax.matrix.json.RoomMessageTextPutBody;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;

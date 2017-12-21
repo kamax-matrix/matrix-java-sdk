@@ -20,13 +20,8 @@
 
 package io.kamax.matrix.sign;
 
-import org.apache.commons.io.FileUtils;
+import io.kamax.matrix.codec.MxBase64;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.util.ArrayList;
@@ -44,42 +39,31 @@ import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
 public class KeyManager {
 
-    private String storagePath;
+    public static KeyManager fromFile(String path) {
+        return new KeyManager(new KeyFileStore(path));
+    }
+
+    public static KeyManager fromMemory() {
+        return new KeyManager(new KeyMemoryStore());
+    }
 
     private EdDSAParameterSpec keySpecs;
     private List<KeyPair> keys;
 
-    public KeyManager(String storagePath) {
-        this.storagePath = storagePath;
+    public KeyManager(_KeyStore store) {
+        keySpecs = EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512);
+        keys = new ArrayList<>();
 
-        try {
-            keySpecs = EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512);
-            keys = new ArrayList<>();
-
-            Path privKey = Paths.get(storagePath);
-            if (Files.isDirectory(privKey)) {
-                throw new RuntimeException("Invalid path for private key: " + privKey.toString());
-            }
-
-            if (!Files.exists(privKey)) {
-                KeyPair pair = (new KeyPairGenerator()).generateKeyPair();
-                String keyEncoded = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
-                FileUtils.writeStringToFile(privKey.toFile(), keyEncoded, StandardCharsets.ISO_8859_1);
-                keys.add(pair);
-            } else {
-                if (!Files.isReadable(privKey)) {
-                    throw new RuntimeException("Signing keys file is not readable: " + storagePath);
-                }
-
-                byte[] seed = Base64.getDecoder()
-                        .decode(FileUtils.readFileToString(privKey.toFile(), StandardCharsets.ISO_8859_1));
-                EdDSAPrivateKeySpec privKeySpec = new EdDSAPrivateKeySpec(seed, keySpecs);
-                EdDSAPublicKeySpec pubKeySpec = new EdDSAPublicKeySpec(privKeySpec.getA(), keySpecs);
-                keys.add(new KeyPair(new EdDSAPublicKey(pubKeySpec), new EdDSAPrivateKey(privKeySpec)));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String seedBase64 = store.load().orElseGet(() -> {
+            KeyPair pair = (new KeyPairGenerator()).generateKeyPair();
+            String keyEncoded = MxBase64.encode(pair.getPrivate().getEncoded());
+            store.store(keyEncoded);
+            return keyEncoded;
+        });
+        byte[] seed = Base64.getDecoder().decode(seedBase64);
+        EdDSAPrivateKeySpec privKeySpec = new EdDSAPrivateKeySpec(seed, keySpecs);
+        EdDSAPublicKeySpec pubKeySpec = new EdDSAPublicKeySpec(privKeySpec.getA(), keySpecs);
+        keys.add(new KeyPair(new EdDSAPublicKey(pubKeySpec), new EdDSAPrivateKey(privKeySpec)));
     }
 
     public int getCurrentIndex() {
@@ -103,7 +87,7 @@ public class KeyManager {
     }
 
     public String getPublicKeyBase64(int index) {
-        return Base64.getEncoder().encodeToString(getPublicKey(index).getAbyte());
+        return MxBase64.encode(getPublicKey(index).getAbyte());
     }
 
 }

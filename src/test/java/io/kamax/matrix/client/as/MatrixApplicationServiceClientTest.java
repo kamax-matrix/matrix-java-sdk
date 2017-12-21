@@ -20,7 +20,8 @@
 
 package io.kamax.matrix.client.as;
 
-import io.kamax.matrix.client.*;
+import io.kamax.matrix.client.MatrixClientRequestException;
+import io.kamax.matrix.client.MatrixHttpTest;
 import io.kamax.matrix.hs.MatrixHomeserver;
 
 import org.junit.Test;

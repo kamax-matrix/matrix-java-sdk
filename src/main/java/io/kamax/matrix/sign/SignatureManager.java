@@ -22,11 +22,12 @@ package io.kamax.matrix.sign;
 
 import com.google.gson.JsonObject;
 
+import io.kamax.matrix.codec.MxBase64;
+
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
-import java.util.Base64;
 
 
 import net.i2p.crypto.eddsa.EdDSAEngine;
@@ -50,10 +51,10 @@ public class SignatureManager {
         }
     }
 
-    private String sign(String message) {
+    public String sign(String message) {
         try {
             byte[] signRaw = signEngine.signOneShot(message.getBytes());
-            return Base64.getEncoder().encodeToString(signRaw);
+            return MxBase64.encode(signRaw);
         } catch (SignatureException e) {
             throw new RuntimeException(e);
         }
