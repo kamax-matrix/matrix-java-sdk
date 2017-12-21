@@ -41,7 +41,7 @@ public class MatrixID implements _MatrixID {
         }
 
         public MatrixID acceptable() {
-            if (!mxId.isValid()) {
+            if (!mxId.isAcceptable()) {
                 throw new IllegalArgumentException(mxId + " is not an acceptable Matrix ID");
             }
             return mxId;
