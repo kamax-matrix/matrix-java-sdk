@@ -36,8 +36,12 @@ public class MxSha256 {
         }
     }
 
+    public String hash(byte[] data) {
+        return MxBase64.encode(md.digest(data));
+    }
+
     public String hash(String data) {
-        return MxBase64.encode(md.digest(data.getBytes(StandardCharsets.UTF_8)));
+        return hash(data.getBytes(StandardCharsets.UTF_8));
     }
 
 }
