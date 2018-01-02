@@ -20,6 +20,8 @@
 
 package io.kamax.matrix.sign;
 
+import com.google.gson.JsonObject;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -47,6 +49,21 @@ public class SignatureManagerTest {
     public void simpleObject() {
         assertThat(signMgr.sign("{\"one\":1,\"two\":\"Two\"}"),
                 is(equalTo("KqmLSbO39/Bzb0QIYE82zqLwsA+PDzYIpIRA2sRQ4sL53+sN6/fpNSoqE7BP7vBZhG6kYdD13EIMJpvhJI+6Bw")));
+    }
+
+    @Test
+    public void test() {
+        SignatureManager mgr = new SignatureManager(
+                new KeyManager(new KeyMemoryStore("1QblgjFeL3IxoY4DKOR7p5mL5sQTC0ChmeMJlqb4d5M")),
+                "synapse.local.kamax.io");
+        JsonObject o = new JsonObject();
+        o.addProperty("method", "GET");
+        o.addProperty("uri", "/_matrix/federation/v1/query/directory?room_alias=%23a%3Amxhsd.local.kamax.io%3A8447");
+        o.addProperty("origin", "synapse.local.kamax.io");
+        o.addProperty("destination", "mxhsd.local.kamax.io:8447");
+        String signature = mgr.sign(o);
+        assertThat(signature,
+                is(equalTo("SEMGSOJEsoalrBfHqPO2QrSlbLaUYLHLk4e3q4IJ2JbgvCynT1onp7QF1U4Sl3G3NzybrgdnVvpqcaEgV0WPCw")));
     }
 
 }
