@@ -23,6 +23,7 @@ package io.kamax.matrix.sign;
 import com.google.gson.JsonObject;
 
 import io.kamax.matrix.codec.MxBase64;
+import io.kamax.matrix.json.MatrixJson;
 
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -49,6 +50,10 @@ public class SignatureManager {
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String sign(JsonObject obj) {
+        return sign(MatrixJson.encodeCanonical(obj));
     }
 
     public String sign(String message) {
