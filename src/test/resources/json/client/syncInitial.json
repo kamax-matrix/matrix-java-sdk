@@ -1,0 +1,614 @@
+{
+    "account_data": {
+        "events": [
+            {
+                "content": {
+                    "device": {},
+                    "global": {
+                        "content": [
+                            {
+                                "actions": [
+                                    "notify",
+                                    {
+                                        "set_tweak": "sound",
+                                        "value": "default"
+                                    },
+                                    {
+                                        "set_tweak": "highlight"
+                                    }
+                                ],
+                                "default": true,
+                                "enabled": true,
+                                "pattern": "user",
+                                "rule_id": ".m.rule.contains_user_name"
+                            }
+                        ],
+                        "override": [
+                            {
+                                "actions": [
+                                    "dont_notify"
+                                ],
+                                "conditions": [],
+                                "default": true,
+                                "enabled": false,
+                                "rule_id": ".m.rule.master"
+                            },
+                            {
+                                "actions": [
+                                    "dont_notify"
+                                ],
+                                "conditions": [
+                                    {
+                                        "key": "content.msgtype",
+                                        "kind": "event_match",
+                                        "pattern": "m.notice"
+                                    }
+                                ],
+                                "default": true,
+                                "enabled": true,
+                                "rule_id": ".m.rule.suppress_notices"
+                            },
+                            {
+                                "actions": [
+                                    "notify",
+                                    {
+                                        "set_tweak": "sound",
+                                        "value": "default"
+                                    },
+                                    {
+                                        "set_tweak": "highlight",
+                                        "value": false
+                                    }
+                                ],
+                                "conditions": [
+                                    {
+                                        "key": "type",
+                                        "kind": "event_match",
+                                        "pattern": "m.room.member"
+                                    },
+                                    {
+                                        "key": "content.membership",
+                                        "kind": "event_match",
+                                        "pattern": "invite"
+                                    },
+                                    {
+                                        "key": "state_key",
+                                        "kind": "event_match",
+                                        "pattern": "@user:synapse.local.kamax.io"
+                                    }
+                                ],
+                                "default": true,
+                                "enabled": true,
+                                "rule_id": ".m.rule.invite_for_me"
+                            },
+                            {
+                                "actions": [
+                                    "dont_notify"
+                                ],
+                                "conditions": [
+                                    {
+                                        "key": "type",
+                                        "kind": "event_match",
+                                        "pattern": "m.room.member"
+                                    }
+                                ],
+                                "default": true,
+                                "enabled": true,
+                                "rule_id": ".m.rule.member_event"
+                            },
+                            {
+                                "actions": [
+                                    "notify",
+                                    {
+                                        "set_tweak": "sound",
+                                        "value": "default"
+                                    },
+                                    {
+                                        "set_tweak": "highlight"
+                                    }
+                                ],
+                                "conditions": [
+                                    {
+                                        "kind": "contains_display_name"
+                                    }
+                                ],
+                                "default": true,
+                                "enabled": true,
+                                "rule_id": ".m.rule.contains_display_name"
+                            },
+                            {
+                                "actions": [
+                                    "notify",
+                                    {
+                                        "set_tweak": "highlight",
+                                        "value": true
+                                    }
+                                ],
+                                "conditions": [
+                                    {
+                                        "key": "content.body",
+                                        "kind": "event_match",
+                                        "pattern": "@room"
+                                    },
+                                    {
+                                        "key": "room",
+                                        "kind": "sender_notification_permission"
+                                    }
+                                ],
+                                "default": true,
+                                "enabled": true,
+                                "rule_id": ".m.rule.roomnotif"
+                            }
+                        ],
+                        "room": [],
+                        "sender": [],
+                        "underride": [
+                            {
+                                "actions": [
+                                    "notify",
+                                    {
+                                        "set_tweak": "sound",
+                                        "value": "ring"
+                                    },
+                                    {
+                                        "set_tweak": "highlight",
+                                        "value": false
+                                    }
+                                ],
+                                "conditions": [
+                                    {
+                                        "key": "type",
+                                        "kind": "event_match",
+                                        "pattern": "m.call.invite"
+                                    }
+                                ],
+                                "default": true,
+                                "enabled": true,
+                                "rule_id": ".m.rule.call"
+                            },
+                            {
+                                "actions": [
+                                    "notify",
+                                    {
+                                        "set_tweak": "sound",
+                                        "value": "default"
+                                    },
+                                    {
+                                        "set_tweak": "highlight",
+                                        "value": false
+                                    }
+                                ],
+                                "conditions": [
+                                    {
+                                        "is": "2",
+                                        "kind": "room_member_count"
+                                    },
+                                    {
+                                        "key": "type",
+                                        "kind": "event_match",
+                                        "pattern": "m.room.message"
+                                    }
+                                ],
+                                "default": true,
+                                "enabled": true,
+                                "rule_id": ".m.rule.room_one_to_one"
+                            },
+                            {
+                                "actions": [
+                                    "notify",
+                                    {
+                                        "set_tweak": "sound",
+                                        "value": "default"
+                                    },
+                                    {
+                                        "set_tweak": "highlight",
+                                        "value": false
+                                    }
+                                ],
+                                "conditions": [
+                                    {
+                                        "is": "2",
+                                        "kind": "room_member_count"
+                                    },
+                                    {
+                                        "key": "type",
+                                        "kind": "event_match",
+                                        "pattern": "m.room.encrypted"
+                                    }
+                                ],
+                                "default": true,
+                                "enabled": true,
+                                "rule_id": ".m.rule.encrypted_room_one_to_one"
+                            },
+                            {
+                                "actions": [
+                                    "notify",
+                                    {
+                                        "set_tweak": "highlight",
+                                        "value": false
+                                    }
+                                ],
+                                "conditions": [
+                                    {
+                                        "key": "type",
+                                        "kind": "event_match",
+                                        "pattern": "m.room.message"
+                                    }
+                                ],
+                                "default": true,
+                                "enabled": true,
+                                "rule_id": ".m.rule.message"
+                            },
+                            {
+                                "actions": [
+                                    "notify",
+                                    {
+                                        "set_tweak": "highlight",
+                                        "value": false
+                                    }
+                                ],
+                                "conditions": [
+                                    {
+                                        "key": "type",
+                                        "kind": "event_match",
+                                        "pattern": "m.room.encrypted"
+                                    }
+                                ],
+                                "default": true,
+                                "enabled": true,
+                                "rule_id": ".m.rule.encrypted"
+                            }
+                        ]
+                    }
+                },
+                "type": "m.push_rules"
+            }
+        ]
+    },
+    "device_lists": {
+        "changed": [],
+        "left": []
+    },
+    "device_one_time_keys_count": {
+        "signed_curve25519": 50
+    },
+    "groups": {
+        "invite": {},
+        "join": {},
+        "leave": {}
+    },
+    "next_batch": "s70_301_72_2_36_1_1_5_1",
+    "presence": {
+        "events": [
+            {
+                "content": {
+                    "currently_active": true,
+                    "last_active_ago": 6,
+                    "presence": "online"
+                },
+                "sender": "@user:synapse.local.kamax.io",
+                "type": "m.presence"
+            }
+        ]
+    },
+    "rooms": {
+        "invite": {
+            "!sKXtjLhFyymcVWDNuS:synapse.local.kamax.io": {
+                "invite_state": {
+                    "events": [
+                        {
+                            "content": {
+                                "join_rule": "invite"
+                            },
+                            "sender": "@user1:synapse.local.kamax.io",
+                            "state_key": "",
+                            "type": "m.room.join_rules"
+                        },
+                        {
+                            "content": {
+                                "avatar_url": null,
+                                "displayname": "user1",
+                                "membership": "join"
+                            },
+                            "sender": "@user1:synapse.local.kamax.io",
+                            "state_key": "@user1:synapse.local.kamax.io",
+                            "type": "m.room.member"
+                        },
+                        {
+                            "content": {
+                                "avatar_url": null,
+                                "displayname": "user",
+                                "membership": "invite"
+                            },
+                            "event_id": "$151873502072wyKmm:synapse.local.kamax.io",
+                            "membership": "invite",
+                            "origin_server_ts": 1518735020331,
+                            "sender": "@user1:synapse.local.kamax.io",
+                            "state_key": "@user:synapse.local.kamax.io",
+                            "type": "m.room.member",
+                            "unsigned": {
+                                "age": 107139
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "join": {
+            "!KctOqwskWrXZIfCoEq:synapse.local.kamax.io": {
+                "account_data": {
+                    "events": [
+                        {
+                            "content": {
+                                "event_id": "$151873504082FsAsX:synapse.local.kamax.io"
+                            },
+                            "type": "m.fully_read"
+                        }
+                    ]
+                },
+                "ephemeral": {
+                    "events": [
+                        {
+                            "content": {
+                                "user_ids": []
+                            },
+                            "type": "m.typing"
+                        }
+                    ]
+                },
+                "state": {
+                    "events": [
+                        {
+                            "content": {
+                                "join_rule": "invite"
+                            },
+                            "event_id": "$15187348984DMKLE:synapse.local.kamax.io",
+                            "origin_server_ts": 1518734898734,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "state_key": "",
+                            "type": "m.room.join_rules",
+                            "unsigned": {
+                                "age": 228736
+                            }
+                        },
+                        {
+                            "content": {
+                                "guest_access": "can_join"
+                            },
+                            "event_id": "$15187348986NDVXj:synapse.local.kamax.io",
+                            "origin_server_ts": 1518734898871,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "state_key": "",
+                            "type": "m.room.guest_access",
+                            "unsigned": {
+                                "age": 228599
+                            }
+                        },
+                        {
+                            "content": {
+                                "creator": "@user:synapse.local.kamax.io"
+                            },
+                            "event_id": "$15187348981QFhLu:synapse.local.kamax.io",
+                            "origin_server_ts": 1518734898574,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "state_key": "",
+                            "type": "m.room.create",
+                            "unsigned": {
+                                "age": 228896
+                            }
+                        },
+                        {
+                            "content": {
+                                "avatar_url": null,
+                                "displayname": "user",
+                                "membership": "join"
+                            },
+                            "event_id": "$15187348982xNmgY:synapse.local.kamax.io",
+                            "membership": "join",
+                            "origin_server_ts": 1518734898610,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "state_key": "@user:synapse.local.kamax.io",
+                            "type": "m.room.member",
+                            "unsigned": {
+                                "age": 228860
+                            }
+                        },
+                        {
+                            "content": {
+                                "history_visibility": "shared"
+                            },
+                            "event_id": "$15187348985sKxWB:synapse.local.kamax.io",
+                            "origin_server_ts": 1518734898825,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "state_key": "",
+                            "type": "m.room.history_visibility",
+                            "unsigned": {
+                                "age": 228645
+                            }
+                        },
+                        {
+                            "content": {
+                                "ban": 50,
+                                "events": {
+                                    "m.room.avatar": 50,
+                                    "m.room.canonical_alias": 50,
+                                    "m.room.history_visibility": 100,
+                                    "m.room.name": 50,
+                                    "m.room.power_levels": 100
+                                },
+                                "events_default": 0,
+                                "invite": 0,
+                                "kick": 50,
+                                "redact": 50,
+                                "state_default": 50,
+                                "users": {
+                                    "@user:synapse.local.kamax.io": 100
+                                },
+                                "users_default": 0
+                            },
+                            "event_id": "$15187348983yhWHj:synapse.local.kamax.io",
+                            "origin_server_ts": 1518734898656,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "state_key": "",
+                            "type": "m.room.power_levels",
+                            "unsigned": {
+                                "age": 228814
+                            }
+                        }
+                    ]
+                },
+                "timeline": {
+                    "events": [
+                        {
+                            "content": {
+                                "body": "0",
+                                "msgtype": "m.text"
+                            },
+                            "event_id": "$151873499556eltks:synapse.local.kamax.io",
+                            "origin_server_ts": 1518734995565,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "type": "m.room.message",
+                            "unsigned": {
+                                "age": 131905,
+                                "transaction_id": "m1518734925742.26"
+                            }
+                        },
+                        {
+                            "content": {
+                                "body": "1",
+                                "msgtype": "m.text"
+                            },
+                            "event_id": "$151873500058XGoUq:synapse.local.kamax.io",
+                            "origin_server_ts": 1518735000601,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "type": "m.room.message",
+                            "unsigned": {
+                                "age": 126869,
+                                "transaction_id": "m1518734926600.27"
+                            }
+                        },
+                        {
+                            "content": {
+                                "body": "2",
+                                "msgtype": "m.text"
+                            },
+                            "event_id": "$151873500560dBVkH:synapse.local.kamax.io",
+                            "origin_server_ts": 1518735005559,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "type": "m.room.message",
+                            "unsigned": {
+                                "age": 121911,
+                                "transaction_id": "m1518734927224.28"
+                            }
+                        },
+                        {
+                            "content": {
+                                "body": "3",
+                                "msgtype": "m.text"
+                            },
+                            "event_id": "$151873501068SVPIh:synapse.local.kamax.io",
+                            "origin_server_ts": 1518735010556,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "type": "m.room.message",
+                            "unsigned": {
+                                "age": 116914,
+                                "transaction_id": "m1518734927730.29"
+                            }
+                        },
+                        {
+                            "content": {
+                                "body": "4",
+                                "msgtype": "m.text"
+                            },
+                            "event_id": "$151873501570ghvSe:synapse.local.kamax.io",
+                            "origin_server_ts": 1518735015568,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "type": "m.room.message",
+                            "unsigned": {
+                                "age": 111902,
+                                "transaction_id": "m1518734928220.30"
+                            }
+                        },
+                        {
+                            "content": {
+                                "body": "5",
+                                "msgtype": "m.text"
+                            },
+                            "event_id": "$151873502073xOCWH:synapse.local.kamax.io",
+                            "origin_server_ts": 1518735020570,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "type": "m.room.message",
+                            "unsigned": {
+                                "age": 106900,
+                                "transaction_id": "m1518734929066.31"
+                            }
+                        },
+                        {
+                            "content": {
+                                "body": "6",
+                                "msgtype": "m.text"
+                            },
+                            "event_id": "$151873502576wKFoA:synapse.local.kamax.io",
+                            "origin_server_ts": 1518735025559,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "type": "m.room.message",
+                            "unsigned": {
+                                "age": 101911,
+                                "transaction_id": "m1518734929542.32"
+                            }
+                        },
+                        {
+                            "content": {
+                                "body": "7",
+                                "msgtype": "m.text"
+                            },
+                            "event_id": "$151873503078mPqaN:synapse.local.kamax.io",
+                            "origin_server_ts": 1518735030576,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "type": "m.room.message",
+                            "unsigned": {
+                                "age": 96894,
+                                "transaction_id": "m1518734930141.33"
+                            }
+                        },
+                        {
+                            "content": {
+                                "body": "8",
+                                "msgtype": "m.text"
+                            },
+                            "event_id": "$151873503580HWbKx:synapse.local.kamax.io",
+                            "origin_server_ts": 1518735035574,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "type": "m.room.message",
+                            "unsigned": {
+                                "age": 91896,
+                                "transaction_id": "m1518734930731.34"
+                            }
+                        },
+                        {
+                            "content": {
+                                "body": "9",
+                                "msgtype": "m.text"
+                            },
+                            "event_id": "$151873504082FsAsX:synapse.local.kamax.io",
+                            "origin_server_ts": 1518735040568,
+                            "sender": "@user:synapse.local.kamax.io",
+                            "type": "m.room.message",
+                            "unsigned": {
+                                "age": 86902,
+                                "transaction_id": "m1518734932231.35"
+                            }
+                        }
+                    ],
+                    "limited": true,
+                    "prev_batch": "t33-51_301_72_2_36_1_1_5_1"
+                },
+                "unread_notifications": {}
+            }
+        },
+        "leave": {}
+    },
+    "to_device": {
+        "events": []
+    }
+}

@@ -20,8 +20,12 @@
 
 package io.kamax.matrix.json;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
+import java.util.Optional;
 
 public class MatrixJsonObject {
 
@@ -31,21 +35,16 @@ public class MatrixJsonObject {
         this.obj = obj;
     }
 
+    protected Optional<String> findString(String field) {
+        return GsonUtil.findString(obj, field);
+    }
+
     protected String getString(String field) {
-        return obj.get(field).getAsString();
+        return GsonUtil.getStringOrNull(obj, field);
     }
 
     protected String getStringOrNull(JsonObject obj, String field) {
-        if (!obj.has(field)) {
-            return null;
-        }
-
-        JsonElement el = obj.get(field);
-        if (el.isJsonNull()) {
-            return null;
-        }
-
-        return el.getAsString();
+        return GsonUtil.findString(obj, field).orElse(null);
     }
 
     protected String getStringOrNull(String field) {
@@ -53,24 +52,35 @@ public class MatrixJsonObject {
     }
 
     protected int getInt(String field) {
-        return obj.get(field).getAsInt();
+        return GsonUtil.getPrimitive(obj, field).getAsInt();
     }
 
     protected int getInt(String field, int failover) {
-        if (!obj.has(field)) {
-            return failover;
+        return GsonUtil.findPrimitive(obj, field).map(JsonPrimitive::getAsInt).orElse(failover);
+    }
+
+    protected long getLong(String field) {
+        return GsonUtil.getLong(obj, field);
+    }
+
+    protected JsonObject asObj(JsonElement el) {
+        if (!el.isJsonObject()) {
+            throw new IllegalArgumentException("Not a JSON object");
         }
 
-        JsonElement el = obj.get(field);
-        if (el.isJsonNull()) {
-            return failover;
-        }
-
-        return el.getAsInt();
+        return el.getAsJsonObject();
     }
 
     protected JsonObject getObj(String field) {
-        return obj.get(field).getAsJsonObject();
+        return GsonUtil.getObj(obj, field);
+    }
+
+    protected Optional<JsonObject> findObj(String field) {
+        return GsonUtil.findObj(obj, field);
+    }
+
+    protected Optional<JsonArray> findArray(String field) {
+        return GsonUtil.findArray(obj, field);
     }
 
     public JsonObject getJson() {

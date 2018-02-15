@@ -253,14 +253,17 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return getPathBuilder("media", "v1", action);
     }
 
-    protected URI getClientPathWithAccessToken(String action) {
+    protected URI getWithAccessToken(URIBuilder builder) {
         try {
-            URIBuilder builder = getClientPathBuilder(action);
             builder.setParameter("access_token", getAccessTokenOrThrow());
             return builder.build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    protected URI getClientPathWithAccessToken(String action) {
+        return getWithAccessToken(getClientPathBuilder(action));
     }
 
     protected URI getClientPath(String action) {
@@ -272,13 +275,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     protected URI getMediaPath(String action) {
-        try {
-            URIBuilder builder = getMediaPathBuilder(action);
-            builder.setParameter("access_token", getAccessTokenOrThrow());
-            return builder.build();
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return getWithAccessToken(getMediaPathBuilder(action));
     }
 
     protected HttpEntity getJsonEntity(Object o) {
