@@ -20,6 +20,8 @@
 
 package io.kamax.matrix.event;
 
+import com.google.gson.JsonObject;
+
 import io.kamax.matrix._MatrixID;
 
 import java.time.Instant;
@@ -32,8 +34,8 @@ public interface _MatrixEvent {
 
     Instant getTime();
 
-    int getAge();
-
     _MatrixID getSender();
+
+    JsonObject getJson();
 
 }

@@ -126,13 +126,15 @@ public class MatrixHttpTest {
      */
     @After
     public void logout() {
-        client.logout();
-        client = null;
+        if (client != null) {
+            client.logout();
+            client = null;
+        }
     }
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(options().port(port).usingFilesUnderDirectory(resourcePath));
-    private MatrixHttpClient client;
+    protected MatrixHttpClient client;
 
     protected MatrixClientContext getOrCreateClientContext() throws URISyntaxException {
         if (client != null) {

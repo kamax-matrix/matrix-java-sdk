@@ -63,11 +63,6 @@ public class MatrixJsonEvent extends MatrixJsonObject implements _MatrixEvent {
     }
 
     @Override
-    public int getAge() {
-        return age;
-    }
-
-    @Override
     public _MatrixID getSender() {
         return sender;
     }

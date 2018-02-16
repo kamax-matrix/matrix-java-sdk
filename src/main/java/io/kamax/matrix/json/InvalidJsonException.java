@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Maxime Dor
+ * Copyright (C) 2018 Maxime Dor
  *
  * https://www.kamax.io/
  *
@@ -18,28 +18,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.client;
+package io.kamax.matrix.json;
 
-import io.kamax.matrix._MatrixID;
-import io.kamax.matrix._MatrixUser;
-import io.kamax.matrix.hs._MatrixRoom;
+import io.kamax.matrix.MatrixException;
 
-import java.util.Optional;
+public class InvalidJsonException extends MatrixException {
 
-public interface _MatrixClient extends _MatrixClientRaw {
+    public InvalidJsonException(Throwable t) {
+        super("M_BAD_JSON", t.getMessage(), t);
+    }
 
-    void setDisplayName(String name);
-
-    _MatrixRoom getRoom(String roomId);
-
-    _MatrixUser getUser(_MatrixID mxId);
-
-    Optional<String> getDeviceId();
-
-    void login(MatrixPasswordLoginCredentials credentials);
-
-    void logout();
-
-    _SyncData sync(_SyncOptions options);
+    public InvalidJsonException(String error) {
+        super("M_BAD_JSON", error);
+    }
 
 }

@@ -25,10 +25,12 @@ import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
 import io.kamax.matrix.client.*;
 import io.kamax.matrix.hs._MatrixRoom;
+import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.LoginPostBody;
 import io.kamax.matrix.json.LoginResponse;
 import io.kamax.matrix.json.UserDisplaynameSetBody;
 
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
@@ -104,6 +106,20 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         context.setToken(null);
         context.setUser(null);
         context.setDeviceId(null);
+    }
+
+    @Override
+    public _SyncData sync(_SyncOptions options) {
+        URIBuilder path = getClientPathBuilder("/sync");
+
+        path.addParameter("timeout", options.getTimeout().map(Long::intValue).orElse(30000).toString());
+        options.getSince().ifPresent(since -> path.addParameter("since", since));
+        options.getFilter().ifPresent(filter -> path.addParameter("filter", filter));
+        options.withFullState().ifPresent(state -> path.addParameter("full_state", state ? "true" : "false"));
+        options.getSetPresence().ifPresent(presence -> path.addParameter("presence", presence));
+
+        String body = execute(new HttpGet(getWithAccessToken(path)));
+        return new SyncDataJson(GsonUtil.parseObj(body));
     }
 
 }
