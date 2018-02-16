@@ -111,14 +111,14 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     @Override
     public _SyncData sync(_SyncOptions options) {
         URIBuilder path = getClientPathBuilder("/sync");
+
+        path.addParameter("timeout", options.getTimeout().map(Long::intValue).orElse(30000).toString());
         options.getSince().ifPresent(since -> path.addParameter("since", since));
         options.getFilter().ifPresent(filter -> path.addParameter("filter", filter));
         options.withFullState().ifPresent(state -> path.addParameter("full_state", state ? "true" : "false"));
         options.getSetPresence().ifPresent(presence -> path.addParameter("presence", presence));
-        options.getTimeout().ifPresent(timeout -> path.addParameter("timeout", timeout.toString()));
 
-        HttpGet request = new HttpGet(getWithAccessToken(path));
-        String body = execute(request);
+        String body = execute(new HttpGet(getWithAccessToken(path)));
         return new SyncDataJson(GsonUtil.parseObj(body));
     }
 

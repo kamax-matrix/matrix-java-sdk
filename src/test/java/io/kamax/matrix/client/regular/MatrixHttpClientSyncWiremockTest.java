@@ -63,6 +63,21 @@ public class MatrixHttpClientSyncWiremockTest extends AMatrixHttpClientSyncTest 
     }
 
     @Test
+    public void doLongSync() throws Exception {
+        stubFor(get(urlPathEqualTo(syncPath))
+                .willReturn(aResponse().withStatus(200).withBody(getJson()).withFixedDelay(30000)));
+
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixClientContext context = new MatrixClientContext(hs, MatrixID.asValid("@user:localhost"), "test");
+        MatrixHttpClient client = new MatrixHttpClient(context);
+        setClient(client);
+
+        super.getInitialSync();
+
+        verify(getRequestedFor(urlPathEqualTo(syncPath)));
+    }
+
+    @Test
     @Override
     public void getSeveralSync() throws Exception {
         stubFor(get(urlPathEqualTo(syncPath)).willReturn(aResponse().withStatus(200).withBody(getJson())));

@@ -30,6 +30,7 @@ import io.kamax.matrix.hs._MatrixHomeserver;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -56,7 +57,9 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected Gson gson = new Gson();
     protected JsonParser jsonParser = new JsonParser();
-    private CloseableHttpClient client = HttpClients.createDefault();
+    private CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom()
+            .setConnectTimeout(60000).setConnectionRequestTimeout(60000).setSocketTimeout(60000).build()).build();
+
     private Pattern accessTokenUrlPattern = Pattern.compile("\\?access_token=(?<token>[^&]*)");
 
     public AMatrixHttpClient(MatrixClientContext context) {
