@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Maxime Dor
+ * Copyright (C) 2018 Maxime Dor
  *
  * https://www.kamax.io/
  *
@@ -18,31 +18,36 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.client;
+package io.kamax.matrix.room;
 
-import io.kamax.matrix._MatrixID;
-import io.kamax.matrix._MatrixUser;
-import io.kamax.matrix.hs._MatrixRoom;
-import io.kamax.matrix.room._RoomCreationOptions;
+/**
+ * Room Directory visibility status available in the specification.
+ */
+public enum RoomDirectoryVisibility {
 
-import java.util.Optional;
+    /**
+     * The room will not be visible in the directory.
+     */
+    Private("private"),
 
-public interface _MatrixClient extends _MatrixClientRaw {
+    /**
+     * The room will be visible by anyone, without authentication.
+     */
+    Public("public");
 
-    void setDisplayName(String name);
+    private String id;
 
-    _MatrixRoom createRoom(_RoomCreationOptions options);
+    RoomDirectoryVisibility(String id) {
+        this.id = id;
+    }
 
-    _MatrixRoom getRoom(String roomId);
-
-    _MatrixUser getUser(_MatrixID mxId);
-
-    Optional<String> getDeviceId();
-
-    void login(MatrixPasswordLoginCredentials credentials);
-
-    void logout();
-
-    _SyncData sync(_SyncOptions options);
+    /**
+     * Get the Matrix value for this setting.
+     * 
+     * @return the value.
+     */
+    public String get() {
+        return id;
+    }
 
 }
