@@ -25,10 +25,8 @@ import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
 import io.kamax.matrix.client.*;
 import io.kamax.matrix.hs._MatrixRoom;
-import io.kamax.matrix.json.GsonUtil;
-import io.kamax.matrix.json.LoginPostBody;
-import io.kamax.matrix.json.LoginResponse;
-import io.kamax.matrix.json.UserDisplaynameSetBody;
+import io.kamax.matrix.json.*;
+import io.kamax.matrix.room._RoomCreationOptions;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -61,6 +59,17 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         HttpPut req = new HttpPut(path);
         req.setEntity(getJsonEntity(new UserDisplaynameSetBody(name)));
         execute(req);
+    }
+
+    @Override
+    public _MatrixRoom createRoom(_RoomCreationOptions options) {
+        URI path = getClientPathWithAccessToken("/createRoom");
+        HttpPost req = new HttpPost(path);
+        req.setEntity(getJsonEntity(new RoomCreationRequestJson(options)));
+
+        String resBody = execute(req);
+        String roomId = GsonUtil.get().fromJson(resBody, RoomCreationResponseJson.class).getRoomId();
+        return getRoom(roomId);
     }
 
     @Override
