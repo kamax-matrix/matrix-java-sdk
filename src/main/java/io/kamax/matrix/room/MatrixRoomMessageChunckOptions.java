@@ -55,6 +55,11 @@ public class MatrixRoomMessageChunckOptions implements _MatrixRoomMessageChunckO
             obj.limit = limit;
             return this;
         }
+
+        public MatrixRoomMessageChunckOptions get() {
+            return obj;
+        }
+
     }
 
     public static Builder build() {
