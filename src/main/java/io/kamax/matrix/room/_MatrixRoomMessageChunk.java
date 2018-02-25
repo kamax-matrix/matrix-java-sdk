@@ -25,9 +25,9 @@ import io.kamax.matrix.event._MatrixEvent;
 import java.util.List;
 
 /**
- * Room messages pagination chunck.
+ * Room messages pagination chunk.
  */
-public interface _MatrixRoomMessageChunck {
+public interface _MatrixRoomMessageChunk {
 
     /**
      * The token the pagination starts from.

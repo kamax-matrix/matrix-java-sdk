@@ -23,9 +23,9 @@ package io.kamax.matrix.room;
 import java.util.Optional;
 
 /**
- * Possible options that can be passed to the room messages chunck call.
+ * Possible options that can be passed to the room messages chunk call.
  */
-public interface _MatrixRoomMessageChunckOptions {
+public interface _MatrixRoomMessageChunkOptions {
 
     /**
      * The direction to return events from.

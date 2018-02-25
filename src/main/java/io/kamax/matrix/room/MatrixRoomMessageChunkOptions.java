@@ -22,14 +22,14 @@ package io.kamax.matrix.room;
 
 import java.util.Optional;
 
-public class MatrixRoomMessageChunckOptions implements _MatrixRoomMessageChunckOptions {
+public class MatrixRoomMessageChunkOptions implements _MatrixRoomMessageChunkOptions {
 
     public static class Builder {
 
-        private MatrixRoomMessageChunckOptions obj;
+        private MatrixRoomMessageChunkOptions obj;
 
         public Builder() {
-            this.obj = new MatrixRoomMessageChunckOptions();
+            this.obj = new MatrixRoomMessageChunkOptions();
         }
 
         public Builder setFromToken(String token) {
@@ -47,7 +47,7 @@ public class MatrixRoomMessageChunckOptions implements _MatrixRoomMessageChunckO
             return this;
         }
 
-        public Builder setDirection(_MatrixRoomMessageChunckOptions.Direction direction) {
+        public Builder setDirection(_MatrixRoomMessageChunkOptions.Direction direction) {
             return setDirection(direction.get());
         }
 
@@ -56,7 +56,7 @@ public class MatrixRoomMessageChunckOptions implements _MatrixRoomMessageChunckO
             return this;
         }
 
-        public MatrixRoomMessageChunckOptions get() {
+        public MatrixRoomMessageChunkOptions get() {
             return obj;
         }
 

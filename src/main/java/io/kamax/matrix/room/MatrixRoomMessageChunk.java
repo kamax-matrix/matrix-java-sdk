@@ -24,13 +24,13 @@ import io.kamax.matrix.event._MatrixEvent;
 
 import java.util.List;
 
-public class MatrixRoomMessageChunck implements _MatrixRoomMessageChunck {
+public class MatrixRoomMessageChunk implements _MatrixRoomMessageChunk {
 
     private String startToken;
     private String endToken;
     private List<_MatrixEvent> events;
 
-    public MatrixRoomMessageChunck(String startToken, String endToken, List<_MatrixEvent> events) {
+    public MatrixRoomMessageChunk(String startToken, String endToken, List<_MatrixEvent> events) {
         this.startToken = startToken;
         this.endToken = endToken;
         this.events = events;

@@ -21,8 +21,8 @@
 package io.kamax.matrix.hs;
 
 import io.kamax.matrix._MatrixID;
-import io.kamax.matrix.room._MatrixRoomMessageChunck;
-import io.kamax.matrix.room._MatrixRoomMessageChunckOptions;
+import io.kamax.matrix.room._MatrixRoomMessageChunk;
+import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +53,6 @@ public interface _MatrixRoom {
 
     List<_MatrixID> getJoinedUsers();
 
-    _MatrixRoomMessageChunck getMessages(_MatrixRoomMessageChunckOptions options);
+    _MatrixRoomMessageChunk getMessages(_MatrixRoomMessageChunkOptions options);
 
 }
