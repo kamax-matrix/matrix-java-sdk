@@ -26,8 +26,14 @@ import com.google.gson.JsonObject;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixRoom;
+import io.kamax.matrix.json.GsonUtil;
+import io.kamax.matrix.json.RoomMessageChunkResponseJson;
 import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
 import io.kamax.matrix.json.RoomMessageTextPutBody;
+import io.kamax.matrix.json.event.MatrixJsonEvent;
+import io.kamax.matrix.room.MatrixRoomMessageChunk;
+import io.kamax.matrix.room._MatrixRoomMessageChunk;
+import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpGet;
@@ -42,6 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
@@ -156,5 +163,19 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
             }
         }
         return ids;
+    }
+
+    @Override
+    public _MatrixRoomMessageChunk getMessages(_MatrixRoomMessageChunkOptions options) {
+        URIBuilder builder = getClientPathBuilder("/rooms/{roomId}/messages");
+        builder.setParameter("from", options.getFromToken());
+        builder.setParameter("dir", options.getDirection());
+        options.getToToken().ifPresent(token -> builder.setParameter("to", token));
+        options.getLimit().ifPresent(limit -> builder.setParameter("limit", limit.toString()));
+
+        String bodyRaw = execute(new HttpGet(getWithAccessToken(builder)));
+        RoomMessageChunkResponseJson body = GsonUtil.get().fromJson(bodyRaw, RoomMessageChunkResponseJson.class);
+        return new MatrixRoomMessageChunk(body.getStart(), body.getEnd(),
+                body.getChunk().stream().map(MatrixJsonEvent::new).collect(Collectors.toList()));
     }
 }
