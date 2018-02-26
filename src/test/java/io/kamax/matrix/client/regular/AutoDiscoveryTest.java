@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Maxime Dor
+ * Copyright (C) 2018 Maxime Dor
  *
  * https://www.kamax.io/
  *
@@ -18,18 +18,28 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs;
+package io.kamax.matrix.client.regular;
 
-import org.apache.http.client.utils.URIBuilder;
+import io.kamax.matrix.client._MatrixClient;
+import io.kamax.matrix.hs._MatrixHomeserver;
 
-import java.net.URL;
+import org.junit.jupiter.api.Test;
 
-public interface _MatrixHomeserver {
+import static junit.framework.TestCase.assertTrue;
 
-    String getDomain();
+public class AutoDiscoveryTest {
 
-    URL getBaseEndpoint();
+    private final String domain = "kamax.io";
+    private final String autoUrl = "https://" + domain;
 
-    URIBuilder getBaseEndpointBuilder();
+    @Test
+    public void AutoDiscoveryTest() {
+        _MatrixClient client = new MatrixHttpClient(domain);
+
+        client.discoverSettings();
+        _MatrixHomeserver hs = client.getHomeserver();
+        assertTrue(domain.equals(hs.getDomain()));
+        assertTrue(autoUrl.equals(hs.getBaseEndpoint().toString()));
+    }
 
 }

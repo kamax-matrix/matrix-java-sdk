@@ -44,7 +44,7 @@ public class MatrixJsonEvent extends MatrixJsonObject implements _MatrixEvent {
         type = getString("type");
         time = Instant.ofEpochMilli(obj.get("origin_server_ts").getAsLong());
         age = getInt("age", -1);
-        sender = MatrixID.from(getString("sender")).acceptable();
+        sender = MatrixID.asAcceptable(getString("sender"));
     }
 
     @Override

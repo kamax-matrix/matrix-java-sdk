@@ -84,17 +84,13 @@ public class MatrixHttpTest {
     public void login() throws URISyntaxException {
         InputStream configFile = readConfigFile();
         if (configFile != null) {
-            try {
-                MatrixHomeserver homeserver = new MatrixHomeserver(domain, baseUrl);
-                MatrixClientContext context = new MatrixClientContext(homeserver);
-                MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(username, password);
+            MatrixHomeserver homeserver = new MatrixHomeserver(domain, baseUrl);
+            MatrixClientContext context = new MatrixClientContext(homeserver);
+            MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(username, password);
 
-                client = new MatrixHttpClient(context);
-                client.login(credentials);
-                testToken = client.getAccessTokenOrThrow();
-            } catch (URISyntaxException e) {
-                throw new IllegalStateException(e);
-            }
+            client = new MatrixHttpClient(context);
+            client.login(credentials);
+            testToken = client.getAccessTokenOrThrow();
         }
     }
 
@@ -136,7 +132,7 @@ public class MatrixHttpTest {
     public WireMockRule wireMockRule = new WireMockRule(options().port(port).usingFilesUnderDirectory(resourcePath));
     protected MatrixHttpClient client;
 
-    protected MatrixClientContext getOrCreateClientContext() throws URISyntaxException {
+    protected MatrixClientContext getOrCreateClientContext() {
         if (client != null) {
             return client.getContext();
         } else {

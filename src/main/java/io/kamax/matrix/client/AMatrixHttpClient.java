@@ -26,12 +26,14 @@ import com.google.gson.JsonParser;
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
+import io.kamax.matrix.json.GsonUtil;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -43,7 +45,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,7 +56,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     private Logger log = LoggerFactory.getLogger(AMatrixHttpClient.class);
 
-    protected MatrixClientContext context;
+    protected MatrixClientContext context = new MatrixClientContext();
 
     protected Gson gson = new Gson();
     protected JsonParser jsonParser = new JsonParser();
@@ -60,8 +64,57 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     private Pattern accessTokenUrlPattern = Pattern.compile("\\?access_token=(?<token>[^&]*)");
 
-    public AMatrixHttpClient(MatrixClientContext context) {
+    public AMatrixHttpClient(String domain) {
+        context.setDomain(domain);
+    }
+
+    public AMatrixHttpClient(URL hsBaseUrl) {
+        context.setHsBaseUrl(hsBaseUrl);
+    }
+
+    protected AMatrixHttpClient(MatrixClientContext context) {
         this.context = context;
+    }
+
+    @Override
+    public void discoverSettings() {
+        if (StringUtils.isBlank(context.getDomain())) {
+            throw new IllegalStateException("A non-empty Matrix domain must be set to discover the client settings");
+        }
+
+        try {
+            String hostname = context.getDomain().split(":")[0];
+            log.info("Performing .well-known auto-discovery for {}", hostname);
+
+            URIBuilder builder = new URIBuilder();
+            builder.setScheme("https");
+            builder.setHost(hostname);
+            builder.setPath("/.well-known/matrix");
+            HttpGet req = new HttpGet(builder.build());
+            String body = execute(req);
+            log.info("Found body: {}", body);
+
+            WellKnownAutoDiscoverySettings settings = new WellKnownAutoDiscoverySettings(GsonUtil.parseObj(body));
+            log.info("Found .well-known data");
+
+            if (settings.getHsBaseUrls().isEmpty()) {
+                throw new IllegalArgumentException("No valid Homeserver base URL was found");
+            }
+
+            for (URL baseUrlCandidate : settings.getHsBaseUrls()) {
+                context.setHsBaseUrl(baseUrlCandidate);
+                try {
+                    if (!getApiVersions().isEmpty()) {
+                        log.info("Found a valid HS at {}", getContext().getHsBaseUrl().toString());
+                        break;
+                    }
+                } catch (MatrixClientRequestException e) {
+                    log.warn("Error when trying to fetch {}: {}", baseUrlCandidate, e.getMessage());
+                }
+            }
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @Override
@@ -71,7 +124,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     @Override
     public _MatrixHomeserver getHomeserver() {
-        return context.getHs();
+        return context.getHomeserver();
     }
 
     @Override
@@ -82,6 +135,12 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     public String getAccessTokenOrThrow() {
         return getAccessToken()
                 .orElseThrow(() -> new IllegalStateException("This method can only be used with a valid token."));
+    }
+
+    @Override
+    public List<String> getApiVersions() {
+        String body = execute(new HttpGet(getPath("client", "", "versions")));
+        return GsonUtil.asList(GsonUtil.parseObj(body), "versions", String.class);
     }
 
     @Override
@@ -237,13 +296,21 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     protected URIBuilder getPathBuilder(String module, String version, String action) {
-        URIBuilder builder = context.getHs().getClientEndpoint();
+        URIBuilder builder = context.getHomeserver().getBaseEndpointBuilder();
         builder.setPath(builder.getPath() + "/_matrix/" + module + "/" + version + action);
-        if (context.isVirtualUser()) {
+        if (context.isVirtual()) {
             context.getUser().ifPresent(user -> builder.setParameter("user_id", user.getId()));
         }
 
         return builder;
+    }
+
+    protected URI getPath(String module, String version, String action) {
+        try {
+            return getPathBuilder(module, version, action).build();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     protected URIBuilder getClientPathBuilder(String action) {

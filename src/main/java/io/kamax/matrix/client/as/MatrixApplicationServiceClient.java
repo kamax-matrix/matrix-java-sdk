@@ -20,11 +20,9 @@
 
 package io.kamax.matrix.client.as;
 
-import io.kamax.matrix.MatrixID;
 import io.kamax.matrix.client.MatrixClientContext;
 import io.kamax.matrix.client._MatrixClient;
 import io.kamax.matrix.client.regular.MatrixHttpClient;
-import io.kamax.matrix.hs._MatrixHomeserver;
 import io.kamax.matrix.json.VirtualUserRegistrationBody;
 
 import org.apache.http.client.methods.HttpPost;
@@ -37,13 +35,14 @@ public class MatrixApplicationServiceClient extends MatrixHttpClient implements 
 
     private Logger log = LoggerFactory.getLogger(MatrixApplicationServiceClient.class);
 
-    public MatrixApplicationServiceClient(_MatrixHomeserver hs, String token, String localpart) {
-        super(new MatrixClientContext(hs, new MatrixID(localpart, hs.getDomain()), token));
+    public MatrixApplicationServiceClient(MatrixClientContext context) {
+        super(context);
     }
 
     private MatrixHttpClient createClient(String localpart) {
-        return new MatrixHttpClient(
-                new MatrixClientContext(getHomeserver(), getMatrixId(localpart), getAccessTokenOrThrow(), true));
+        MatrixClientContext context = new MatrixClientContext(getContext()).setUserWithLocalpart(localpart)
+                .setVirtual(true);
+        return new MatrixHttpClient(context);
     }
 
     @Override

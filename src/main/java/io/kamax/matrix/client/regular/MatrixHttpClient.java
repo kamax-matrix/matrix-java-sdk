@@ -38,6 +38,10 @@ import java.util.Optional;
 
 public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient {
 
+    public MatrixHttpClient(String domain) {
+        super(domain);
+    }
+
     public MatrixHttpClient(MatrixClientContext context) {
         super(context);
     }
@@ -84,15 +88,15 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
 
     @Override
     public Optional<String> getDeviceId() {
-        return context.getDeviceId();
+        return Optional.ofNullable(context.getDeviceId());
     }
 
     @Override
     public void login(MatrixPasswordLoginCredentials credentials) {
         HttpPost request = new HttpPost(getClientPath("/login"));
-        if (context.getDeviceId().isPresent()) {
-            request.setEntity(getJsonEntity(new LoginPostBody(credentials.getLocalPart(), credentials.getPassword(),
-                    context.getDeviceId().get())));
+        if (getDeviceId().isPresent()) {
+            request.setEntity(getJsonEntity(
+                    new LoginPostBody(credentials.getLocalPart(), credentials.getPassword(), getDeviceId().get())));
         } else {
             request.setEntity(getJsonEntity(new LoginPostBody(credentials.getLocalPart(), credentials.getPassword())));
         }

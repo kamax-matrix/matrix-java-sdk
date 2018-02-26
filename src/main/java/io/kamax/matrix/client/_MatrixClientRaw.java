@@ -23,6 +23,7 @@ package io.kamax.matrix.client;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface _MatrixClientRaw {
@@ -34,4 +35,9 @@ public interface _MatrixClientRaw {
     Optional<String> getAccessToken();
 
     Optional<_MatrixID> getUser();
+
+    void discoverSettings();
+
+    List<String> getApiVersions();
+
 }

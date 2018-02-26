@@ -20,13 +20,14 @@
 
 package io.kamax.matrix.client.as;
 
+import io.kamax.matrix.client.MatrixClientContext;
 import io.kamax.matrix.client.MatrixClientRequestException;
 import io.kamax.matrix.client.MatrixHttpTest;
-import io.kamax.matrix.hs.MatrixHomeserver;
 
 import org.junit.Test;
 
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
@@ -37,7 +38,7 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
     private String testUser = "testUser";
 
     @Override
-    public void login() throws URISyntaxException {
+    public void login() {
     }
 
     @Override
@@ -45,13 +46,13 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
     }
 
     @Test
-    public void createUser() throws URISyntaxException {
+    public void createUser() throws MalformedURLException {
         stubFor(post(urlEqualTo(createUserUrl)).willReturn(aResponse().withStatus(200)));
         createClientObject().createUser(testUser);
     }
 
     @Test
-    public void createUserErrorRateLimited() throws URISyntaxException {
+    public void createUserErrorRateLimited() {
         stubFor(post(urlEqualTo(createUserUrl))
                 .willReturn(aResponse().withStatus(429).withBody(errorRateLimitedResponse)));
 
@@ -60,11 +61,16 @@ public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
         checkErrorInfoRateLimited(e);
     }
 
-    private MatrixApplicationServiceClient createClientObject() throws URISyntaxException {
+    private MatrixApplicationServiceClient createClientObject() throws MalformedURLException {
         String domain = "localhost";
         String baseUrl = "http://localhost:" + port;
-        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
-        return new MatrixApplicationServiceClient(hs, testToken, "testuser");
+
+        MatrixClientContext context = new MatrixClientContext();
+        context.setDomain("localhost");
+        context.setHsBaseUrl(new URL(baseUrl));
+        context.setUserWithLocalpart("testuser");
+
+        return new MatrixApplicationServiceClient(context);
     }
 
 }

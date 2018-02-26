@@ -20,76 +20,123 @@
 
 package io.kamax.matrix.client;
 
+import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
+import io.kamax.matrix.hs.MatrixHomeserver;
 import io.kamax.matrix.hs._MatrixHomeserver;
 
+import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 
 public class MatrixClientContext {
 
-    private _MatrixHomeserver hs;
+    private String domain;
+    private URL hsBaseUrl;
+    private URL isBaseUrl;
     private _MatrixID user;
     private String token;
-    private boolean isVirtualUser;
+    private boolean isVirtual;
     private String deviceId;
 
-    public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token) {
-        this(hs, user, token, false);
+    public MatrixClientContext() {
+        // stub
     }
 
-    public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token, boolean isVirtualUser) {
-        this(hs, user, isVirtualUser);
-        this.token = token;
+    public MatrixClientContext(MatrixClientContext other) {
+        this.domain = other.domain;
+        this.hsBaseUrl = other.hsBaseUrl;
+        this.isBaseUrl = other.isBaseUrl;
+        this.user = other.user;
+        this.token = other.token;
+        this.isVirtual = other.isVirtual;
+        this.deviceId = other.deviceId;
     }
 
     public MatrixClientContext(_MatrixHomeserver hs) {
-        this(hs, false);
+        setDomain(hs.getDomain());
+        setHsBaseUrl(hs.getBaseEndpoint());
     }
 
-    public MatrixClientContext(_MatrixHomeserver hs, String deviceId) {
-        this(hs, false);
-        this.deviceId = deviceId;
+    public MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, String token) {
+        this(hs);
+        setUser(user);
+        setToken(token);
     }
 
-    private MatrixClientContext(_MatrixHomeserver hs, _MatrixID user, boolean isVirtualUser) {
-        this(hs, isVirtualUser);
-        this.user = user;
+    public _MatrixHomeserver getHomeserver() {
+        if (Objects.isNull(hsBaseUrl)) {
+            throw new IllegalStateException("Homeserver Base URL is not set");
+        }
+
+        return new MatrixHomeserver(domain, hsBaseUrl.toString());
     }
 
-    private MatrixClientContext(_MatrixHomeserver hs, boolean isVirtualUser) {
-        this.hs = hs;
-        this.isVirtualUser = isVirtualUser;
+    public String getDomain() {
+        return domain;
     }
 
-    public _MatrixHomeserver getHs() {
-        return hs;
+    public MatrixClientContext setDomain(String domain) {
+        this.domain = domain;
+        return this;
+    }
+
+    public URL getHsBaseUrl() {
+        return hsBaseUrl;
+    }
+
+    public MatrixClientContext setHsBaseUrl(URL hsBaseUrl) {
+        this.hsBaseUrl = hsBaseUrl;
+        return this;
+    }
+
+    public URL getIsBaseUrl() {
+        return isBaseUrl;
+    }
+
+    public MatrixClientContext setIsBaseUrl(URL isBaseUrl) {
+        this.isBaseUrl = isBaseUrl;
+        return this;
     }
 
     public Optional<_MatrixID> getUser() {
         return Optional.ofNullable(user);
     }
 
-    public void setUser(_MatrixID user) {
+    public MatrixClientContext setUser(_MatrixID user) {
         this.user = user;
+        return this;
+    }
+
+    public MatrixClientContext setUserWithLocalpart(String localpart) {
+        setUser(MatrixID.asAcceptable(localpart, getDomain()));
+        return this;
     }
 
     public String getToken() {
         return token;
     }
 
-    public void setToken(String token) {
+    public MatrixClientContext setToken(String token) {
         this.token = token;
+        return this;
     }
 
-    public boolean isVirtualUser() {
-        return isVirtualUser;
+    public boolean isVirtual() {
+        return isVirtual;
     }
 
-    public Optional<String> getDeviceId() {
-        return Optional.ofNullable(deviceId);
+    public MatrixClientContext setVirtual(boolean virtual) {
+        isVirtual = virtual;
+        return this;
     }
 
-    public void setDeviceId(String deviceId) {
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public MatrixClientContext setDeviceId(String deviceId) {
         this.deviceId = deviceId;
+        return this;
     }
 }
