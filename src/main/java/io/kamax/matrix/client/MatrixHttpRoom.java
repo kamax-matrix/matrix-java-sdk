@@ -146,8 +146,10 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public void invite(_MatrixID mxId) {
-        // TODO populate
-        log.error("Invite is not yet supported");
+        URI path = getClientPathWithAccessToken("/rooms/{roomId}/invite");
+        HttpPost req = new HttpPost(path);
+        req.setEntity(getJsonEntity(GsonUtil.makeObj("user_id", mxId.getId())));
+        execute(req);
     }
 
     @Override
