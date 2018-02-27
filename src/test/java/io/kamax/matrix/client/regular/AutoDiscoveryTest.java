@@ -20,26 +20,55 @@
 
 package io.kamax.matrix.client.regular;
 
+import io.kamax.matrix.client.MatrixClientContext;
+import io.kamax.matrix.client._AutoDiscoverySettings;
 import io.kamax.matrix.client._MatrixClient;
-import io.kamax.matrix.hs._MatrixHomeserver;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 import static junit.framework.TestCase.assertTrue;
 
 public class AutoDiscoveryTest {
 
+    /*
+     * FIXME
+     * we shouldn't hardcode this, but since auto-discover use TCP 443, we might create a conflict with an existing
+     * process.
+     * So until we find a better solution...
+     */
     private final String domain = "kamax.io";
     private final String autoUrl = "https://" + domain;
 
     @Test
-    public void AutoDiscoveryTest() {
+    public void kamaxAutoDiscover() {
         _MatrixClient client = new MatrixHttpClient(domain);
 
-        client.discoverSettings();
-        _MatrixHomeserver hs = client.getHomeserver();
-        assertTrue(domain.equals(hs.getDomain()));
-        assertTrue(autoUrl.equals(hs.getBaseEndpoint().toString()));
+        Optional<_AutoDiscoverySettings> opt = client.discoverSettings();
+        assertTrue(opt.isPresent());
+
+        assertTrue(opt.get().getHsBaseUrls().size() == 1);
+        assertTrue(autoUrl.equals(opt.get().getHsBaseUrls().get(0).toString()));
+        assertTrue(opt.get().getIsBaseUrls().size() == 1);
+        assertTrue(autoUrl.equals(opt.get().getIsBaseUrls().get(0).toString()));
+
+        MatrixClientContext context = client.getContext();
+        assertTrue(domain.equals(context.getDomain()));
+        assertTrue(autoUrl.equals(context.getHsBaseUrl().toString()));
+        assertTrue(autoUrl.equals(context.getIsBaseUrl().toString()));
     }
+
+    @Test
+    public void noDataAutoDiscover() {
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            _MatrixClient client = new MatrixHttpClient("example.org");
+            client.discoverSettings();
+        });
+    }
+
+    // TODO test cases if the HS URL is set, and we call auto-discovery
+    // Add Two test cases: one with data (HS URL is changed), one without (HS URL remains).
 
 }

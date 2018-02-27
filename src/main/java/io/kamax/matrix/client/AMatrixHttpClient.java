@@ -48,6 +48,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -73,11 +74,11 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     protected AMatrixHttpClient(MatrixClientContext context) {
-        this.context = context;
+        this.context = new MatrixClientContext(context);
     }
 
     @Override
-    public void discoverSettings() {
+    public Optional<_AutoDiscoverySettings> discoverSettings() {
         if (StringUtils.isBlank(context.getDomain())) {
             throw new IllegalStateException("A non-empty Matrix domain must be set to discover the client settings");
         }
@@ -91,20 +92,33 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
             builder.setHost(hostname);
             builder.setPath("/.well-known/matrix");
             HttpGet req = new HttpGet(builder.build());
-            String body = execute(req);
+            String body = execute(new MatrixHttpRequest(req).addIgnoredErrorCode(404));
+            if (StringUtils.isBlank(body)) {
+                if (Objects.isNull(context.getHsBaseUrl())) {
+                    throw new IllegalStateException("No valid Homeserver base URL was found");
+                }
+
+                // No .well-known data found
+                // FIXME improve SDK so we can differentiate between not found and empty.
+                // not found = skip
+                // empty = failure
+                return Optional.empty();
+            }
+
             log.info("Found body: {}", body);
 
-            WellKnownAutoDiscoverySettings settings = new WellKnownAutoDiscoverySettings(GsonUtil.parseObj(body));
+            WellKnownAutoDiscoverySettings settings = new WellKnownAutoDiscoverySettings(body);
             log.info("Found .well-known data");
 
+            // TODO reconsider if and where we should check for an already present HS url in the context
             if (settings.getHsBaseUrls().isEmpty()) {
-                throw new IllegalArgumentException("No valid Homeserver base URL was found");
+                throw new IllegalStateException("No valid Homeserver base URL was found");
             }
 
             for (URL baseUrlCandidate : settings.getHsBaseUrls()) {
                 context.setHsBaseUrl(baseUrlCandidate);
                 try {
-                    if (!getApiVersions().isEmpty()) {
+                    if (!getHomeApiVersions().isEmpty()) {
                         log.info("Found a valid HS at {}", getContext().getHsBaseUrl().toString());
                         break;
                     }
@@ -112,7 +126,21 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
                     log.warn("Error when trying to fetch {}: {}", baseUrlCandidate, e.getMessage());
                 }
             }
-        } catch (URISyntaxException e) {
+
+            for (URL baseUrlCandidate : settings.getIsBaseUrls()) {
+                context.setIsBaseUrl(baseUrlCandidate);
+                try {
+                    if (!getIdentityApiVersions().isEmpty()) {
+                        log.info("Found a valid IS at {}", getContext().getHsBaseUrl().toString());
+                        break;
+                    }
+                } catch (MatrixClientRequestException e) {
+                    log.warn("Error when trying to fetch {}: {}", baseUrlCandidate, e.getMessage());
+                }
+            }
+
+            return Optional.of(settings);
+        } catch (URISyntaxException e) { // The domain was invalid when used in a URL
             throw new IllegalArgumentException(e);
         }
     }
@@ -138,8 +166,13 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     @Override
-    public List<String> getApiVersions() {
+    public List<String> getHomeApiVersions() {
         String body = execute(new HttpGet(getPath("client", "", "versions")));
+        return GsonUtil.asList(GsonUtil.parseObj(body), "versions", String.class);
+    }
+
+    public List<String> getIdentityApiVersions() {
+        String body = execute(new HttpGet(getIdentityPath("identity", "", "versions")));
         return GsonUtil.asList(GsonUtil.parseObj(body), "versions", String.class);
     }
 
@@ -295,19 +328,34 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         log.debug("Doing {} {}", req.getMethod(), reqUrl);
     }
 
-    protected URIBuilder getPathBuilder(String module, String version, String action) {
-        URIBuilder builder = context.getHomeserver().getBaseEndpointBuilder();
-        builder.setPath(builder.getPath() + "/_matrix/" + module + "/" + version + action);
+    protected URIBuilder getPathBuilder(URIBuilder base, String module, String version, String action) {
+        base.setPath(base.getPath() + "/_matrix/" + module + "/" + version + action);
         if (context.isVirtual()) {
-            context.getUser().ifPresent(user -> builder.setParameter("user_id", user.getId()));
+            context.getUser().ifPresent(user -> base.setParameter("user_id", user.getId()));
         }
 
-        return builder;
+        return base;
+    }
+
+    protected URIBuilder getPathBuilder(String module, String version, String action) {
+        return getPathBuilder(context.getHomeserver().getBaseEndpointBuilder(), module, version, action);
+    }
+
+    protected URIBuilder getIdentityPathBuilder(String module, String version, String action) {
+        return getPathBuilder(new URIBuilder(URI.create(context.getIsBaseUrl().toString())), module, version, action);
     }
 
     protected URI getPath(String module, String version, String action) {
         try {
             return getPathBuilder(module, version, action).build();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    protected URI getIdentityPath(String module, String version, String action) {
+        try {
+            return getIdentityPathBuilder(module, version, action).build();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }

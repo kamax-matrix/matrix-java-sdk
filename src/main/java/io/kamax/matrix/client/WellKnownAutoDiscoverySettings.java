@@ -22,8 +22,10 @@ package io.kamax.matrix.client;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import io.kamax.matrix.json.GsonUtil;
+import io.kamax.matrix.json.InvalidJsonException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class WellKnownAutoDiscoverySettings {
+public class WellKnownAutoDiscoverySettings implements _AutoDiscoverySettings {
 
     private final Logger log = LoggerFactory.getLogger(WellKnownAutoDiscoverySettings.class);
 
@@ -43,7 +45,23 @@ public class WellKnownAutoDiscoverySettings {
     private List<URL> hsBaseUrls = new ArrayList<>();
     private List<URL> isBaseUrls = new ArrayList<>();
 
-    public WellKnownAutoDiscoverySettings(JsonObject raw) {
+    /**
+     * Build .well-known auto-discovery settings from a .well-known source.
+     * 
+     * @param raw
+     *            The raw JSON data
+     * @throws IllegalArgumentException
+     *             if the data is invalid and couldn't be parsed.
+     */
+    public WellKnownAutoDiscoverySettings(String raw) {
+        try {
+            setRaw(GsonUtil.parseObj(raw));
+        } catch (JsonParseException | InvalidJsonException e) {
+            throw new IllegalArgumentException("Invalid JSON data for .well-known string");
+        }
+    }
+
+    private void setRaw(JsonObject raw) {
         this.raw = raw;
         process();
     }
@@ -80,14 +98,27 @@ public class WellKnownAutoDiscoverySettings {
         log.info("Found {} valid URL(s)", hsBaseUrls.size());
 
         log.info("Processing Identity server Base URLs");
-        GsonUtil.findArray(raw, "m.is").ifPresent(arr -> isBaseUrls = getUrls(arr));
+        GsonUtil.findObj(raw, "m.is").ifPresent(cfg -> {
+            log.info("Found Identity server data");
+            GsonUtil.findArray(cfg, "base_urls").ifPresent(arr -> {
+                log.info("Found base URL(s)");
+                isBaseUrls = getUrls(arr);
+            });
+        });
         log.info("Found {} valid URL(s)", isBaseUrls.size());
     }
 
+    @Override
+    public JsonObject getRaw() {
+        return raw;
+    }
+
+    @Override
     public List<URL> getHsBaseUrls() {
         return Collections.unmodifiableList(hsBaseUrls);
     }
 
+    @Override
     public List<URL> getIsBaseUrls() {
         return Collections.unmodifiableList(isBaseUrls);
     }

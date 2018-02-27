@@ -36,8 +36,16 @@ public interface _MatrixClientRaw {
 
     Optional<_MatrixID> getUser();
 
-    void discoverSettings();
+    Optional<_AutoDiscoverySettings> discoverSettings();
 
-    List<String> getApiVersions();
+    // FIXME
+    // we should maybe have a dedicated object for HS related items and be merged into getHomeserver() which is only
+    // holding state at this point and is not functional
+    List<String> getHomeApiVersions();
+
+    // FIXME
+    // we should maybe have a dedicated object for IS related items. Will reconsider when implementing
+    // other part of the IS API
+    List<String> getIdentityApiVersions();
 
 }
