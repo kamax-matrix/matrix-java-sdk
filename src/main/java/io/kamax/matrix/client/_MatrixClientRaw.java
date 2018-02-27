@@ -46,6 +46,6 @@ public interface _MatrixClientRaw {
     // FIXME
     // we should maybe have a dedicated object for IS related items. Will reconsider when implementing
     // other part of the IS API
-    List<String> getIdentityApiVersions();
+    boolean validateIsBaseUrl();
 
 }

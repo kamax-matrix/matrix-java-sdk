@@ -130,7 +130,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
             for (URL baseUrlCandidate : settings.getIsBaseUrls()) {
                 context.setIsBaseUrl(baseUrlCandidate);
                 try {
-                    if (!getIdentityApiVersions().isEmpty()) {
+                    if (validateIsBaseUrl()) {
                         log.info("Found a valid IS at {}", getContext().getHsBaseUrl().toString());
                         break;
                     }
@@ -171,9 +171,10 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return GsonUtil.asList(GsonUtil.parseObj(body), "versions", String.class);
     }
 
-    public List<String> getIdentityApiVersions() {
-        String body = execute(new HttpGet(getIdentityPath("identity", "", "versions")));
-        return GsonUtil.asList(GsonUtil.parseObj(body), "versions", String.class);
+    @Override
+    public boolean validateIsBaseUrl() {
+        String body = execute(new HttpGet(getIdentityPath("identity", "api", "/v1")));
+        return "{}".equals(body);
     }
 
     @Override
