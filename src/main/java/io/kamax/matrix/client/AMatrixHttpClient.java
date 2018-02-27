@@ -90,7 +90,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
             URIBuilder builder = new URIBuilder();
             builder.setScheme("https");
             builder.setHost(hostname);
-            builder.setPath("/.well-known/matrix");
+            builder.setPath("/.well-known/matrix/client");
             HttpGet req = new HttpGet(builder.build());
             String body = execute(new MatrixHttpRequest(req).addIgnoredErrorCode(404));
             if (StringUtils.isBlank(body)) {

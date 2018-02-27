@@ -88,7 +88,7 @@ public class WellKnownAutoDiscoverySettings implements _AutoDiscoverySettings {
 
     private void process() {
         log.info("Processing Homeserver Base URLs");
-        GsonUtil.findObj(raw, "m.hs").ifPresent(cfg -> {
+        GsonUtil.findObj(raw, "m.homeserver").ifPresent(cfg -> {
             log.info("Found Homeserver data");
             GsonUtil.findArray(cfg, "base_urls").ifPresent(arr -> {
                 log.info("Found base URL(s)");
@@ -98,7 +98,7 @@ public class WellKnownAutoDiscoverySettings implements _AutoDiscoverySettings {
         log.info("Found {} valid URL(s)", hsBaseUrls.size());
 
         log.info("Processing Identity server Base URLs");
-        GsonUtil.findObj(raw, "m.is").ifPresent(cfg -> {
+        GsonUtil.findObj(raw, "m.identity_server").ifPresent(cfg -> {
             log.info("Found Identity server data");
             GsonUtil.findArray(cfg, "base_urls").ifPresent(arr -> {
                 log.info("Found base URL(s)");
