@@ -23,7 +23,10 @@ package io.kamax.matrix.client;
 import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
+import io.kamax.matrix.client.regular.Presence;
+import io.kamax.matrix.json.GsonUtil;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,5 +78,18 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<_Presence> getPresence() {
+        URI path = getClientPathWithAccessToken("/presence/" + mxId.getId() + "/status");
+        MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
+        request.addIgnoredErrorCode(404);
+        String body = execute(request);
+        if (StringUtils.isBlank(body)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new Presence(GsonUtil.parseObj(body)));
     }
 }
