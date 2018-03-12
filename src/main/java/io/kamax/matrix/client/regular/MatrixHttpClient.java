@@ -20,6 +20,8 @@
 
 package io.kamax.matrix.client.regular;
 
+import com.google.gson.JsonObject;
+
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
@@ -75,6 +77,17 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     @Override
     public _MatrixRoom getRoom(String roomId) {
         return new MatrixHttpRoom(getContext(), roomId);
+    }
+
+    @Override
+    public _MatrixRoom joinRoom(String roomIdOrAlias) {
+        URI path = getClientPathWithAccessToken("/join/ " + roomIdOrAlias);
+        HttpPost req = new HttpPost(path);
+        req.setEntity(getJsonEntity(new JsonObject()));
+
+        String resBody = execute(req);
+        String roomId = GsonUtil.get().fromJson(resBody, RoomCreationResponseJson.class).getRoomId();
+        return getRoom(roomId);
     }
 
     @Override
