@@ -26,12 +26,14 @@ import com.google.gson.JsonParser;
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
+import io.kamax.matrix.json.GsonUtil;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -43,7 +45,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,7 +57,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     private Logger log = LoggerFactory.getLogger(AMatrixHttpClient.class);
 
-    protected MatrixClientContext context;
+    protected MatrixClientContext context = new MatrixClientContext();
 
     protected Gson gson = new Gson();
     protected JsonParser jsonParser = new JsonParser();
@@ -60,8 +65,84 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     private Pattern accessTokenUrlPattern = Pattern.compile("\\?access_token=(?<token>[^&]*)");
 
-    public AMatrixHttpClient(MatrixClientContext context) {
-        this.context = context;
+    public AMatrixHttpClient(String domain) {
+        context.setDomain(domain);
+    }
+
+    public AMatrixHttpClient(URL hsBaseUrl) {
+        context.setHsBaseUrl(hsBaseUrl);
+    }
+
+    protected AMatrixHttpClient(MatrixClientContext context) {
+        this.context = new MatrixClientContext(context);
+    }
+
+    @Override
+    public Optional<_AutoDiscoverySettings> discoverSettings() {
+        if (StringUtils.isBlank(context.getDomain())) {
+            throw new IllegalStateException("A non-empty Matrix domain must be set to discover the client settings");
+        }
+
+        try {
+            String hostname = context.getDomain().split(":")[0];
+            log.info("Performing .well-known auto-discovery for {}", hostname);
+
+            URIBuilder builder = new URIBuilder();
+            builder.setScheme("https");
+            builder.setHost(hostname);
+            builder.setPath("/.well-known/matrix/client");
+            HttpGet req = new HttpGet(builder.build());
+            String body = execute(new MatrixHttpRequest(req).addIgnoredErrorCode(404));
+            if (StringUtils.isBlank(body)) {
+                if (Objects.isNull(context.getHsBaseUrl())) {
+                    throw new IllegalStateException("No valid Homeserver base URL was found");
+                }
+
+                // No .well-known data found
+                // FIXME improve SDK so we can differentiate between not found and empty.
+                // not found = skip
+                // empty = failure
+                return Optional.empty();
+            }
+
+            log.info("Found body: {}", body);
+
+            WellKnownAutoDiscoverySettings settings = new WellKnownAutoDiscoverySettings(body);
+            log.info("Found .well-known data");
+
+            // TODO reconsider if and where we should check for an already present HS url in the context
+            if (settings.getHsBaseUrls().isEmpty()) {
+                throw new IllegalStateException("No valid Homeserver base URL was found");
+            }
+
+            for (URL baseUrlCandidate : settings.getHsBaseUrls()) {
+                context.setHsBaseUrl(baseUrlCandidate);
+                try {
+                    if (!getHomeApiVersions().isEmpty()) {
+                        log.info("Found a valid HS at {}", getContext().getHsBaseUrl().toString());
+                        break;
+                    }
+                } catch (MatrixClientRequestException e) {
+                    log.warn("Error when trying to fetch {}: {}", baseUrlCandidate, e.getMessage());
+                }
+            }
+
+            for (URL baseUrlCandidate : settings.getIsBaseUrls()) {
+                context.setIsBaseUrl(baseUrlCandidate);
+                try {
+                    if (validateIsBaseUrl()) {
+                        log.info("Found a valid IS at {}", getContext().getHsBaseUrl().toString());
+                        break;
+                    }
+                } catch (MatrixClientRequestException e) {
+                    log.warn("Error when trying to fetch {}: {}", baseUrlCandidate, e.getMessage());
+                }
+            }
+
+            return Optional.of(settings);
+        } catch (URISyntaxException e) { // The domain was invalid when used in a URL
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @Override
@@ -71,7 +152,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     @Override
     public _MatrixHomeserver getHomeserver() {
-        return context.getHs();
+        return context.getHomeserver();
     }
 
     @Override
@@ -82,6 +163,18 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     public String getAccessTokenOrThrow() {
         return getAccessToken()
                 .orElseThrow(() -> new IllegalStateException("This method can only be used with a valid token."));
+    }
+
+    @Override
+    public List<String> getHomeApiVersions() {
+        String body = execute(new HttpGet(getPath("client", "", "versions")));
+        return GsonUtil.asList(GsonUtil.parseObj(body), "versions", String.class);
+    }
+
+    @Override
+    public boolean validateIsBaseUrl() {
+        String body = execute(new HttpGet(getIdentityPath("identity", "api", "/v1")));
+        return "{}".equals(body);
     }
 
     @Override
@@ -236,14 +329,37 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         log.debug("Doing {} {}", req.getMethod(), reqUrl);
     }
 
-    protected URIBuilder getPathBuilder(String module, String version, String action) {
-        URIBuilder builder = context.getHs().getClientEndpoint();
-        builder.setPath(builder.getPath() + "/_matrix/" + module + "/" + version + action);
-        if (context.isVirtualUser()) {
-            context.getUser().ifPresent(user -> builder.setParameter("user_id", user.getId()));
+    protected URIBuilder getPathBuilder(URIBuilder base, String module, String version, String action) {
+        base.setPath(base.getPath() + "/_matrix/" + module + "/" + version + action);
+        if (context.isVirtual()) {
+            context.getUser().ifPresent(user -> base.setParameter("user_id", user.getId()));
         }
 
-        return builder;
+        return base;
+    }
+
+    protected URIBuilder getPathBuilder(String module, String version, String action) {
+        return getPathBuilder(context.getHomeserver().getBaseEndpointBuilder(), module, version, action);
+    }
+
+    protected URIBuilder getIdentityPathBuilder(String module, String version, String action) {
+        return getPathBuilder(new URIBuilder(URI.create(context.getIsBaseUrl().toString())), module, version, action);
+    }
+
+    protected URI getPath(String module, String version, String action) {
+        try {
+            return getPathBuilder(module, version, action).build();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    protected URI getIdentityPath(String module, String version, String action) {
+        try {
+            return getIdentityPathBuilder(module, version, action).build();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     protected URIBuilder getClientPathBuilder(String action) {

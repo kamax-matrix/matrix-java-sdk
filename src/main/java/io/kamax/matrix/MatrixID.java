@@ -86,8 +86,12 @@ public class MatrixID implements _MatrixID {
         return new Builder(id).valid();
     }
 
+    public static MatrixID asAcceptable(String local, String domain) {
+        return from(local, domain).acceptable();
+    }
+
     public static MatrixID asAcceptable(String id) {
-        return new Builder(id).acceptable();
+        return from(id).acceptable();
     }
 
     private MatrixID() {

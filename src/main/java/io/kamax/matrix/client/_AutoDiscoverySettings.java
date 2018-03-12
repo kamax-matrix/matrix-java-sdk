@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Maxime Dor
+ * Copyright (C) 2018 Maxime Dor
  *
  * https://www.kamax.io/
  *
@@ -18,18 +18,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.hs;
+package io.kamax.matrix.client;
 
-import org.apache.http.client.utils.URIBuilder;
+import com.google.gson.JsonObject;
 
 import java.net.URL;
+import java.util.List;
 
-public interface _MatrixHomeserver {
+public interface _AutoDiscoverySettings {
 
-    String getDomain();
+    JsonObject getRaw();
 
-    URL getBaseEndpoint();
+    List<URL> getHsBaseUrls();
 
-    URIBuilder getBaseEndpointBuilder();
+    List<URL> getIsBaseUrls();
 
 }

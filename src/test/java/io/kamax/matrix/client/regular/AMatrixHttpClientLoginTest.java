@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package io.kamax.matrix.client.regular;
 
 import io.kamax.matrix.client.MatrixClientContext;
@@ -76,7 +77,7 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
 
         client.logout();
 
-        context = new MatrixClientContext(hs, deviceId);
+        context = new MatrixClientContext(hs).setDeviceId(deviceId);
         client = new MatrixHttpClient(context);
         client.login(credentials);
 

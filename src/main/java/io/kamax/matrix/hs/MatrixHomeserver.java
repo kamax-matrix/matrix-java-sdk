@@ -22,17 +22,30 @@ package io.kamax.matrix.hs;
 
 import org.apache.http.client.utils.URIBuilder;
 
+import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
 
 public class MatrixHomeserver implements _MatrixHomeserver {
 
     private String domain;
-    private URI base;
+    private URL base;
 
-    public MatrixHomeserver(String domain, String baseUrl) throws URISyntaxException {
+    private static URL getURL(String url) {
+        try {
+            return new URL(url);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public MatrixHomeserver(String domain, URL baseUrl) {
         this.domain = domain;
-        base = new URI(baseUrl);
+        this.base = baseUrl;
+    }
+
+    public MatrixHomeserver(String domain, String baseUrl) {
+        this(domain, getURL(baseUrl));
     }
 
     @Override
@@ -41,8 +54,13 @@ public class MatrixHomeserver implements _MatrixHomeserver {
     }
 
     @Override
-    public URIBuilder getClientEndpoint() {
-        return new URIBuilder(base);
+    public URL getBaseEndpoint() {
+        return base;
+    }
+
+    @Override
+    public URIBuilder getBaseEndpointBuilder() {
+        return new URIBuilder(URI.create(base.toString()));
     }
 
 }

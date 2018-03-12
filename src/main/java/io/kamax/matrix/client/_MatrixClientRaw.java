@@ -23,6 +23,7 @@ package io.kamax.matrix.client;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface _MatrixClientRaw {
@@ -34,4 +35,17 @@ public interface _MatrixClientRaw {
     Optional<String> getAccessToken();
 
     Optional<_MatrixID> getUser();
+
+    Optional<_AutoDiscoverySettings> discoverSettings();
+
+    // FIXME
+    // we should maybe have a dedicated object for HS related items and be merged into getHomeserver() which is only
+    // holding state at this point and is not functional
+    List<String> getHomeApiVersions();
+
+    // FIXME
+    // we should maybe have a dedicated object for IS related items. Will reconsider when implementing
+    // other part of the IS API
+    boolean validateIsBaseUrl();
+
 }
