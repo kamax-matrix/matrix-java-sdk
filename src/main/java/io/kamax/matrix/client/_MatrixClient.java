@@ -35,6 +35,8 @@ public interface _MatrixClient extends _MatrixClientRaw {
 
     _MatrixRoom getRoom(String roomId);
 
+    _MatrixRoom joinRoom(String roomIdOrAlias);
+
     _MatrixUser getUser(_MatrixID mxId);
 
     Optional<String> getDeviceId();
