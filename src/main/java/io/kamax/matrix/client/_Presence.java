@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Maxime Dor
+ * Copyright (C) 2018 Kamax Sàrl
  *
  * https://www.kamax.io/
  *
@@ -18,20 +18,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix;
+package io.kamax.matrix.client;
 
-import io.kamax.matrix.client._Presence;
+import java.time.Instant;
 
-import java.util.Optional;
+public interface _Presence {
 
-public interface _MatrixUser {
+    String getStatus();
 
-    _MatrixID getId();
-
-    Optional<String> getName();
-
-    Optional<_MatrixContent> getAvatar();
-
-    Optional<_Presence> getPresence();
+    Instant getLastActive();
 
 }

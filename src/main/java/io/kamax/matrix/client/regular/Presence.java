@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Maxime Dor
+ * Copyright (C) 2018 Kamax Sàrl
  *
  * https://www.kamax.io/
  *
@@ -18,20 +18,33 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix;
+package io.kamax.matrix.client.regular;
+
+import com.google.gson.JsonObject;
 
 import io.kamax.matrix.client._Presence;
+import io.kamax.matrix.json.GsonUtil;
 
-import java.util.Optional;
+import java.time.Instant;
 
-public interface _MatrixUser {
+public class Presence implements _Presence {
 
-    _MatrixID getId();
+    private String status;
+    private Instant lastActive;
 
-    Optional<String> getName();
+    public Presence(JsonObject json) {
+        this.status = GsonUtil.getStringOrThrow(json, "presence");
+        this.lastActive = Instant.ofEpochMilli(GsonUtil.getLong(json, "last_active_ago"));
+    }
 
-    Optional<_MatrixContent> getAvatar();
+    @Override
+    public String getStatus() {
+        return status;
+    }
 
-    Optional<_Presence> getPresence();
+    @Override
+    public Instant getLastActive() {
+        return lastActive;
+    }
 
 }
