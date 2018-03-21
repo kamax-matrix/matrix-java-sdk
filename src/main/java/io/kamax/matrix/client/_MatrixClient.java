@@ -23,6 +23,8 @@ package io.kamax.matrix.client;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
 import io.kamax.matrix.hs._MatrixRoom;
+import io.kamax.matrix.room.RoomAlias;
+import io.kamax.matrix.room._RoomAliasLookup;
 import io.kamax.matrix.room._RoomCreationOptions;
 
 import java.util.Optional;
@@ -30,6 +32,8 @@ import java.util.Optional;
 public interface _MatrixClient extends _MatrixClientRaw {
 
     void setDisplayName(String name);
+
+    _RoomAliasLookup lookup(RoomAlias alias);
 
     _MatrixRoom createRoom(_RoomCreationOptions options);
 

@@ -28,6 +28,9 @@ import io.kamax.matrix._MatrixUser;
 import io.kamax.matrix.client.*;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.*;
+import io.kamax.matrix.room.RoomAlias;
+import io.kamax.matrix.room.RoomAliasLookup;
+import io.kamax.matrix.room._RoomAliasLookup;
 import io.kamax.matrix.room._RoomCreationOptions;
 
 import org.apache.http.client.methods.HttpGet;
@@ -65,6 +68,15 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         HttpPut req = new HttpPut(path);
         req.setEntity(getJsonEntity(new UserDisplaynameSetBody(name)));
         execute(req);
+    }
+
+    @Override
+    public _RoomAliasLookup lookup(RoomAlias alias) {
+        URI path = getClientPath("/directory/room/" + alias.getId());
+        HttpGet req = new HttpGet(path);
+        String resBody = execute(req);
+        RoomAliasLookupJson lookup = GsonUtil.get().fromJson(resBody, RoomAliasLookupJson.class);
+        return new RoomAliasLookup(lookup.getRoomId(), alias.getId(), lookup.getServers());
     }
 
     @Override
