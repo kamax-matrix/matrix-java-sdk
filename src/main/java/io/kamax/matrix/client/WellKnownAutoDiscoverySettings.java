@@ -35,6 +35,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class WellKnownAutoDiscoverySettings implements _AutoDiscoverySettings {
 
@@ -66,20 +67,43 @@ public class WellKnownAutoDiscoverySettings implements _AutoDiscoverySettings {
         process();
     }
 
+    private Optional<URL> getUrl(String url) {
+        try {
+            return Optional.of(new URL(url));
+        } catch (MalformedURLException e) {
+            log.warn("Ignoring invalid Base URL entry in well-known: {} - {}", url, e.getMessage());
+            return Optional.empty();
+        }
+    }
+
     private List<URL> getUrls(JsonArray array) {
         List<URL> urls = new ArrayList<>();
 
         array.forEach(el -> {
             if (!el.isJsonPrimitive()) {
-                log.warn("Ignoring invalid Base URL entry in well-known: {}", GsonUtil.get().toJson(el));
+                log.warn("Ignoring invalid Base URL entry in well-known: {} - Not a string", GsonUtil.get().toJson(el));
                 return;
             }
 
-            String rawUrl = el.getAsString();
-            try {
-                urls.add(new URL(rawUrl));
-            } catch (MalformedURLException e) {
-                log.warn("Ignoring invalid Base URL entry in well-known: {}", rawUrl);
+            getUrl(el.getAsString()).ifPresent(urls::add);
+        });
+
+        return urls;
+    }
+
+    private List<URL> processUrls(JsonObject base, String key) {
+        List<URL> urls = new ArrayList<>();
+
+        GsonUtil.findObj(base, key).ifPresent(cfg -> {
+            log.info("Found data");
+
+            GsonUtil.findArray(cfg, "base_urls").ifPresent(arr -> {
+                log.info("Found base URL(s)");
+                urls.addAll(getUrls(arr));
+            });
+
+            if (urls.isEmpty()) {
+                GsonUtil.findString(cfg, "base_url").flatMap(this::getUrl).ifPresent(urls::add);
             }
         });
 
@@ -88,23 +112,11 @@ public class WellKnownAutoDiscoverySettings implements _AutoDiscoverySettings {
 
     private void process() {
         log.info("Processing Homeserver Base URLs");
-        GsonUtil.findObj(raw, "m.homeserver").ifPresent(cfg -> {
-            log.info("Found Homeserver data");
-            GsonUtil.findArray(cfg, "base_urls").ifPresent(arr -> {
-                log.info("Found base URL(s)");
-                hsBaseUrls = getUrls(arr);
-            });
-        });
+        hsBaseUrls = processUrls(raw, "m.homeserver");
         log.info("Found {} valid URL(s)", hsBaseUrls.size());
 
         log.info("Processing Identity server Base URLs");
-        GsonUtil.findObj(raw, "m.identity_server").ifPresent(cfg -> {
-            log.info("Found Identity server data");
-            GsonUtil.findArray(cfg, "base_urls").ifPresent(arr -> {
-                log.info("Found base URL(s)");
-                isBaseUrls = getUrls(arr);
-            });
-        });
+        isBaseUrls = processUrls(raw, "m.identity_server");
         log.info("Found {} valid URL(s)", isBaseUrls.size());
     }
 
