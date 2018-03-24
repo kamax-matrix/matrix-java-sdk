@@ -63,6 +63,13 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     }
 
     @Override
+    public _MatrixID getWhoAmI() {
+        URI path = getClientPathWithAccessToken("/account/whoami");
+        String body = execute(new HttpGet(path));
+        return MatrixID.from(GsonUtil.getStringOrThrow(GsonUtil.parseObj(body), "user_id")).acceptable();
+    }
+
+    @Override
     public void setDisplayName(String name) {
         URI path = getClientPathWithAccessToken("/profile/{userId}/displayname");
         HttpPut req = new HttpPut(path);
