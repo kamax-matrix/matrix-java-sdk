@@ -20,10 +20,16 @@
 
 package io.kamax.matrix.event;
 
+import java.util.Optional;
+
 public interface _RoomMessageEvent extends _RoomEvent {
 
     String getBody();
 
     String getBodyType();
+
+    Optional<String> getFormat();
+
+    Optional<String> getFormattedBody();
 
 }
