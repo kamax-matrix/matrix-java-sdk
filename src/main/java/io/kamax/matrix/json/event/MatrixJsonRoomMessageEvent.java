@@ -23,6 +23,9 @@ package io.kamax.matrix.json.event;
 import com.google.gson.JsonObject;
 
 import io.kamax.matrix.event._RoomMessageEvent;
+import io.kamax.matrix.json.GsonUtil;
+
+import java.util.Optional;
 
 public class MatrixJsonRoomMessageEvent extends MatrixJsonRoomEvent implements _RoomMessageEvent {
 
@@ -42,6 +45,16 @@ public class MatrixJsonRoomMessageEvent extends MatrixJsonRoomEvent implements _
     @Override
     public String getBodyType() {
         return content.has("msgtype") ? content.get("msgtype").getAsString() : null;
+    }
+
+    @Override
+    public Optional<String> getFormat() {
+        return GsonUtil.findString(content, "format");
+    }
+
+    @Override
+    public Optional<String> getFormattedBody() {
+        return GsonUtil.findString(content, "formatted_body");
     }
 
 }
