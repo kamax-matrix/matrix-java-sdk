@@ -31,6 +31,7 @@ import io.kamax.matrix.json.GsonUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -61,20 +62,34 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected Gson gson = new Gson();
     protected JsonParser jsonParser = new JsonParser();
-    private CloseableHttpClient client = HttpClients.createDefault();
+    private CloseableHttpClient client;
 
     private Pattern accessTokenUrlPattern = Pattern.compile("\\?access_token=(?<token>[^&]*)");
 
     public AMatrixHttpClient(String domain) {
-        context.setDomain(domain);
+        this(new MatrixClientContext().setDomain(domain));
     }
 
     public AMatrixHttpClient(URL hsBaseUrl) {
-        context.setHsBaseUrl(hsBaseUrl);
+        this(new MatrixClientContext().setHsBaseUrl(hsBaseUrl));
     }
 
     protected AMatrixHttpClient(MatrixClientContext context) {
-        this.context = new MatrixClientContext(context);
+        this(context, new MatrixClientDefaults());
+    }
+
+    protected AMatrixHttpClient(MatrixClientContext context, MatrixClientDefaults defaults) {
+        this(context,
+                HttpClients.custom()
+                        .setDefaultRequestConfig(RequestConfig.custom().setConnectTimeout(defaults.getConnectTimeout())
+                                .setConnectionRequestTimeout(defaults.getRequestTimeout())
+                                .setSocketTimeout(defaults.getRequestTimeout()).build())
+                        .build());
+    }
+
+    protected AMatrixHttpClient(MatrixClientContext context, CloseableHttpClient client) {
+        this.context = context;
+        this.client = client;
     }
 
     @Override

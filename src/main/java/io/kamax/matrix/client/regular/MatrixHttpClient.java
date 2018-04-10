@@ -37,6 +37,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.net.URI;
 import java.util.Optional;
@@ -49,6 +50,14 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
 
     public MatrixHttpClient(MatrixClientContext context) {
         super(context);
+    }
+
+    public MatrixHttpClient(MatrixClientContext context, MatrixClientDefaults defaults) {
+        super(context, defaults);
+    }
+
+    public MatrixHttpClient(MatrixClientContext context, CloseableHttpClient client) {
+        super(context, client);
     }
 
     protected _MatrixID getMatrixId(String localpart) {
