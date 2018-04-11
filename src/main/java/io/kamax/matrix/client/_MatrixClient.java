@@ -31,6 +31,8 @@ import java.util.Optional;
 
 public interface _MatrixClient extends _MatrixClientRaw {
 
+    _MatrixID getWhoAmI();
+
     void setDisplayName(String name);
 
     _RoomAliasLookup lookup(RoomAlias alias);
