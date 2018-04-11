@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.sign;
+package io.kamax.matrix.crypto;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,18 +27,20 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public class KeyFileStore implements _KeyStore {
 
-    private final Charset charset = StandardCharsets.ISO_8859_1;
+    private final Charset charset = StandardCharsets.UTF_8;
 
     private File file;
 
     public KeyFileStore(String path) {
         File file = new File(path);
         if (!file.exists()) {
-            return;
+            throw new IllegalArgumentException("Signing key file storage " + path + " does not exist");
         }
 
         if (file.isDirectory()) {
@@ -59,8 +61,8 @@ public class KeyFileStore implements _KeyStore {
     @Override
     public Optional<String> load() {
         try {
-            String key = FileUtils.readFileToString(file, charset);
-            return StringUtils.isBlank(key) ? Optional.empty() : Optional.of(key);
+            List<String> keys = FileUtils.readLines(file, charset);
+            return keys.stream().filter(StringUtils::isNotBlank).findFirst();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -69,7 +71,7 @@ public class KeyFileStore implements _KeyStore {
     @Override
     public void store(String key) {
         try {
-            FileUtils.writeStringToFile(file, key, charset);
+            FileUtils.writeLines(file, charset.name(), Collections.singletonList(key), false);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

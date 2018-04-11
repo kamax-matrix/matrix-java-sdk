@@ -18,14 +18,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.sign;
+package io.kamax.matrix.crypto;
 
 import java.util.Optional;
 
-public interface _KeyStore {
+public class KeyMemoryStore implements _KeyStore {
 
-    Optional<String> load();
+    private String data;
 
-    void store(String key);
+    public KeyMemoryStore() {
+    }
+
+    public KeyMemoryStore(String data) {
+        this.data = data;
+    }
+
+    @Override
+    public Optional<String> load() {
+        return Optional.ofNullable(data);
+    }
+
+    @Override
+    public void store(String key) {
+        data = key;
+    }
 
 }

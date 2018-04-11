@@ -18,17 +18,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.sign;
+package io.kamax.matrix.crypto;
 
 import com.google.gson.JsonObject;
 
 import io.kamax.matrix.codec.MxBase64;
 import io.kamax.matrix.json.MatrixJson;
 
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
+import java.security.*;
 
 
 import net.i2p.crypto.eddsa.EdDSAEngine;

@@ -18,12 +18,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.sign;
+package io.kamax.matrix.crypto;
 
 import io.kamax.matrix.codec.MxBase64;
 
 import java.security.KeyPair;
-import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -56,7 +55,7 @@ public class KeyManager {
 
         String seedBase64 = store.load().orElseGet(() -> {
             KeyPair pair = (new KeyPairGenerator()).generateKeyPair();
-            String keyEncoded = MxBase64.encode(pair.getPrivate().getEncoded());
+            String keyEncoded = getPrivateKeyBase64((EdDSAPrivateKey) pair.getPrivate());
             store.store(keyEncoded);
             return keyEncoded;
         });
@@ -74,8 +73,16 @@ public class KeyManager {
         return keys.get(index);
     }
 
-    public PrivateKey getPrivateKey(int index) {
-        return getKeys(index).getPrivate();
+    public EdDSAPrivateKey getPrivateKey(int index) {
+        return (EdDSAPrivateKey) getKeys(index).getPrivate();
+    }
+
+    protected String getPrivateKeyBase64(EdDSAPrivateKey key) {
+        return MxBase64.encode(key.getSeed());
+    }
+
+    public String getPrivateKeyBase64(int index) {
+        return getPrivateKeyBase64(getPrivateKey(index));
     }
 
     public EdDSAPublicKey getPublicKey(int index) {

@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.sign;
+package io.kamax.matrix.crypto;
 
 import org.junit.Test;
 
@@ -31,13 +31,11 @@ import static org.junit.Assert.assertThat;
 
 public class KeyFileStoreTest {
 
-    private final String key = "YJDBA9Xnr2sVqXD9Vj7XVUnmFZcZrlw8Md7kMW+3XA1";
-
     @Test
-    public void test() throws IOException {
+    public void storeAndLoad() throws IOException {
         KeyFileStore store = new KeyFileStore(File.createTempFile("matrix-java-sdkSignTest", ".key").getPath());
-        store.store(key);
-        assertThat(key, is(equalTo(store.load().orElse(""))));
+        store.store(KeyTest.Private);
+        assertThat(KeyTest.Private, is(equalTo(store.load().orElse(""))));
     }
 
 }
