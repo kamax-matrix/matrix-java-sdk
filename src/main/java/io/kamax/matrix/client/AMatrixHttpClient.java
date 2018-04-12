@@ -22,6 +22,7 @@ package io.kamax.matrix.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixID;
@@ -324,10 +325,15 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     private MatrixErrorInfo createErrorInfo(String body, int responseStatus) {
-        MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-        log.debug("Request returned with an error. Status code: {}, errcode: {}, error: {}", responseStatus,
-                info.getErrcode(), info.getError());
-        return info;
+        try {
+            MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
+            log.debug("Request returned with an error. Status code: {}, errcode: {}, error: {}", responseStatus,
+                    info.getErrcode(), info.getError());
+            return info;
+        } catch (JsonSyntaxException e) {
+            log.debug("Unable to parse Matrix error info. Content was:\n{}", body);
+            return null;
+        }
     }
 
     private void log(HttpRequestBase req) {
