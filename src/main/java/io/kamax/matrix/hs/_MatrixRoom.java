@@ -21,6 +21,7 @@
 package io.kamax.matrix.hs;
 
 import io.kamax.matrix._MatrixID;
+import io.kamax.matrix._MatrixUserProfile;
 import io.kamax.matrix.room._MatrixRoomMessageChunk;
 import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
 
@@ -51,7 +52,7 @@ public interface _MatrixRoom {
 
     void invite(_MatrixID mxId);
 
-    List<_MatrixID> getJoinedUsers();
+    List<_MatrixUserProfile> getJoinedUsers();
 
     _MatrixRoomMessageChunk getMessages(_MatrixRoomMessageChunkOptions options);
 

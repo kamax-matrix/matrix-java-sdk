@@ -45,7 +45,7 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     private String getJoinedUsersUrl = String.format("/_matrix/client/r0/rooms/%s/joined_members", roomId)
             + tokenParameter;
-    private String getJoinedUsersResponse = String.format("{\"joined\": {\"%s\": \"1\", \"%s\": \"2\"}}", joinedUser1,
+    private String getJoinedUsersResponse = String.format("{\"joined\": {\"%s\": {}, \"%s\": {}}}", joinedUser1,
             joinedUser2);
 
     @Override

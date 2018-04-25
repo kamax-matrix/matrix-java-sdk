@@ -20,11 +20,12 @@
 
 package io.kamax.matrix.client;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import io.kamax.matrix.MatrixID;
+import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
+import io.kamax.matrix._MatrixUserProfile;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.RoomMessageChunkResponseJson;
@@ -44,9 +45,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -153,17 +154,37 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
-    public List<_MatrixID> getJoinedUsers() {
+    public List<_MatrixUserProfile> getJoinedUsers() {
         URI path = getClientPathWithAccessToken("/rooms/{roomId}/joined_members");
         String body = execute(new HttpGet(path));
 
-        List<_MatrixID> ids = new ArrayList<>();
+        List<_MatrixUserProfile> ids = new ArrayList<>();
         if (StringUtils.isNotEmpty(body)) {
             JsonObject joinedUsers = jsonParser.parse(body).getAsJsonObject().get("joined").getAsJsonObject();
-            for (Map.Entry<String, JsonElement> entry : joinedUsers.entrySet()) {
-                ids.add(new MatrixID(entry.getKey()));
-            }
+            ids = joinedUsers.entrySet().stream().filter(e -> e.getValue().isJsonObject()).map(entry -> {
+                JsonObject obj = entry.getValue().getAsJsonObject();
+                return new MatrixHttpUser(getContext(), MatrixID.asAcceptable(entry.getKey())) {
+
+                    @Override
+                    public Optional<String> getName() {
+                        return GsonUtil.findString(obj, "display_name");
+                    }
+
+                    @Override
+                    public Optional<_MatrixContent> getAvatar() {
+                        return GsonUtil.findString(obj, "avatar_url").flatMap(s -> {
+                            try {
+                                return Optional.of(new URI(s));
+                            } catch (URISyntaxException e) {
+                                return Optional.empty();
+                            }
+                        }).map(uri -> new MatrixHttpContent(getContext(), uri));
+                    }
+
+                };
+            }).collect(Collectors.toList());
         }
+
         return ids;
     }
 
