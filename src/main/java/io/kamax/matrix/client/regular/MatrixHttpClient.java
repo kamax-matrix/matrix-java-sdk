@@ -113,7 +113,7 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
 
     @Override
     public _MatrixRoom joinRoom(String roomIdOrAlias) {
-        URI path = getClientPathWithAccessToken("/join/ " + roomIdOrAlias);
+        URI path = getClientPathWithAccessToken("/join/" + roomIdOrAlias);
         HttpPost req = new HttpPost(path);
         req.setEntity(getJsonEntity(new JsonObject()));
 
