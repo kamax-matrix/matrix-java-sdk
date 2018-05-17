@@ -263,7 +263,6 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     protected MatrixHttpContentResult executeContentRequest(MatrixHttpRequest matrixRequest) {
         log(matrixRequest.getHttpRequest());
         try (CloseableHttpResponse response = client.execute(matrixRequest.getHttpRequest())) {
-
             HttpEntity entity = response.getEntity();
             int responseStatus = response.getStatusLine().getStatusCode();
 
@@ -313,10 +312,11 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     protected Optional<String> extractAsStringFromBody(String body, String jsonObjectName) {
-        if (StringUtils.isNotEmpty(body)) {
-            return Optional.of(new JsonParser().parse(body).getAsJsonObject().get(jsonObjectName).getAsString());
+        if (StringUtils.isEmpty(body)) {
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        return GsonUtil.findString(jsonParser.parse(body).getAsJsonObject(), jsonObjectName);
     }
 
     private String getBody(HttpEntity entity) throws IOException {
