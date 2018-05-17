@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Maxime Dor
+ * Copyright (C) 2017 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -135,12 +135,11 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     @Override
     public void login(MatrixPasswordLoginCredentials credentials) {
         HttpPost request = new HttpPost(getClientPath("/login"));
-        if (getDeviceId().isPresent()) {
-            request.setEntity(getJsonEntity(
-                    new LoginPostBody(credentials.getLocalPart(), credentials.getPassword(), getDeviceId().get())));
-        } else {
-            request.setEntity(getJsonEntity(new LoginPostBody(credentials.getLocalPart(), credentials.getPassword())));
-        }
+
+        LoginPostBody data = new LoginPostBody(credentials.getLocalPart(), credentials.getPassword());
+        getDeviceId().ifPresent(data::setDeviceId);
+        Optional.ofNullable(context.getInitialDeviceName()).ifPresent(data::setInitialDeviceDisplayName);
+        request.setEntity(getJsonEntity(data));
 
         String body = execute(request);
         LoginResponse response = gson.fromJson(body, LoginResponse.class);

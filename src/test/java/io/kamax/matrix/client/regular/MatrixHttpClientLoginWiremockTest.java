@@ -79,6 +79,36 @@ public class MatrixHttpClientLoginWiremockTest extends AMatrixHttpClientLoginTes
 
     @Test
     @Override
+    public void loginWithDeviceNameAndLogout() {
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"," + //
+                        "\"initial_device_display_name\": \"initialDeviceName\"}"))
+                .willReturn(aResponse().withStatus(200)
+                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
+                                "\"access_token\": \"" + testToken + "\"," + //
+                                "\"home_server\": \"" + hostname + "\"," + //
+                                "\"device_id\": \"" + deviceId + "\"}")));
+
+        stubFor(post(urlEqualTo(logoutUrl)));
+
+        stubFor(post(urlEqualTo(loginUrl))
+                .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //
+                        "\"user\": \"" + user.getLocalPart() + "\"," + //
+                        "\"password\": \"" + password + "\"," + //
+                        "\"device_id\": \"" + deviceId + "\"}"))
+                .willReturn(aResponse().withStatus(200)
+                        .withBody("{\"user_id\": \"" + user.getId() + "\"," + //
+                                "\"access_token\": \"" + testToken + "\"," + //
+                                "\"home_server\": \"" + hostname + "\"," + //
+                                "\"device_id\": \"" + deviceId + "\"}")));
+
+        super.loginWithDeviceNameAndLogout();
+    }
+
+    @Test
+    @Override
     public void loginWrongPassword() throws URISyntaxException {
         stubFor(post(urlEqualTo(loginUrl))
                 .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //

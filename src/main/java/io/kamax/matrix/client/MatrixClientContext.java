@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Maxime Dor
+ * Copyright (C) 2017 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -38,6 +38,7 @@ public class MatrixClientContext {
     private String token;
     private boolean isVirtual;
     private String deviceId;
+    private String initialDeviceName;
 
     public MatrixClientContext() {
         // stub
@@ -51,6 +52,7 @@ public class MatrixClientContext {
         this.token = other.token;
         this.isVirtual = other.isVirtual;
         this.deviceId = other.deviceId;
+        this.initialDeviceName = other.initialDeviceName;
     }
 
     public MatrixClientContext(_MatrixHomeserver hs) {
@@ -139,4 +141,14 @@ public class MatrixClientContext {
         this.deviceId = deviceId;
         return this;
     }
+
+    public String getInitialDeviceName() {
+        return initialDeviceName;
+    }
+
+    public MatrixClientContext setInitialDeviceName(String initialDeviceName) {
+        this.initialDeviceName = initialDeviceName;
+        return this;
+    }
+
 }

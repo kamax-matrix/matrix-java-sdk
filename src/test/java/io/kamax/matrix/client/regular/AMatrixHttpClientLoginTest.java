@@ -90,6 +90,22 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
     }
 
     @Test
+    public void loginWithDeviceNameAndLogout() {
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixClientContext context = new MatrixClientContext(hs).setInitialDeviceName("initialDeviceName");
+        MatrixHttpClient client = new MatrixHttpClient(context);
+
+        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
+        client.login(credentials);
+
+        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
+        assertTrue(StringUtils.isNotBlank(client.getDeviceId().get()));
+        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
+
+        client.logout();
+    }
+
+    @Test
     public void loginWrongPassword() throws URISyntaxException {
         MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
         MatrixClientContext context = new MatrixClientContext(hs);

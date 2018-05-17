@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Maxime Dor
+ * Copyright (C) 2017 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -61,7 +61,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected MatrixClientContext context = new MatrixClientContext();
 
-    protected Gson gson = new Gson();
+    protected Gson gson = GsonUtil.get();
     protected JsonParser jsonParser = new JsonParser();
     private CloseableHttpClient client;
 

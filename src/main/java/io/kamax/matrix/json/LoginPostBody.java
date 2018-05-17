@@ -1,6 +1,7 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
  * Copyright (C) 2017 Arne Augenstein
+ * Copyright (C) 2018 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -21,18 +22,37 @@
 package io.kamax.matrix.json;
 
 public class LoginPostBody {
+
     private String type = "m.login.password";
     private String user;
     private String password;
-    private String device_id;
+    private String deviceId;
+    private String initialDeviceDisplayName;
 
     public LoginPostBody(String user, String password) {
         this.user = user;
         this.password = password;
     }
 
-    public LoginPostBody(String user, String password, String device_id) {
+    public LoginPostBody(String user, String password, String deviceId) {
         this(user, password);
-        this.device_id = device_id;
+        this.deviceId = deviceId;
     }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getInitialDeviceDisplayName() {
+        return initialDeviceDisplayName;
+    }
+
+    public void setInitialDeviceDisplayName(String initialDeviceDisplayName) {
+        this.initialDeviceDisplayName = initialDeviceDisplayName;
+    }
+
 }
