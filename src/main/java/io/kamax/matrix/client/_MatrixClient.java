@@ -20,6 +20,7 @@
 
 package io.kamax.matrix.client;
 
+import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
 import io.kamax.matrix.hs._MatrixRoom;
@@ -27,6 +28,7 @@ import io.kamax.matrix.room.RoomAlias;
 import io.kamax.matrix.room._RoomAliasLookup;
 import io.kamax.matrix.room._RoomCreationOptions;
 
+import java.net.URI;
 import java.util.Optional;
 
 public interface _MatrixClient extends _MatrixClientRaw {
@@ -52,5 +54,9 @@ public interface _MatrixClient extends _MatrixClientRaw {
     void logout();
 
     _SyncData sync(_SyncOptions options);
+
+    _MatrixContent getMedia(String mxUri) throws IllegalArgumentException;
+
+    _MatrixContent getMedia(URI mxUri) throws IllegalArgumentException;
 
 }

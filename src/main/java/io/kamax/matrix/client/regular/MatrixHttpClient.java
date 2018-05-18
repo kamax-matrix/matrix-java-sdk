@@ -23,6 +23,7 @@ package io.kamax.matrix.client.regular;
 import com.google.gson.JsonObject;
 
 import io.kamax.matrix.MatrixID;
+import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
 import io.kamax.matrix.client.*;
@@ -173,6 +174,16 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
 
         String body = execute(new HttpGet(getWithAccessToken(path)));
         return new SyncDataJson(GsonUtil.parseObj(body));
+    }
+
+    @Override
+    public _MatrixContent getMedia(String mxUri) throws IllegalArgumentException {
+        return getMedia(URI.create(mxUri));
+    }
+
+    @Override
+    public _MatrixContent getMedia(URI mxUri) throws IllegalArgumentException {
+        return new MatrixHttpContent(context, mxUri);
     }
 
 }

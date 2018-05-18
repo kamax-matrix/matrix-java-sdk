@@ -32,6 +32,8 @@ public class MatrixJsonEventFactory {
 
         if ("m.room.member".contentEquals(type)) {
             return new MatrixJsonRoomMembershipEvent(obj);
+        } else if ("m.room.avatar".contentEquals(type)) {
+            return new MatrixJsonRoomAvatarEvent(obj);
         } else if ("m.room.name".contentEquals(type)) {
             return new MatrixJsonRoomNameEvent(obj);
         } else if ("m.room.topic".contentEquals(type)) {
