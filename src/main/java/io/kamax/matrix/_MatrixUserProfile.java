@@ -28,6 +28,8 @@ public interface _MatrixUserProfile {
 
     Optional<String> getName();
 
+    Optional<String> getAvatarUrl();
+
     Optional<_MatrixContent> getAvatar();
 
 }

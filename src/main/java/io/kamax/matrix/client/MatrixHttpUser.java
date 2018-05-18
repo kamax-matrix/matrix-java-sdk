@@ -63,21 +63,25 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
     }
 
     @Override
-    public Optional<_MatrixContent> getAvatar() {
+    public Optional<String> getAvatarUrl() {
         URI path = getClientPathWithAccessToken("/profile/" + mxId.getId() + "/avatar_url");
 
         MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
         request.addIgnoredErrorCode(404);
         String body = execute(request);
-        Optional<String> uri = extractAsStringFromBody(body, "avatar_url");
-        if (uri.isPresent()) {
+        return extractAsStringFromBody(body, "avatar_url");
+    }
+
+    @Override
+    public Optional<_MatrixContent> getAvatar() {
+        return getAvatarUrl().flatMap(uri -> {
             try {
-                return Optional.of(new MatrixHttpContent(getContext(), new URI(uri.get())));
+                return Optional.of(new MatrixHttpContent(getContext(), new URI(uri)));
             } catch (URISyntaxException e) {
-                log.debug("{} is not a valid URI for avatar, returning empty", uri.get());
+                log.debug("{} is not a valid URI for avatar, returning empty", uri);
+                return Optional.empty();
             }
-        }
-        return Optional.empty();
+        });
     }
 
     @Override
@@ -92,4 +96,5 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
 
         return Optional.of(new Presence(GsonUtil.parseObj(body)));
     }
+
 }
