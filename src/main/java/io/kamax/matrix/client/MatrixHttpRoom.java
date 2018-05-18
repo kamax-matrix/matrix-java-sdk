@@ -77,21 +77,40 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public Optional<String> getName() {
-        URI path = getClientPathWithAccessToken("/rooms/{roomId}/state/m.room.name");
-
-        MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
-        request.addIgnoredErrorCode(404);
-        String body = execute(request);
-        return extractAsStringFromBody(body, "name");
+        return getState("m.room.name").flatMap(obj -> GsonUtil.findString(obj, "name"));
     }
 
     @Override
     public Optional<String> getTopic() {
-        URI path = getClientPathWithAccessToken("/rooms/{roomId}/state/m.room.topic");
-        MatrixHttpRequest matrixRequest = new MatrixHttpRequest(new HttpGet(path));
-        matrixRequest.addIgnoredErrorCode(404);
-        String body = execute(matrixRequest);
-        return extractAsStringFromBody(body, "topic");
+        return getState("m.room.topic").flatMap(obj -> GsonUtil.findString(obj, "topic"));
+    }
+
+    @Override
+    public Optional<JsonObject> getState(String type) {
+        URI path = getClientPathWithAccessToken("/rooms/{roomId}/state/" + type);
+
+        MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
+        request.addIgnoredErrorCode(404);
+        String body = execute(request);
+        if (StringUtils.isBlank(body)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(GsonUtil.parseObj(body));
+    }
+
+    @Override
+    public Optional<JsonObject> getState(String type, String key) {
+        URI path = getClientPathWithAccessToken("/rooms/{roomId}/state/" + type + "/" + key);
+
+        MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
+        request.addIgnoredErrorCode(404);
+        String body = execute(request);
+        if (StringUtils.isBlank(body)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(GsonUtil.parseObj(body));
     }
 
     @Override

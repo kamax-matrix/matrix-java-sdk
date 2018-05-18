@@ -20,6 +20,8 @@
 
 package io.kamax.matrix.hs;
 
+import com.google.gson.JsonObject;
+
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUserProfile;
 import io.kamax.matrix.room._MatrixRoomMessageChunk;
@@ -37,6 +39,26 @@ public interface _MatrixRoom {
     Optional<String> getName();
 
     Optional<String> getTopic();
+
+    /**
+     * Get a state event
+     * 
+     * @param type
+     *            The type of state to look for
+     * @return An optional JsonObject representing the content key of the event
+     */
+    Optional<JsonObject> getState(String type);
+
+    /**
+     * Get a state event
+     * 
+     * @param type
+     *            The type of state to look for
+     * @param key
+     *            The state key to match
+     * @return An optional JsonObject representing the content key of the event
+     */
+    Optional<JsonObject> getState(String type, String key);
 
     void join();
 
