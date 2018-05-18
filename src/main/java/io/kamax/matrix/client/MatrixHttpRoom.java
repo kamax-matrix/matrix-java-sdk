@@ -86,6 +86,23 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
+    public Optional<String> getAvatarUrl() {
+        return getState("m.room.avatar").flatMap(obj -> GsonUtil.findString(obj, "url"));
+    }
+
+    @Override
+    public Optional<_MatrixContent> getAvatar() {
+        return getAvatarUrl().flatMap(url -> {
+            try {
+                return Optional.of(new MatrixHttpContent(context, new URI(url)));
+            } catch (URISyntaxException e) {
+                log.debug("{} is not a valid URI for avatar, returning empty", url);
+                return Optional.empty();
+            }
+        });
+    }
+
+    @Override
     public Optional<JsonObject> getState(String type) {
         URI path = getClientPathWithAccessToken("/rooms/{roomId}/state/" + type);
 

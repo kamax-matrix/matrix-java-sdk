@@ -22,6 +22,7 @@ package io.kamax.matrix.hs;
 
 import com.google.gson.JsonObject;
 
+import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUserProfile;
 import io.kamax.matrix.room._MatrixRoomMessageChunk;
@@ -39,6 +40,10 @@ public interface _MatrixRoom {
     Optional<String> getName();
 
     Optional<String> getTopic();
+
+    Optional<String> getAvatarUrl();
+
+    Optional<_MatrixContent> getAvatar();
 
     /**
      * Get a state event
