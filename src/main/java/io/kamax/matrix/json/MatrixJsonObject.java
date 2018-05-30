@@ -59,6 +59,10 @@ public class MatrixJsonObject {
         return GsonUtil.findPrimitive(obj, field).map(JsonPrimitive::getAsInt).orElse(failover);
     }
 
+    protected Optional<Long> findLong(String field) {
+        return GsonUtil.findLong(obj, field);
+    }
+
     protected long getLong(String field) {
         return GsonUtil.getLong(obj, field);
     }
@@ -77,6 +81,10 @@ public class MatrixJsonObject {
 
     protected Optional<JsonObject> findObj(String field) {
         return GsonUtil.findObj(obj, field);
+    }
+
+    protected JsonObject computeObj(String field) {
+        return findObj(field).orElseGet(JsonObject::new);
     }
 
     protected Optional<JsonArray> findArray(String field) {
