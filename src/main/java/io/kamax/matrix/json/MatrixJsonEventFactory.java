@@ -23,9 +23,7 @@ package io.kamax.matrix.json;
 import com.google.gson.JsonObject;
 
 import io.kamax.matrix.event._MatrixEvent;
-import io.kamax.matrix.json.event.MatrixJsonEvent;
-import io.kamax.matrix.json.event.MatrixJsonRoomMembershipEvent;
-import io.kamax.matrix.json.event.MatrixJsonRoomMessageEvent;
+import io.kamax.matrix.json.event.*;
 
 public class MatrixJsonEventFactory {
 
@@ -34,6 +32,14 @@ public class MatrixJsonEventFactory {
 
         if ("m.room.member".contentEquals(type)) {
             return new MatrixJsonRoomMembershipEvent(obj);
+        } else if ("m.room.avatar".contentEquals(type)) {
+            return new MatrixJsonRoomAvatarEvent(obj);
+        } else if ("m.room.name".contentEquals(type)) {
+            return new MatrixJsonRoomNameEvent(obj);
+        } else if ("m.room.topic".contentEquals(type)) {
+            return new MatrixJsonRoomTopicEvent(obj);
+        } else if ("m.room.aliases".contentEquals(type)) {
+            return new MatrixJsonRoomAliasesEvent(obj);
         } else if ("m.room.message".contentEquals(type)) {
             return new MatrixJsonRoomMessageEvent(obj);
         } else {
