@@ -146,17 +146,42 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         }
     }
 
+    public class UnreadNotificationsJson extends MatrixJsonObject implements _SyncData.UnreadNotifications {
+
+        private long highlights;
+        private long global;
+
+        public UnreadNotificationsJson(JsonObject data) {
+            super(data);
+            this.highlights = findLong("highlight_count").orElse(0L);
+            this.global = findLong("notification_count").orElse(0L);
+        }
+
+        @Override
+        public long getHighlightCount() {
+            return highlights;
+        }
+
+        @Override
+        public long getNotificationCount() {
+            return global;
+        }
+
+    }
+
     public class JoinedRoomJson extends MatrixJsonObject implements _SyncData.JoinedRoom {
 
         private String id;
         private State state;
         private Timeline timeline;
+        private UnreadNotifications unreadNotifications;
 
         public JoinedRoomJson(String id, JsonObject data) {
             super(data);
             this.id = id;
             this.state = new StateJson(findObj("state").orElseGet(JsonObject::new));
             this.timeline = new TimelineJson(findObj("timeline").orElseGet(JsonObject::new));
+            this.unreadNotifications = new UnreadNotificationsJson(computeObj("unread_notifications"));
         }
 
         @Override
@@ -172,6 +197,11 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         @Override
         public Timeline getTimeline() {
             return timeline;
+        }
+
+        @Override
+        public UnreadNotifications getUnreadNotifications() {
+            return unreadNotifications;
         }
     }
 

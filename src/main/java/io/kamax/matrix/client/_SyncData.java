@@ -86,6 +86,24 @@ public interface _SyncData {
 
     }
 
+    interface UnreadNotifications {
+
+        /**
+         * The number of unread notifications with the highlight flag set.
+         * 
+         * @return the count.
+         */
+        long getHighlightCount();
+
+        /**
+         * The total number of unread notifications.
+         * 
+         * @return the count.
+         */
+        long getNotificationCount();
+
+    }
+
     interface JoinedRoom {
 
         /**
@@ -108,6 +126,13 @@ public interface _SyncData {
          * @return the timeline.
          */
         Timeline getTimeline();
+
+        /**
+         * The Counts of unread notifications.
+         * 
+         * @return unread notifications.
+         */
+        UnreadNotifications getUnreadNotifications();
 
     }
 
