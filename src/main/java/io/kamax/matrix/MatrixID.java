@@ -49,8 +49,9 @@ public class MatrixID implements _MatrixID {
 
     }
 
-    private static final Pattern LAX_PATTERN = Pattern.compile("@(.*?):(.+)");
-    private static final Pattern STRICT_PATTERN = Pattern.compile("@([0-9a-z-.=_]+):(.+)");
+    public static final String ALLOWED_CHARS = "0-9a-z-.=_";
+    public static final Pattern LAX_PATTERN = Pattern.compile("@(.*?):(.+)");
+    public static final Pattern STRICT_PATTERN = Pattern.compile("@([" + ALLOWED_CHARS + "]+):(.+)");
 
     private String id;
 
