@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2018 Maxime Dor
+ * Copyright (C) 2018 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -23,6 +23,7 @@ package io.kamax.matrix.json;
 import com.google.gson.*;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class GsonUtil {
@@ -84,6 +85,12 @@ public class GsonUtil {
     public static JsonObject makeObj(String key, JsonElement el) {
         JsonObject obj = new JsonObject();
         obj.add(key, el);
+        return obj;
+    }
+
+    public static JsonObject makeObj(Consumer<JsonObject> consumer) {
+        JsonObject obj = new JsonObject();
+        consumer.accept(obj);
         return obj;
     }
 
