@@ -236,7 +236,11 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
      *         MatrixClientRequestException
      */
     protected String handleError(MatrixHttpRequest matrixRequest, int responseStatus, MatrixErrorInfo info) {
-        String message = String.format("Request failed with status code: %s", responseStatus);
+        String message = String.format("Request failed: %s", responseStatus);
+
+        if (Objects.nonNull(info)) {
+            message = String.format("%s - %s - %s", message, info.getErrcode(), info.getError());
+        }
 
         if (responseStatus == 429) {
             return handleRateLimited(matrixRequest, info);
