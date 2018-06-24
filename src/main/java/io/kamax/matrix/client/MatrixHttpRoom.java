@@ -22,10 +22,7 @@ package io.kamax.matrix.client;
 
 import com.google.gson.JsonObject;
 
-import io.kamax.matrix.MatrixID;
-import io.kamax.matrix._MatrixContent;
-import io.kamax.matrix._MatrixID;
-import io.kamax.matrix._MatrixUserProfile;
+import io.kamax.matrix.*;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.RoomMessageChunkResponseJson;
@@ -137,6 +134,16 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
+    public Optional<MatrixErrorInfo> tryJoin() {
+        try {
+            join();
+            return Optional.empty();
+        } catch (MatrixClientRequestException e) {
+            return e.getError();
+        }
+    }
+
+    @Override
     public void leave() {
         URI path = getClientPathWithAccessToken("/rooms/{roomId}/leave");
         MatrixHttpRequest request = new MatrixHttpRequest(new HttpPost(path));
@@ -150,6 +157,16 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         // }
         request.addIgnoredErrorCode(404);
         execute(request);
+    }
+
+    @Override
+    public Optional<MatrixErrorInfo> tryLeave() {
+        try {
+            leave();
+            return Optional.empty();
+        } catch (MatrixClientRequestException e) {
+            return e.getError();
+        }
     }
 
     private void sendMessage(RoomMessageTextPutBody content) {

@@ -22,6 +22,7 @@ package io.kamax.matrix.hs;
 
 import com.google.gson.JsonObject;
 
+import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUserProfile;
@@ -67,7 +68,11 @@ public interface _MatrixRoom {
 
     void join();
 
+    Optional<MatrixErrorInfo> tryJoin();
+
     void leave();
+
+    Optional<MatrixErrorInfo> tryLeave();
 
     void sendText(String message);
 
