@@ -22,8 +22,11 @@ package io.kamax.matrix.json;
 
 import com.google.gson.JsonObject;
 
+import io.kamax.matrix.event.EventKey;
 import io.kamax.matrix.event._MatrixEvent;
 import io.kamax.matrix.json.event.*;
+
+import java.util.Optional;
 
 public class MatrixJsonEventFactory {
 
@@ -43,6 +46,11 @@ public class MatrixJsonEventFactory {
         } else if ("m.room.message".contentEquals(type)) {
             return new MatrixJsonRoomMessageEvent(obj);
         } else {
+            Optional<String> rId = EventKey.RoomId.findString(obj);
+            if (rId.isPresent()) {
+                return new MatrixJsonRoomEvent(obj);
+            }
+
             return new MatrixJsonEvent(obj);
         }
     }
