@@ -169,11 +169,17 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         }
     }
 
-    private void sendMessage(RoomMessageTextPutBody content) {
-        URI path = getClientPathWithAccessToken("/rooms/{roomId}/send/m.room.message/" + System.currentTimeMillis());
+    @Override
+    public void sendEvent(String type, JsonObject content) {
+        // FIXME URL encoding
+        URI path = getClientPathWithAccessToken("/rooms/{roomId}/send/" + type + "/" + System.currentTimeMillis());
         HttpPut httpPut = new HttpPut(path);
         httpPut.setEntity(getJsonEntity(content));
         execute(httpPut);
+    }
+
+    private void sendMessage(RoomMessageTextPutBody content) {
+        sendEvent("m.room.message", GsonUtil.makeObj(content));
     }
 
     @Override

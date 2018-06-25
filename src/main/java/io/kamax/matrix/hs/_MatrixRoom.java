@@ -74,6 +74,8 @@ public interface _MatrixRoom {
 
     Optional<MatrixErrorInfo> tryLeave();
 
+    void sendEvent(String type, JsonObject content);
+
     void sendText(String message);
 
     void sendFormattedText(String formatted, String rawFallback);
