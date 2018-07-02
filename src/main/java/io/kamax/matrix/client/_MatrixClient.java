@@ -29,6 +29,7 @@ import io.kamax.matrix.room._RoomAliasLookup;
 import io.kamax.matrix.room._RoomCreationOptions;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 public interface _MatrixClient extends _MatrixClientRaw {
@@ -42,6 +43,8 @@ public interface _MatrixClient extends _MatrixClientRaw {
     _MatrixRoom createRoom(_RoomCreationOptions options);
 
     _MatrixRoom getRoom(String roomId);
+
+    List<_MatrixRoom> getJoinedRooms();
 
     _MatrixRoom joinRoom(String roomIdOrAlias);
 

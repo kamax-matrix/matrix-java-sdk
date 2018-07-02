@@ -41,7 +41,9 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient {
 
@@ -110,6 +112,15 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     @Override
     public _MatrixRoom getRoom(String roomId) {
         return new MatrixHttpRoom(getContext(), roomId);
+    }
+
+    @Override
+    public List<_MatrixRoom> getJoinedRooms() {
+        URI path = getClientPathWithAccessToken("/joined_rooms");
+        HttpGet req = new HttpGet(path);
+        JsonObject resBody = GsonUtil.parseObj(execute(req));
+        return GsonUtil.asList(resBody, "joined_rooms", String.class).stream().map(this::getRoom)
+                .collect(Collectors.toList());
     }
 
     @Override
