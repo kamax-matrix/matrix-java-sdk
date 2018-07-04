@@ -30,34 +30,49 @@ import static org.junit.Assert.*;
 public class MatrixPathTest {
 
     @Test
+    public void root() {
+        assertThat(MatrixPath.root().get(), is("/"));
+    }
+
+    @Test
     public void base() {
-        assertThat(MatrixPath.base().toString(), is("/_matrix"));
+        assertThat(MatrixPath.base().get(), is("/_matrix"));
     }
 
     @Test
     public void client() {
-        assertThat(MatrixPath.client().toString(), is("/_matrix/client"));
+        assertThat(MatrixPath.client().get(), is("/_matrix/client"));
     }
 
     @Test
     public void clientR0() {
-        assertThat(MatrixPath.clientR0().toString(), is("/_matrix/client/r0"));
+        assertThat(MatrixPath.clientR0().get(), is("/_matrix/client/r0"));
     }
 
     @Test
     public void encodedRoomId() {
-        assertThat(MatrixPath.root().append("!a:b.c:1").toString(), is("/%21a%3Ab.c%3A1"));
+        assertThat(MatrixPath.root().add("!a:b.c:1").get(), is("/%21a%3Ab.c%3A1"));
     }
 
     @Test
-    public void encodeUserId() {
-        assertThat(MatrixPath.root().append("@a:b.c:1").toString(), is("/%40a%3Ab.c%3A1"));
+    public void encodedUserId() {
+        assertThat(MatrixPath.root().add("@a:b.c:1").get(), is("/%40a%3Ab.c%3A1"));
     }
 
     @Test
     public void roomMessages() {
-        assertThat(MatrixPath.clientR0().append("rooms").append("!a:b.c:1").append("messages").toString(),
+        assertThat(MatrixPath.clientR0().add("rooms").add("!a:b.c:1").add("messages").get(),
                 is("/_matrix/client/r0/rooms/%21a%3Ab.c%3A1/messages"));
+    }
+
+    @Test
+    public void encodedElements() {
+        assertThat(MatrixPath.root().add("!@:%+$").get(), is("/%21%40%3A%25%2B%24"));
+    }
+
+    @Test
+    public void addRawElement() {
+        assertThat(MatrixPath.root().put("!@:%+$").get(), is("/!@:%+$"));
     }
 
 }

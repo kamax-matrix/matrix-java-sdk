@@ -37,7 +37,7 @@ public class MatrixPath {
     }
 
     private static MatrixPath with(String base) {
-        return new MatrixPath().append(base);
+        return new MatrixPath().add(base);
     }
 
     public static MatrixPath root() {
@@ -45,35 +45,60 @@ public class MatrixPath {
     }
 
     public static MatrixPath base() {
-        return root().append("_matrix");
+        return root().add("_matrix");
     }
 
     public static MatrixPath client() {
-        return base().append("client");
+        return base().add("client");
     }
 
     public static MatrixPath clientR0() {
-        return client().append("r0");
+        return client().add("r0");
     }
 
-    private StringBuilder path = new StringBuilder("/");
+    private StringBuilder path = new StringBuilder();
 
-    public MatrixPath append(String element) {
-        // We add a path separator if this is the first character or if the last character is not a path separator
-        // already
-        if (path.length() == 0 || path.lastIndexOf("/", 0) < path.length() - 1) {
-            path.append("/");
-        }
-        path.append(encode(element));
+    /**
+     * Add the raw element to this path
+     * 
+     * @param element
+     *            The raw element to be added as is to the path, without encoding or path separator
+     * @return The MatrixPath
+     */
+    public MatrixPath put(String element) {
+        path.append(element);
         return this;
     }
 
-    public String toString() {
+    /**
+     * URL encode and add a new path element
+     *
+     * This method handle path separators
+     * 
+     * @param element
+     *            The element to be encoded and added.
+     * @return The MatrixPath
+     */
+    public MatrixPath add(String element) {
+        // We add a path separator if this is the first character or if the last character is not a path separator
+        // already
+        if (path.length() == 0 || path.lastIndexOf("/", 0) < path.length() - 1) {
+            put("/");
+        }
+        put(encode(element));
+        return this;
+    }
+
+    public String get() {
         return path.toString();
     }
 
+    public String toString() {
+        return get();
+    }
+
     public URI toURI() {
-        return URI.create(path.toString());
+        return URI.create(toString());
     }
 
 }
