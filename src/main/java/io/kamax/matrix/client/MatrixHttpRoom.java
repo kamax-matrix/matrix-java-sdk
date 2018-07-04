@@ -205,6 +205,13 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
+    public void sendReceipt(String type, String eventId) {
+        URI path = getClientPathWithAccessToken("/rooms/{roomId}/receipt/" + type + "/" + eventId);
+        HttpPost req = new HttpPost(path);
+        execute(req);
+    }
+
+    @Override
     public void invite(_MatrixID mxId) {
         URI path = getClientPathWithAccessToken("/rooms/{roomId}/invite");
         HttpPost req = new HttpPost(path);

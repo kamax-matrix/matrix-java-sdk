@@ -26,6 +26,7 @@ import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUserProfile;
+import io.kamax.matrix.room.ReceiptType;
 import io.kamax.matrix.room._MatrixRoomMessageChunk;
 import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
 
@@ -83,6 +84,38 @@ public interface _MatrixRoom {
     void sendNotice(String message);
 
     void sendNotice(String formatted, String plain);
+
+    /**
+     * Send a receipt for an event
+     * 
+     * @param type
+     *            The receipt type to send
+     * @param eventId
+     *            The Event ID targeted by the receipt
+     */
+    void sendReceipt(String type, String eventId);
+
+    /**
+     * Send a receipt for an event
+     * 
+     * @param type
+     *            The receipt type to send
+     * @param eventId
+     *            The Event ID targeted by the receipt
+     */
+    default void sendReceipt(ReceiptType type, String eventId) {
+        sendReceipt(type.getId(), eventId);
+    }
+
+    /**
+     * Send a Read receipt for an event
+     * 
+     * @param eventId
+     *            The Event ID targeted by the read receipt
+     */
+    default void sendReadReceipt(String eventId) {
+        sendReceipt(ReceiptType.Read, eventId);
+    }
 
     void invite(_MatrixID mxId);
 
