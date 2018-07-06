@@ -16,24 +16,25 @@ repositories {
 }
 
 dependencies {
-    compile 'io.kamax:matrix-java-sdk:USE_LATEST_TAG'
+    compile 'io.kamax:matrix-java-sdk:USE_LATEST_TAG_WITHOUT_LEADING_V'
 }
 ```
 
 ### Maven
 ```
 <repositories>
-    <repository>
-        <name>kamax-io</name>
-        <url>https://kamax.io/maven/releases/</url>
-    </repository>
+  <repository>
+    <id>kamax-io</id>
+    <name>kamax-io</name>
+    <url>https://kamax.io/maven/releases/</url>
+  </repository>
 </repositories>
 <dependencies>
-    <dependency>
-        <groupId>io.kamax</groupId>
-        <artifactId>matrix-java-sdk</artifactId>
-        <version>USE_LATEST_TAG</version>
-    </dependency>
+  <dependency>
+    <groupId>io.kamax</groupId>
+    <artifactId>matrix-java-sdk</artifactId>
+    <version>USE_LATEST_TAG_WITHOUT_LEADING_V</version>
+  </dependency>
 </dependencies>
 ```
 **WARNING:** This SDK was originally created to support [Kamax.io projects](https://github.com/kamax-io) and is therefore not necessarly complete. It will be built as the various projects evolve and grow. The SDK is therefore still in Alpha.
