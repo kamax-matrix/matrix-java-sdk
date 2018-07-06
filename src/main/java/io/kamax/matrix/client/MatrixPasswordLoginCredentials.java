@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Arne Augenstein
+ * Copyright (C) 2017 Kamax Sarl
  *
  * https://www.kamax.io/
  *
