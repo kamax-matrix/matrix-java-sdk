@@ -55,7 +55,7 @@ To run the integration tests, please use the task testInt: `./gradlew testInt`.
 
 ## Contribute
 Contributions and PRs are welcome to turn this into a fully fledged Matrix Java SDK.  
-Your code will be licensed under GPLv3.
+Your code will be licensed under AGPLv3.
 
 ## Contact
 Matrix:
