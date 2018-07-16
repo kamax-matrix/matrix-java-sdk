@@ -50,6 +50,7 @@ version = gitVersion()
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: 'maven-publish'
 
 configurations {
     deployerJars
@@ -90,6 +91,14 @@ dependencies {
     testIntRuntime configurations.testRuntime
 
     deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
 }
 
 uploadArchives {

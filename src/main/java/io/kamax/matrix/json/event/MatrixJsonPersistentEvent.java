@@ -24,12 +24,12 @@ import com.google.gson.JsonObject;
 
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
-import io.kamax.matrix.event._MatrixEvent;
+import io.kamax.matrix.event._MatrixPersistentEvent;
 import io.kamax.matrix.json.MatrixJsonObject;
 
 import java.time.Instant;
 
-public class MatrixJsonEvent extends MatrixJsonObject implements _MatrixEvent {
+public class MatrixJsonPersistentEvent extends MatrixJsonObject implements _MatrixPersistentEvent {
 
     private String id;
     private String type;
@@ -37,7 +37,7 @@ public class MatrixJsonEvent extends MatrixJsonObject implements _MatrixEvent {
     private int age;
     private _MatrixID sender;
 
-    public MatrixJsonEvent(JsonObject obj) {
+    public MatrixJsonPersistentEvent(JsonObject obj) {
         super(obj);
 
         id = getString("event_id");

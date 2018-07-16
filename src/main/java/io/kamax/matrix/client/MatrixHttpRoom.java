@@ -28,7 +28,7 @@ import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.RoomMessageChunkResponseJson;
 import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
 import io.kamax.matrix.json.RoomMessageTextPutBody;
-import io.kamax.matrix.json.event.MatrixJsonEvent;
+import io.kamax.matrix.json.event.MatrixJsonPersistentEvent;
 import io.kamax.matrix.room.MatrixRoomMessageChunk;
 import io.kamax.matrix.room._MatrixRoomMessageChunk;
 import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
@@ -265,6 +265,6 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         String bodyRaw = execute(new HttpGet(getWithAccessToken(builder)));
         RoomMessageChunkResponseJson body = GsonUtil.get().fromJson(bodyRaw, RoomMessageChunkResponseJson.class);
         return new MatrixRoomMessageChunk(body.getStart(), body.getEnd(),
-                body.getChunk().stream().map(MatrixJsonEvent::new).collect(Collectors.toList()));
+                body.getChunk().stream().map(MatrixJsonPersistentEvent::new).collect(Collectors.toList()));
     }
 }

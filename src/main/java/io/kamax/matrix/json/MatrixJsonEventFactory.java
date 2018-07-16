@@ -45,13 +45,23 @@ public class MatrixJsonEventFactory {
             return new MatrixJsonRoomAliasesEvent(obj);
         } else if ("m.room.message".contentEquals(type)) {
             return new MatrixJsonRoomMessageEvent(obj);
+        } else if ("m.receipt".contentEquals(type)) {
+            return new MatrixJsonReadReceiptEvent(obj);
         } else {
-            Optional<String> rId = EventKey.RoomId.findString(obj);
-            if (rId.isPresent()) {
-                return new MatrixJsonRoomEvent(obj);
-            }
+            Optional<String> timestamp = EventKey.Timestamp.findString(obj);
+            Optional<String> sender = EventKey.Sender.findString(obj);
 
-            return new MatrixJsonEvent(obj);
+            if (!timestamp.isPresent() || !sender.isPresent()) {
+                return new MatrixJsonEphemeralEvent(obj);
+            } else {
+
+                Optional<String> rId = EventKey.RoomId.findString(obj);
+                if (rId.isPresent()) {
+                    return new MatrixJsonRoomEvent(obj);
+                }
+
+                return new MatrixJsonPersistentEvent(obj);
+            }
         }
     }
 
