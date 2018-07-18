@@ -1,0 +1,22 @@
+{
+    "content": {
+        "$15296836321000niTzS:matrix.localtoast.de": {
+            "m.read": {
+                "@caldavtestuser:matrix.localtoast.de": {
+                    "ts": 1529683638046
+                },
+                "@arne:matrix.localtoast.de": {
+                    "ts": 1531668885573
+                }
+            }
+        },
+        "$1520971505455BCXJZ:matrix.localtoast.de": {
+            "m.read": {
+                "@arne:testmatrix.localtoast.de": {
+                    "ts": 1520971518671
+                }
+            }
+        }
+    },
+    "type": "m.receipt"
+}

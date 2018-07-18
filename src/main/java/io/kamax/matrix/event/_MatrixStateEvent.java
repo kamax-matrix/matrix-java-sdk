@@ -20,7 +20,7 @@
 
 package io.kamax.matrix.event;
 
-public interface _MatrixStateEvent extends _MatrixEvent {
+public interface _MatrixStateEvent extends _MatrixPersistentEvent {
 
     String getStateKey();
 

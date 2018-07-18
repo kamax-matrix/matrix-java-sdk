@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2017 Kamax Sarl
+ * Copyright (C) 2018 Arne Augenstein
  *
  * https://www.kamax.io/
  *
@@ -16,26 +16,15 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package io.kamax.matrix.event;
 
 import com.google.gson.JsonObject;
 
-import io.kamax.matrix._MatrixID;
-
-import java.time.Instant;
-
 public interface _MatrixEvent {
-
-    String getId();
-
     String getType();
 
-    Instant getTime();
-
-    _MatrixID getSender();
-
     JsonObject getJson();
-
 }

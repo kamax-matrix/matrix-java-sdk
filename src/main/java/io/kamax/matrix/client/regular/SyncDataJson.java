@@ -26,7 +26,8 @@ import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.client._SyncData;
 import io.kamax.matrix.event.EventKey;
-import io.kamax.matrix.event._MatrixEvent;
+import io.kamax.matrix.event._MatrixEphemeralEvent;
+import io.kamax.matrix.event._MatrixPersistentEvent;
 import io.kamax.matrix.event._MatrixStateEvent;
 import io.kamax.matrix.json.MatrixJsonObject;
 
@@ -38,9 +39,9 @@ import java.util.Set;
 
 public class SyncDataJson extends MatrixJsonObject implements _SyncData {
 
-    public class MatrixEventJson extends MatrixJsonObject implements _MatrixEvent {
+    public class MatrixPersistentEventJson extends MatrixJsonObject implements _MatrixPersistentEvent {
 
-        public MatrixEventJson(JsonObject obj) {
+        public MatrixPersistentEventJson(JsonObject obj) {
             super(obj);
         }
 
@@ -65,7 +66,20 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         }
     }
 
-    public class MatrixStateEventJson extends MatrixEventJson implements _MatrixStateEvent {
+    public class MatrixEphemeralEventJson extends MatrixJsonObject implements _MatrixEphemeralEvent {
+
+        public MatrixEphemeralEventJson(JsonObject obj) {
+            super(obj);
+        }
+
+        @Override
+        public String getType() {
+            return getString(EventKey.Type.get());
+        }
+
+    }
+
+    public class MatrixStateEventJson extends MatrixPersistentEventJson implements _MatrixStateEvent {
 
         public MatrixStateEventJson(JsonObject obj) {
             super(obj);
@@ -98,18 +112,18 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
 
     public class TimelineJson extends MatrixJsonObject implements _SyncData.Timeline {
 
-        private List<_MatrixEvent> events = new ArrayList<>();
+        private List<_MatrixPersistentEvent> events = new ArrayList<>();
 
         public TimelineJson(JsonObject obj) {
             super(obj);
 
             findArray("events").ifPresent(array -> array.forEach(el -> {
-                events.add(new MatrixEventJson(asObj(el)));
+                events.add(new MatrixPersistentEventJson(asObj(el)));
             }));
         }
 
         @Override
-        public List<_MatrixEvent> getEvents() {
+        public List<_MatrixPersistentEvent> getEvents() {
             return events;
         }
 
@@ -121,6 +135,24 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         @Override
         public String getPreviousBatchToken() {
             return getString("prev_batch");
+        }
+    }
+
+    public class EphemeralJson extends MatrixJsonObject implements _SyncData.Ephemeral {
+
+        private List<_MatrixEphemeralEvent> events = new ArrayList<>();
+
+        public EphemeralJson(JsonObject obj) {
+            super(obj);
+
+            findArray("events").ifPresent(array -> array.forEach(el -> {
+                events.add(new MatrixEphemeralEventJson(asObj(el)));
+            }));
+        }
+
+        @Override
+        public List<_MatrixEphemeralEvent> getEvents() {
+            return events;
         }
     }
 
@@ -175,6 +207,7 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         private State state;
         private Timeline timeline;
         private UnreadNotifications unreadNotifications;
+        private Ephemeral ephemeral;
 
         public JoinedRoomJson(String id, JsonObject data) {
             super(data);
@@ -182,6 +215,7 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
             this.state = new StateJson(findObj("state").orElseGet(JsonObject::new));
             this.timeline = new TimelineJson(findObj("timeline").orElseGet(JsonObject::new));
             this.unreadNotifications = new UnreadNotificationsJson(computeObj("unread_notifications"));
+            this.ephemeral = new EphemeralJson(findObj("ephemeral").orElseGet(JsonObject::new));
         }
 
         @Override
@@ -200,12 +234,17 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         }
 
         @Override
+        public Ephemeral getEphemeral() {
+            return ephemeral;
+        }
+
+        @Override
         public UnreadNotifications getUnreadNotifications() {
             return unreadNotifications;
         }
     }
 
-    public class LeftRoomJson extends MatrixJsonObject implements _SyncData.LeftRoom {
+    public class LeftRoomJson extends MatrixPersistentEventJson implements _SyncData.LeftRoom {
 
         private String id;
         private State state;

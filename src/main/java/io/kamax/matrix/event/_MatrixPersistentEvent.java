@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2018 Kamax Sarl
+ * Copyright (C) 2017 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -18,36 +18,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.room;
+package io.kamax.matrix.event;
 
-import io.kamax.matrix.event._MatrixPersistentEvent;
+import io.kamax.matrix._MatrixID;
 
-import java.util.List;
+import java.time.Instant;
 
-/**
- * Room messages pagination chunk.
- */
-public interface _MatrixRoomMessageChunk {
+public interface _MatrixPersistentEvent extends _MatrixEvent {
 
-    /**
-     * The token the pagination starts from.
-     * 
-     * @return the token.
-     */
-    String getStartToken();
+    String getId();
 
-    /**
-     * The token the pagination ends at.
-     * 
-     * @return the token.
-     */
-    String getEndToken();
+    Instant getTime();
 
-    /**
-     * A list of room events.
-     * 
-     * @return the list.
-     */
-    List<_MatrixPersistentEvent> getEvents();
+    _MatrixID getSender();
 
 }

@@ -24,7 +24,7 @@ import com.google.gson.JsonObject;
 
 import io.kamax.matrix.event._RoomEvent;
 
-public class MatrixJsonRoomEvent extends MatrixJsonEvent implements _RoomEvent {
+public class MatrixJsonRoomEvent extends MatrixJsonPersistentEvent implements _RoomEvent {
 
     private String roomId;
 

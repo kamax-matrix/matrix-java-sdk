@@ -22,7 +22,8 @@ package io.kamax.matrix.client;
 
 import com.google.gson.JsonObject;
 
-import io.kamax.matrix.event._MatrixEvent;
+import io.kamax.matrix.event._MatrixEphemeralEvent;
+import io.kamax.matrix.event._MatrixPersistentEvent;
 import io.kamax.matrix.event._MatrixStateEvent;
 
 import java.util.List;
@@ -51,7 +52,7 @@ public interface _SyncData {
          * 
          * @return List of events.
          */
-        List<_MatrixEvent> getEvents();
+        List<_MatrixPersistentEvent> getEvents();
 
         /**
          * If the number of events returned was limited by the sync filter.
@@ -66,6 +67,16 @@ public interface _SyncData {
          * @return the token.
          */
         String getPreviousBatchToken();
+    }
+
+    interface Ephemeral {
+
+        /**
+         * Events that happened in the sync window.
+         *
+         * @return List of events.
+         */
+        List<_MatrixEphemeralEvent> getEvents();
     }
 
     interface InvitedRoom {
@@ -126,6 +137,13 @@ public interface _SyncData {
          * @return the timeline.
          */
         Timeline getTimeline();
+
+        /**
+         * Ephemeral events of the room.
+         *
+         * @return a list of ephemeral events.
+         */
+        Ephemeral getEphemeral();
 
         /**
          * The Counts of unread notifications.

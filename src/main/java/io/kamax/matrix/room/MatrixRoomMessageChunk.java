@@ -20,7 +20,7 @@
 
 package io.kamax.matrix.room;
 
-import io.kamax.matrix.event._MatrixEvent;
+import io.kamax.matrix.event._MatrixPersistentEvent;
 
 import java.util.List;
 
@@ -28,9 +28,9 @@ public class MatrixRoomMessageChunk implements _MatrixRoomMessageChunk {
 
     private String startToken;
     private String endToken;
-    private List<_MatrixEvent> events;
+    private List<_MatrixPersistentEvent> events;
 
-    public MatrixRoomMessageChunk(String startToken, String endToken, List<_MatrixEvent> events) {
+    public MatrixRoomMessageChunk(String startToken, String endToken, List<_MatrixPersistentEvent> events) {
         this.startToken = startToken;
         this.endToken = endToken;
         this.events = events;
@@ -47,7 +47,7 @@ public class MatrixRoomMessageChunk implements _MatrixRoomMessageChunk {
     }
 
     @Override
-    public List<_MatrixEvent> getEvents() {
+    public List<_MatrixPersistentEvent> getEvents() {
         return events;
     }
 
