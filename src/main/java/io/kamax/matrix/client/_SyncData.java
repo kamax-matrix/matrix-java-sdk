@@ -22,6 +22,7 @@ package io.kamax.matrix.client;
 
 import com.google.gson.JsonObject;
 
+import io.kamax.matrix.event._MatrixEphemeralEvent;
 import io.kamax.matrix.event._MatrixPersistentEvent;
 import io.kamax.matrix.event._MatrixStateEvent;
 
@@ -75,7 +76,7 @@ public interface _SyncData {
          *
          * @return List of events.
          */
-        List<_MatrixPersistentEvent> getEvents();
+        List<_MatrixEphemeralEvent> getEvents();
     }
 
     interface InvitedRoom {
