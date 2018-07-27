@@ -52,7 +52,11 @@ public interface _MatrixClient extends _MatrixClientRaw {
 
     Optional<String> getDeviceId();
 
-    void login(MatrixPasswordLoginCredentials credentials);
+    /* Custom endpoint! */
+    // TODO refactor into custom synapse class?
+    void register(MatrixPasswordCredentials credentials, String sharedSecret, boolean admin);
+
+    void login(MatrixPasswordCredentials credentials);
 
     void logout();
 

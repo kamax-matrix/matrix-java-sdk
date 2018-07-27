@@ -23,7 +23,7 @@ package io.kamax.matrix.client.regular;
 import io.kamax.matrix.client.MatrixClientContext;
 import io.kamax.matrix.client.MatrixClientRequestException;
 import io.kamax.matrix.client.MatrixHttpTest;
-import io.kamax.matrix.client.MatrixPasswordLoginCredentials;
+import io.kamax.matrix.client.MatrixPasswordCredentials;
 import io.kamax.matrix.hs.MatrixHomeserver;
 
 import org.junit.Test;
@@ -54,7 +54,7 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
         MatrixClientContext context = new MatrixClientContext(hs);
         MatrixHttpClient client = new MatrixHttpClient(context);
 
-        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
+        MatrixPasswordCredentials credentials = new MatrixPasswordCredentials(user.getLocalPart(), password);
         client.login(credentials);
 
         assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
@@ -70,7 +70,7 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
         MatrixClientContext context = new MatrixClientContext(hs);
         MatrixHttpClient client = new MatrixHttpClient(context);
 
-        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
+        MatrixPasswordCredentials credentials = new MatrixPasswordCredentials(user.getLocalPart(), password);
         client.login(credentials);
 
         String deviceId = client.getDeviceId().get();
@@ -95,7 +95,7 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
         MatrixClientContext context = new MatrixClientContext(hs).setInitialDeviceName("initialDeviceName");
         MatrixHttpClient client = new MatrixHttpClient(context);
 
-        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(), password);
+        MatrixPasswordCredentials credentials = new MatrixPasswordCredentials(user.getLocalPart(), password);
         client.login(credentials);
 
         assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
@@ -111,8 +111,7 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
         MatrixClientContext context = new MatrixClientContext(hs);
         MatrixHttpClient client = new MatrixHttpClient(context);
 
-        MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(user.getLocalPart(),
-                wrongPassword);
+        MatrixPasswordCredentials credentials = new MatrixPasswordCredentials(user.getLocalPart(), wrongPassword);
         MatrixClientRequestException e = assertThrows(MatrixClientRequestException.class,
                 () -> client.login(credentials));
         checkErrorInfo(errcodeForbidden, "Invalid password", e.getError());

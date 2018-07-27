@@ -34,6 +34,8 @@ import io.kamax.matrix.room.RoomAliasLookup;
 import io.kamax.matrix.room._RoomAliasLookup;
 import io.kamax.matrix.room._RoomCreationOptions;
 
+import org.apache.commons.codec.digest.HmacAlgorithms;
+import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -145,7 +147,25 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     }
 
     @Override
-    public void login(MatrixPasswordLoginCredentials credentials) {
+    public void register(MatrixPasswordCredentials credentials, String sharedSecret, boolean admin) {
+        // As per synapse registration script:
+        // https://github.com/matrix-org/synapse/blob/master/scripts/register_new_matrix_user#L28
+        String value = credentials.getLocalPart() + "\0" + credentials.getPassword() + "\0"
+                + (admin ? "admin" : "notadmin");
+        String mac = new HmacUtils(HmacAlgorithms.HMAC_SHA_1, sharedSecret).hmacHex(value);
+        JsonObject body = new JsonObject();
+        body.addProperty("user", credentials.getLocalPart());
+        body.addProperty("password", credentials.getPassword());
+        body.addProperty("mac", mac);
+        body.addProperty("type", "org.matrix.login.shared_secret");
+        body.addProperty("admin", false);
+        HttpPost req = new HttpPost(getPath("client", "api/v1", "/register"));
+        req.setEntity(getJsonEntity(body));
+        execute(req);
+    }
+
+    @Override
+    public void login(MatrixPasswordCredentials credentials) {
         HttpPost request = new HttpPost(getClientPath("/login"));
 
         LoginPostBody data = new LoginPostBody(credentials.getLocalPart(), credentials.getPassword());

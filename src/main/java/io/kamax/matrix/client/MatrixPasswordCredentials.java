@@ -20,11 +20,11 @@
 
 package io.kamax.matrix.client;
 
-public class MatrixPasswordLoginCredentials {
+public class MatrixPasswordCredentials {
     private final String localPart;
     private final String password;
 
-    public MatrixPasswordLoginCredentials(String localPart, String password) {
+    public MatrixPasswordCredentials(String localPart, String password) {
         this.localPart = localPart;
         this.password = password;
     }

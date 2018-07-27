@@ -71,6 +71,7 @@ dependencies {
     compile 'org.slf4j:log4j-over-slf4j:1.7.25'
     compile 'org.apache.commons:commons-lang3:3.7'
     compile 'commons-io:commons-io:2.5'
+    compile 'commons-codec:commons-codec:1.11'
     compile 'org.apache.httpcomponents:fluent-hc:4.5.5'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'net.i2p.crypto:eddsa:0.1.0'

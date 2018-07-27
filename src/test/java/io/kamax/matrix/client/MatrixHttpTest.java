@@ -86,7 +86,7 @@ public class MatrixHttpTest {
         if (configFile != null) {
             MatrixHomeserver homeserver = new MatrixHomeserver(domain, baseUrl);
             MatrixClientContext context = new MatrixClientContext(homeserver);
-            MatrixPasswordLoginCredentials credentials = new MatrixPasswordLoginCredentials(username, password);
+            MatrixPasswordCredentials credentials = new MatrixPasswordCredentials(username, password);
 
             client = new MatrixHttpClient(context);
             client.login(credentials);
