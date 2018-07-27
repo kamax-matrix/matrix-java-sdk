@@ -146,6 +146,13 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         return Optional.ofNullable(context.getDeviceId());
     }
 
+    protected void updateContext(String resBody) {
+        LoginResponse response = gson.fromJson(resBody, LoginResponse.class);
+        context.setToken(response.getAccessToken());
+        context.setDeviceId(response.getDeviceId());
+        context.setUser(MatrixID.asValid(response.getUserId()));
+    }
+
     @Override
     public void register(MatrixPasswordCredentials credentials, String sharedSecret, boolean admin) {
         // As per synapse registration script:
@@ -161,7 +168,7 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         body.addProperty("admin", false);
         HttpPost req = new HttpPost(getPath("client", "api/v1", "/register"));
         req.setEntity(getJsonEntity(body));
-        execute(req);
+        updateContext(execute(req));
     }
 
     @Override
@@ -172,15 +179,7 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         getDeviceId().ifPresent(data::setDeviceId);
         Optional.ofNullable(context.getInitialDeviceName()).ifPresent(data::setInitialDeviceDisplayName);
         request.setEntity(getJsonEntity(data));
-
-        String body = execute(request);
-        LoginResponse response = gson.fromJson(body, LoginResponse.class);
-        context.setToken(response.getAccessToken());
-        context.setDeviceId(response.getDeviceId());
-        context.setUser(new MatrixID(response.getUserId()));
-
-        // FIXME spec returns hostname which we might not be the same as what has been used in baseUrl to login. Must
-        // update internals accordingly
+        updateContext(execute(request));
     }
 
     @Override
