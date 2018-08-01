@@ -67,6 +67,10 @@ public class MatrixJsonObject {
         return GsonUtil.getLong(obj, field);
     }
 
+    protected double getDouble(String field) {
+        return GsonUtil.getPrimitive(obj, field).getAsDouble();
+    }
+
     protected JsonObject asObj(JsonElement el) {
         if (!el.isJsonObject()) {
             throw new IllegalArgumentException("Not a JSON object");
