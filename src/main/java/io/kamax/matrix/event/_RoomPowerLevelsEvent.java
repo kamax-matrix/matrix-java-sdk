@@ -21,25 +21,26 @@
 package io.kamax.matrix.event;
 
 import java.util.Map;
+import java.util.Optional;
 
 public interface _RoomPowerLevelsEvent extends _RoomEvent {
 
-    double getBan();
+    Optional<Double> getBan();
 
     Map<String, Double> getEvents();
 
-    double getEventsDefault();
+    Optional<Double> getEventsDefault();
 
-    double getInvite();
+    Optional<Double> getInvite();
 
-    double getKick();
+    Optional<Double> getKick();
 
-    double getRedact();
+    Optional<Double> getRedact();
 
-    double getStateDefault();
+    Optional<Double> getStateDefault();
 
     Map<String, Double> getUsers();
 
-    double getUsersDefault();
+    Optional<Double> getUsersDefault();
 
 }

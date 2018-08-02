@@ -25,8 +25,10 @@ import com.google.gson.JsonObject;
 import io.kamax.matrix.event._RoomPowerLevelsEvent;
 import io.kamax.matrix.json.MatrixJsonObject;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MatrixJsonRoomPowerLevelsEvent extends MatrixJsonRoomEvent implements _RoomPowerLevelsEvent {
@@ -40,48 +42,48 @@ public class MatrixJsonRoomPowerLevelsEvent extends MatrixJsonRoomEvent implemen
     }
 
     @Override
-    public double getBan() {
-        return content.getBan();
+    public Optional<Double> getBan() {
+        return Optional.ofNullable(content.getBan());
     }
 
     @Override
     public Map<String, Double> getEvents() {
-        return content.getEvents();
+        return Collections.unmodifiableMap(content.getEvents());
     }
 
     @Override
-    public double getEventsDefault() {
-        return content.getEventsDefault();
+    public Optional<Double> getEventsDefault() {
+        return Optional.ofNullable(content.getEventsDefault());
     }
 
     @Override
-    public double getInvite() {
-        return content.getInvite();
+    public Optional<Double> getInvite() {
+        return Optional.ofNullable(content.getInvite());
     }
 
     @Override
-    public double getKick() {
-        return content.getKick();
+    public Optional<Double> getKick() {
+        return Optional.ofNullable(content.getKick());
     }
 
     @Override
-    public double getRedact() {
-        return content.getRedact();
+    public Optional<Double> getRedact() {
+        return Optional.ofNullable(content.getRedact());
     }
 
     @Override
-    public double getStateDefault() {
-        return content.getStateDefault();
+    public Optional<Double> getStateDefault() {
+        return Optional.ofNullable(content.getStateDefault());
     }
 
     @Override
     public Map<String, Double> getUsers() {
-        return content.getUsers();
+        return Collections.unmodifiableMap(content.getUsers());
     }
 
     @Override
-    public double getUsersDefault() {
-        return content.getUsersDefault();
+    public Optional<Double> getUsersDefault() {
+        return Optional.ofNullable(content.getUsersDefault());
     }
 
     private class Content extends MatrixJsonObject {
