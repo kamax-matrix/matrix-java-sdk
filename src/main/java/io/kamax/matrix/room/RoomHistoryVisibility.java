@@ -48,4 +48,7 @@ public enum RoomHistoryVisibility {
         return id;
     }
 
+    public boolean is(String id) {
+        return this.id.contentEquals(id);
+    }
 }
