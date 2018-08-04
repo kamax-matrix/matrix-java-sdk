@@ -18,17 +18,34 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.matrix.event;
+package io.kamax.matrix.room;
 
-import io.kamax.matrix.room.RoomHistoryVisibility;
+/**
+ * Room history visibility settings available in the specification.
+ */
+public enum RoomHistoryVisibility {
 
-public interface _RoomHistoryVisibilityEvent extends _RoomEvent {
+    Invited("invited"),
+
+    Joined("joined"),
+
+    Shared("shared"),
+
+    WorldReadable("world_readable");
+
+    private String id;
+
+    RoomHistoryVisibility(String id) {
+        this.id = id;
+    }
 
     /**
-     * There is an enum for handling the return values defined in th specification: {@link RoomHistoryVisibility}
+     * Get the Matrix value for this setting.
      * 
-     * @return The current setting of the room for the visibility of future messages.
+     * @return the value.
      */
-    String getHistoryVisibility();
+    public String get() {
+        return id;
+    }
 
 }
