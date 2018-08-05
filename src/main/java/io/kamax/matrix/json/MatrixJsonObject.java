@@ -67,8 +67,14 @@ public class MatrixJsonObject {
         return GsonUtil.getLong(obj, field);
     }
 
-    protected double getDouble(String field) {
-        return GsonUtil.getPrimitive(obj, field).getAsDouble();
+    /*
+     * Returns the Double value, if the key is present, null else
+     */
+    protected Double getDoubleIfPresent(String field) {
+        if (obj.get(field) != null) {
+            return GsonUtil.getPrimitive(obj, field).getAsDouble();
+        }
+        return null;
     }
 
     protected JsonObject asObj(JsonElement el) {

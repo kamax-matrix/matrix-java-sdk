@@ -88,26 +88,26 @@ public class MatrixJsonRoomPowerLevelsEvent extends MatrixJsonRoomEvent implemen
 
     private class Content extends MatrixJsonObject {
 
-        private double ban;
+        private Double ban;
         private Map<String, Double> events = new HashMap<>();
-        private double eventsDefault;
-        private double invite;
-        private double kick;
-        private double redact;
-        private double stateDefault;
+        private Double eventsDefault;
+        private Double invite;
+        private Double kick;
+        private Double redact;
+        private Double stateDefault;
         private Map<String, Double> users = new HashMap<>();
-        private double usersDefault;
+        private Double usersDefault;
 
         Content(JsonObject obj) {
             super(obj);
 
-            setBan(getDouble("ban"));
-            setEventsDefault(getDouble("events_default"));
-            setInvite(getDouble("invite"));
-            setKick(getDouble("kick"));
-            setRedact(getDouble("redact"));
-            setStateDefault(getDouble("state_default"));
-            setUsersDefault(getDouble("users_default"));
+            setBan(getDoubleIfPresent("ban"));
+            setEventsDefault(getDoubleIfPresent("events_default"));
+            setInvite(getDoubleIfPresent("invite"));
+            setKick(getDoubleIfPresent("kick"));
+            setRedact(getDoubleIfPresent("redact"));
+            setStateDefault(getDoubleIfPresent("state_default"));
+            setUsersDefault(getDoubleIfPresent("users_default"));
 
             JsonObject eventsJson = obj.getAsJsonObject("events");
             JsonObject usersJson = obj.getAsJsonObject("users");
@@ -122,19 +122,19 @@ public class MatrixJsonRoomPowerLevelsEvent extends MatrixJsonRoomEvent implemen
             setUsers(usersMap);
         }
 
-        double getBan() {
+        Double getBan() {
             return ban;
         }
 
-        void setBan(double ban) {
+        void setBan(Double ban) {
             this.ban = ban;
         }
 
-        double getEventsDefault() {
+        Double getEventsDefault() {
             return eventsDefault;
         }
 
-        void setEventsDefault(double eventsDefault) {
+        void setEventsDefault(Double eventsDefault) {
             this.eventsDefault = eventsDefault;
         }
 
@@ -146,35 +146,35 @@ public class MatrixJsonRoomPowerLevelsEvent extends MatrixJsonRoomEvent implemen
             this.events.putAll(events);
         }
 
-        double getInvite() {
+        Double getInvite() {
             return invite;
         }
 
-        void setInvite(double invite) {
+        void setInvite(Double invite) {
             this.invite = invite;
         }
 
-        double getKick() {
+        Double getKick() {
             return kick;
         }
 
-        void setKick(double kick) {
+        void setKick(Double kick) {
             this.kick = kick;
         }
 
-        double getRedact() {
+        Double getRedact() {
             return redact;
         }
 
-        void setRedact(double redact) {
+        void setRedact(Double redact) {
             this.redact = redact;
         }
 
-        double getStateDefault() {
+        Double getStateDefault() {
             return stateDefault;
         }
 
-        void setStateDefault(double stateDefault) {
+        void setStateDefault(Double stateDefault) {
             this.stateDefault = stateDefault;
         }
 
@@ -186,11 +186,11 @@ public class MatrixJsonRoomPowerLevelsEvent extends MatrixJsonRoomEvent implemen
             this.users.putAll(users);
         }
 
-        double getUsersDefault() {
+        Double getUsersDefault() {
             return usersDefault;
         }
 
-        void setUsersDefault(double usersDefault) {
+        void setUsersDefault(Double usersDefault) {
             this.usersDefault = usersDefault;
         }
 
