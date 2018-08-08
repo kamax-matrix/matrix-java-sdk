@@ -170,38 +170,39 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
-    public void sendEvent(String type, JsonObject content) {
+    public String sendEvent(String type, JsonObject content) {
         // FIXME URL encoding
         URI path = getClientPathWithAccessToken("/rooms/{roomId}/send/" + type + "/" + System.currentTimeMillis());
         HttpPut httpPut = new HttpPut(path);
         httpPut.setEntity(getJsonEntity(content));
-        execute(httpPut);
+        String body = execute(httpPut);
+        return GsonUtil.getStringOrThrow(GsonUtil.parseObj(body), "event_id");
     }
 
-    private void sendMessage(RoomMessageTextPutBody content) {
-        sendEvent("m.room.message", GsonUtil.makeObj(content));
-    }
-
-    @Override
-    public void sendText(String message) {
-        sendMessage(new RoomMessageTextPutBody(message));
+    private String sendMessage(RoomMessageTextPutBody content) {
+        return sendEvent("m.room.message", GsonUtil.makeObj(content));
     }
 
     @Override
-    public void sendFormattedText(String formatted, String rawFallback) {
+    public String sendText(String message) {
+        return sendMessage(new RoomMessageTextPutBody(message));
+    }
+
+    @Override
+    public String sendFormattedText(String formatted, String rawFallback) {
         // TODO sanitize input
-        sendMessage(new RoomMessageFormattedTextPutBody(rawFallback, formatted));
+        return sendMessage(new RoomMessageFormattedTextPutBody(rawFallback, formatted));
     }
 
     @Override
-    public void sendNotice(String message) {
-        sendMessage(new RoomMessageTextPutBody("m.notice", message));
+    public String sendNotice(String message) {
+        return sendMessage(new RoomMessageTextPutBody("m.notice", message));
     }
 
     @Override
-    public void sendNotice(String formatted, String plain) {
+    public String sendNotice(String formatted, String plain) {
         // TODO sanitize input
-        sendMessage(new RoomMessageFormattedTextPutBody("m.notice", plain, formatted));
+        return sendMessage(new RoomMessageFormattedTextPutBody("m.notice", plain, formatted));
     }
 
     @Override

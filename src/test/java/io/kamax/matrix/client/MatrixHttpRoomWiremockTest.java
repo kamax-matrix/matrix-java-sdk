@@ -41,7 +41,7 @@ public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
 
     private String sendTextUrl = String.format("/_matrix/client/r0/rooms/%s/send/m.room.message/([0-9.]+)\\", roomId)
             + tokenParameter;
-    private String sendTextResponse = String.format("{\"event_id\": \"%s\"}", eventId) + tokenParameter;
+    private String sendTextResponse = String.format("{\"event_id\": \"%s\"}", eventId);
 
     private String getJoinedUsersUrl = String.format("/_matrix/client/r0/rooms/%s/joined_members", roomId)
             + tokenParameter;

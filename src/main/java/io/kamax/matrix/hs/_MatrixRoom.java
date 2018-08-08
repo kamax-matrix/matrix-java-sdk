@@ -75,15 +75,15 @@ public interface _MatrixRoom {
 
     Optional<MatrixErrorInfo> tryLeave();
 
-    void sendEvent(String type, JsonObject content);
+    String sendEvent(String type, JsonObject content);
 
-    void sendText(String message);
+    String sendText(String message);
 
-    void sendFormattedText(String formatted, String rawFallback);
+    String sendFormattedText(String formatted, String rawFallback);
 
-    void sendNotice(String message);
+    String sendNotice(String message);
 
-    void sendNotice(String formatted, String plain);
+    String sendNotice(String formatted, String plain);
 
     /**
      * Send a receipt for an event
