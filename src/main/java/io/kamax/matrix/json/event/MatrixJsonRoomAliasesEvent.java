@@ -26,6 +26,7 @@ import io.kamax.matrix.event._RoomAliasesEvent;
 import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.MatrixJsonObject;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,12 +34,14 @@ public class MatrixJsonRoomAliasesEvent extends MatrixJsonRoomEvent implements _
 
     private class Content extends MatrixJsonObject {
 
-        private List<String> aliases;
+        private List<String> aliases = new ArrayList<>();
 
         public Content(JsonObject obj) {
             super(obj);
 
-            setAliases(GsonUtil.asList(obj, "aliases", String.class));
+            GsonUtil.findArray(obj, "aliases").ifPresent(aliasesJson -> {
+                setAliases(GsonUtil.asList(aliasesJson, String.class));
+            });
         }
 
         public List<String> getAliases() {
