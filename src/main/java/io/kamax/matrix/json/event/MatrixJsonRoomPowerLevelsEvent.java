@@ -110,23 +110,17 @@ public class MatrixJsonRoomPowerLevelsEvent extends MatrixJsonRoomEvent implemen
             setStateDefault(getDoubleIfPresent("state_default"));
             setUsersDefault(getDoubleIfPresent("users_default"));
 
-            Optional<JsonObject> eventsJson = GsonUtil.findObj(obj, "events");
-
-            if (eventsJson.isPresent()) {
-                Map<String, Double> eventsMap = eventsJson.get().entrySet().stream()
+            GsonUtil.findObj(obj, "events").ifPresent(eventsJson -> {
+                Map<String, Double> eventsMap = eventsJson.entrySet().stream()
                         .collect(Collectors.toMap(it -> it.getKey(), it -> it.getValue().getAsDouble()));
-
                 setEvents(eventsMap);
-            }
+            });
 
-            Optional<JsonObject> usersJson = GsonUtil.findObj(obj, "users");
-
-            if (usersJson.isPresent()) {
-                Map<String, Double> usersMap = usersJson.get().entrySet().stream()
+            GsonUtil.findObj(obj, "users").ifPresent(usersJson -> {
+                Map<String, Double> usersMap = usersJson.entrySet().stream()
                         .collect(Collectors.toMap(it -> it.getKey(), it -> it.getValue().getAsDouble()));
-
                 setUsers(usersMap);
-            }
+            });
         }
 
         Double getBan() {
