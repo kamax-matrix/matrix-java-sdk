@@ -1,0 +1,12 @@
+{
+    "origin_server_ts": 1492978955573,
+    "sender": "@testuser1:testmatrix.localtoast.de",
+    "event_id": "$1492938562937827160KOtBV:testmatrix.localtoast.de",
+    "unsigned": {
+        "age": 12789836328
+    },
+    "state_key": "",
+    "content": {
+    },
+    "type": "m.room.power_levels"
+}

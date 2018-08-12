@@ -23,6 +23,7 @@ package io.kamax.matrix.json.event;
 import com.google.gson.JsonObject;
 
 import io.kamax.matrix.event._RoomPowerLevelsEvent;
+import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.MatrixJsonObject;
 
 import java.util.Collections;
@@ -109,17 +110,23 @@ public class MatrixJsonRoomPowerLevelsEvent extends MatrixJsonRoomEvent implemen
             setStateDefault(getDoubleIfPresent("state_default"));
             setUsersDefault(getDoubleIfPresent("users_default"));
 
-            JsonObject eventsJson = obj.getAsJsonObject("events");
-            JsonObject usersJson = obj.getAsJsonObject("users");
+            Optional<JsonObject> eventsJson = GsonUtil.findObj(obj, "events");
 
-            Map<String, Double> eventsMap = eventsJson.entrySet().stream()
-                    .collect(Collectors.toMap(it -> it.getKey(), it -> it.getValue().getAsDouble()));
+            if (eventsJson.isPresent()) {
+                Map<String, Double> eventsMap = eventsJson.get().entrySet().stream()
+                        .collect(Collectors.toMap(it -> it.getKey(), it -> it.getValue().getAsDouble()));
 
-            Map<String, Double> usersMap = usersJson.entrySet().stream()
-                    .collect(Collectors.toMap(it -> it.getKey(), it -> it.getValue().getAsDouble()));
+                setEvents(eventsMap);
+            }
 
-            setEvents(eventsMap);
-            setUsers(usersMap);
+            Optional<JsonObject> usersJson = GsonUtil.findObj(obj, "users");
+
+            if (usersJson.isPresent()) {
+                Map<String, Double> usersMap = usersJson.get().entrySet().stream()
+                        .collect(Collectors.toMap(it -> it.getKey(), it -> it.getValue().getAsDouble()));
+
+                setUsers(usersMap);
+            }
         }
 
         Double getBan() {
