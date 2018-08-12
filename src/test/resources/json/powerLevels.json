@@ -1,0 +1,29 @@
+{
+    "origin_server_ts": 1492978955573,
+    "sender": "@testuser1:testmatrix.localtoast.de",
+    "event_id": "$1492938562937827160KOtBV:testmatrix.localtoast.de",
+    "unsigned": {
+        "age": 12789836328
+    },
+    "state_key": "",
+    "content": {
+        "events_default": 0,
+        "users": {
+            "@testuser1:testmatrix.localtoast.de": 99
+        },
+        "state_default": 50,
+        "redact": 40,
+        "ban": 30,
+        "users_default": 10,
+        "events": {
+            "m.room.avatar": 60,
+            "m.room.name": 70,
+            "m.room.canonical_alias": 80,
+            "m.room.history_visibility": 90,
+            "m.room.power_levels": 95
+        },
+        "kick": 55,
+        "invite": 5
+    },
+    "type": "m.room.power_levels"
+}
