@@ -20,20 +20,20 @@
 
 package io.kamax.matrix.client;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import io.kamax.matrix.*;
 import io.kamax.matrix.hs._MatrixRoom;
-import io.kamax.matrix.json.GsonUtil;
-import io.kamax.matrix.json.RoomMessageChunkResponseJson;
-import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
-import io.kamax.matrix.json.RoomMessageTextPutBody;
+import io.kamax.matrix.json.*;
 import io.kamax.matrix.json.event.MatrixJsonPersistentEvent;
 import io.kamax.matrix.room.MatrixRoomMessageChunk;
+import io.kamax.matrix.room.RoomTag;
 import io.kamax.matrix.room._MatrixRoomMessageChunk;
 import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -63,6 +63,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     protected URIBuilder getClientPathBuilder(String action) {
         URIBuilder builder = super.getClientPathBuilder(action);
         builder.setPath(builder.getPath().replace("{roomId}", roomId));
+        context.getUser().ifPresent(user -> builder.setPath(builder.getPath().replace("{userId}", user.getId())));
 
         return builder;
     }
@@ -97,6 +98,11 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                 return Optional.empty();
             }
         });
+    }
+
+    @Override
+    public String getId() {
+        return roomId;
     }
 
     @Override
@@ -267,5 +273,121 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         RoomMessageChunkResponseJson body = GsonUtil.get().fromJson(bodyRaw, RoomMessageChunkResponseJson.class);
         return new MatrixRoomMessageChunk(body.getStart(), body.getEnd(),
                 body.getChunk().stream().map(MatrixJsonPersistentEvent::new).collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<RoomTag> getUserTags() {
+        return getAllTags().stream().filter(tag -> "u".equals(tag.getNamespace())).collect(Collectors.toList());
+    }
+
+    private List<RoomTag> getAllTags() {
+        List<RoomTag> tags = new ArrayList<>();
+
+        URIBuilder builder = getClientPathBuilder("/user/{userId}/rooms/{roomId}/tags");
+
+        String body = execute(new HttpGet(getWithAccessToken(builder)));
+
+        if (StringUtils.isNotEmpty(body)) {
+            JsonObject jsonTags = jsonParser.parse(body).getAsJsonObject().get("tags").getAsJsonObject();
+            tags = jsonTags.entrySet().stream().filter(e -> e.getValue().isJsonObject()).map(entry -> {
+                String completeName = entry.getKey();
+                String name = "";
+                String namespace = "";
+                if (completeName.startsWith("m.")) {
+                    name = completeName.substring(2);
+                    namespace = "m";
+                } else if (completeName.startsWith("u.")) {
+                    name = completeName.substring(2);
+                    namespace = "u";
+                } else {
+                    name = completeName;
+                }
+                JsonElement jsonOrder = entry.getValue().getAsJsonObject().get("order");
+                Double order = null;
+                if (jsonOrder != null) {
+                    order = jsonOrder.getAsDouble();
+                }
+
+                return new RoomTag(namespace, name, order, roomId);
+            }).collect(Collectors.toList());
+        }
+
+        return tags;
+    }
+
+    @Override
+    public void addUserTag(String tag) {
+        addTag("u." + tag, 1);
+    }
+
+    @Override
+    public void addUserTag(String tag, double order) {
+        addTag("u." + tag, order);
+    }
+
+    @Override
+    public void deleteUserTag(String tag) {
+        deleteTag("u." + tag);
+    }
+
+    @Override
+    public void addFavouriteTag() {
+        addTag("m.favourite", 1);
+    }
+
+    @Override
+    public void addFavouriteTag(double order) {
+        addTag("m.favourite", order);
+    }
+
+    @Override
+    public Optional<RoomTag> getFavouriteTag() {
+        return getAllTags().stream().filter(tag -> "m".equals(tag.getNamespace()) && "favourite".equals(tag.getName()))
+                .findFirst();
+    }
+
+    @Override
+    public void deleteFavouriteTag() {
+        deleteTag("m.favourite");
+    }
+
+    @Override
+    public void addLowpriorityTag() {
+        addTag("m.lowpriority", 1);
+    }
+
+    @Override
+    public void addLowpriorityTag(double order) {
+        addTag("m.lowpriority", order);
+    }
+
+    @Override
+    public Optional<RoomTag> getLowpriorityTag() {
+        return getAllTags().stream()
+                .filter(tag -> "m".equals(tag.getNamespace()) && "lowpriority".equals(tag.getName())).findFirst();
+    }
+
+    @Override
+    public void deleteLowpriorityTag() {
+        deleteTag("m.lowpriority");
+    }
+
+    private void addTag(String tag, double order) {
+        // TODO check name size
+
+        if (order < 0 || order > 1) {
+            throw new IllegalArgumentException("Order out of range!");
+        }
+
+        URI path = getClientPathWithAccessToken("/user/{userId}/rooms/{roomId}/tags/" + tag);
+        HttpPut httpPut = new HttpPut(path);
+        httpPut.setEntity(getJsonEntity(new RoomTagSetBody(order)));
+        execute(httpPut);
+    }
+
+    private void deleteTag(String tag) {
+        URI path = getClientPathWithAccessToken("/user/{userId}/rooms/{roomId}/tags/" + tag);
+        HttpDelete httpDelete = new HttpDelete(path);
+        execute(httpDelete);
     }
 }

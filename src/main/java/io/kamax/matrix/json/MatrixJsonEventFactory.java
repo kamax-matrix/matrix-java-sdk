@@ -51,6 +51,8 @@ public class MatrixJsonEventFactory {
             return new MatrixJsonReadReceiptEvent(obj);
         } else if ("m.room.history_visibility".contentEquals(type)) {
             return new MatrixJsonRoomHistoryVisibilityEvent(obj);
+        } else if ("m.tag".contentEquals(type)) {
+            return new MatrixJsonRoomTagsEvent(obj);
         } else {
             Optional<String> timestamp = EventKey.Timestamp.findString(obj);
             Optional<String> sender = EventKey.Sender.findString(obj);

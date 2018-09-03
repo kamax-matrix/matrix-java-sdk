@@ -27,6 +27,7 @@ import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUserProfile;
 import io.kamax.matrix.room.ReceiptType;
+import io.kamax.matrix.room.RoomTag;
 import io.kamax.matrix.room._MatrixRoomMessageChunk;
 import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
 
@@ -46,6 +47,8 @@ public interface _MatrixRoom {
     Optional<String> getAvatarUrl();
 
     Optional<_MatrixContent> getAvatar();
+
+    String getId();
 
     /**
      * Get a state event
@@ -123,4 +126,27 @@ public interface _MatrixRoom {
 
     _MatrixRoomMessageChunk getMessages(_MatrixRoomMessageChunkOptions options);
 
+    List<RoomTag> getUserTags();
+
+    void addUserTag(String tag);
+
+    void addUserTag(String tag, double order);
+
+    void deleteUserTag(String tag);
+
+    void addFavouriteTag();
+
+    void addFavouriteTag(double order);
+
+    void deleteFavouriteTag();
+
+    Optional<RoomTag> getFavouriteTag();
+
+    void addLowpriorityTag();
+
+    void addLowpriorityTag(double order);
+
+    Optional<RoomTag> getLowpriorityTag();
+
+    void deleteLowpriorityTag();
 }
