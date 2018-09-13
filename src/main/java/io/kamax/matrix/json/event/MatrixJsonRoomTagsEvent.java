@@ -83,7 +83,7 @@ public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _RoomTa
         }
 
         public void setTags(List<RoomTag> tags) {
-            this.tags.addAll(tags);
+            this.tags = new ArrayList<>(tags);
         }
 
     }
