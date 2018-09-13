@@ -64,10 +64,11 @@ public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _RoomTa
                     String name = completeName;
                     String namespace = "";
 
-                    String[] split = completeName.split("\\.", 2);
-                    if (split.length == 2) {
-                        namespace = split[0];
-                        name = split[1];
+                    int lastDotIndex = completeName.lastIndexOf(".");
+
+                    if (lastDotIndex >= 0 && lastDotIndex < completeName.length() - 1) {
+                        namespace = completeName.substring(0, lastDotIndex);
+                        name = completeName.substring(lastDotIndex + 1);
                     }
 
                     Double order = it.getValue().getAsJsonObject().get("order").getAsDouble();
