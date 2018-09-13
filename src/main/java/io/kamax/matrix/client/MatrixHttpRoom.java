@@ -287,30 +287,28 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
         String body = execute(new HttpGet(getWithAccessToken(builder)));
 
-        if (StringUtils.isNotEmpty(body)) {
-            JsonObject jsonTags = jsonParser.parse(body).getAsJsonObject().get("tags").getAsJsonObject();
-            tags = jsonTags.entrySet().stream().filter(e -> e.getValue().isJsonObject()).map(entry -> {
-                String completeName = entry.getKey();
-                String name = "";
-                String namespace = "";
-                if (completeName.startsWith("m.")) {
-                    name = completeName.substring(2);
-                    namespace = "m";
-                } else if (completeName.startsWith("u.")) {
-                    name = completeName.substring(2);
-                    namespace = "u";
-                } else {
-                    name = completeName;
-                }
-                JsonElement jsonOrder = entry.getValue().getAsJsonObject().get("order");
-                Double order = null;
-                if (jsonOrder != null) {
-                    order = jsonOrder.getAsDouble();
-                }
+        JsonObject jsonTags = GsonUtil.parseObj(body).getAsJsonObject("tags").getAsJsonObject();
+        tags = jsonTags.entrySet().stream().filter(e -> e.getValue().isJsonObject()).map(entry -> {
+            String completeName = entry.getKey();
+            String name = "";
+            String namespace = "";
+            if (completeName.startsWith("m.")) {
+                name = completeName.substring(2);
+                namespace = "m";
+            } else if (completeName.startsWith("u.")) {
+                name = completeName.substring(2);
+                namespace = "u";
+            } else {
+                name = completeName;
+            }
+            JsonElement jsonOrder = entry.getValue().getAsJsonObject().get("order");
+            Double order = null;
+            if (jsonOrder != null) {
+                order = jsonOrder.getAsDouble();
+            }
 
-                return new RoomTag(namespace, name, order, roomId);
-            }).collect(Collectors.toList());
-        }
+            return new RoomTag(namespace, name, order, roomId);
+        }).collect(Collectors.toList());
 
         return tags;
     }
