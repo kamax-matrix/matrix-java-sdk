@@ -42,6 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public abstract class AMatrixHttpRoomTagTest extends MatrixHttpTest {
     protected String testTag = "usertag";
+    protected String testTagWithOrder = "usertagWithOrder";
+    protected Double testTagOrder = 0.5;
     private String testRoomName = "TagTestRoom";
 
     @Test
@@ -51,14 +53,27 @@ public abstract class AMatrixHttpRoomTagTest extends MatrixHttpTest {
         room.addFavouriteTag();
         room.addLowpriorityTag();
         room.addUserTag(testTag);
+        room.addUserTag(testTagWithOrder, testTagOrder);
 
-        assertFalse(room.getUserTags().isEmpty());
+        assertTrue(room.getUserTags().size() == 2);
+
+        Optional<RoomTag> roomTagWithOrder = room.getUserTags().stream()
+                .filter(tag -> testTagWithOrder.equals(tag.getName())).findFirst();
+        assertTrue(roomTagWithOrder.isPresent());
+        assertTrue(roomTagWithOrder.get().getOrder().doubleValue() == testTagOrder);
+
+        Optional<RoomTag> roomTag = room.getUserTags().stream().filter(tag -> testTag.equals(tag.getName()))
+                .findFirst();
+        assertTrue(roomTag.isPresent());
+        assertTrue(roomTag.get().getOrder() == null);
+
         assertTrue(room.getFavouriteTag().isPresent());
         assertTrue(room.getLowpriorityTag().isPresent());
 
         room.deleteFavouriteTag();
         room.deleteLowpriorityTag();
         room.deleteUserTag(testTag);
+        room.deleteUserTag(testTagWithOrder);
 
         assertTrue(room.getUserTags().isEmpty());
         assertFalse(room.getFavouriteTag().isPresent());

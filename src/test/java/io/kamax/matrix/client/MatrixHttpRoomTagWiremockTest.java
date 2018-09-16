@@ -41,12 +41,13 @@ public class MatrixHttpRoomTagWiremockTest extends AMatrixHttpRoomTagTest {
 
     private String tagRequestUrl = tagsBaseUrl + "?access_token=" + testToken;
     private String emptyTagsBody = "{\"tags\": " + "{}}";
-    private String allTagsResponse = "{\"tags\": " + "{\"m.favourite\": {\"order\": 1.0},"
-            + "\"m.lowpriority\": {\"order\": 1.0}," + "\"u." + testTag + "\": {\"order\": 1.0}}}";
+    private String allTagsResponse = "{\"tags\": " + "{\"m.favourite\": {}," + "\"m.lowpriority\": {}," + "\"u."
+            + testTag + "\": {}," + "\"u." + testTagWithOrder + "\": {\"order\": " + testTagOrder + "}}}";
 
     private String favouriteTagUrl = tagsBaseUrl + "/m.favourite?access_token=" + testToken;
     private String lowPriorityTagUrl = tagsBaseUrl + "/m.lowpriority?access_token=" + testToken;
     private String userTagUrl = tagsBaseUrl + "/u." + testTag + "?access_token=" + testToken;
+    private String userTagWithOrderUrl = tagsBaseUrl + "/u." + testTagWithOrder + "?access_token=" + testToken;
 
     @Before
     public void createClient() {
@@ -75,10 +76,13 @@ public class MatrixHttpRoomTagWiremockTest extends AMatrixHttpRoomTagTest {
         stubFor(put(urlEqualTo(userTagUrl)).inScenario("Tags").whenScenarioStateIs("LowPriorityTagAdded")
                 .willSetStateTo("UserTagAdded").willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(get(urlEqualTo(tagRequestUrl)).inScenario("Tags").whenScenarioStateIs("UserTagAdded")
+        stubFor(put(urlEqualTo(userTagWithOrderUrl)).inScenario("Tags").whenScenarioStateIs("UserTagAdded")
+                .willSetStateTo("UserTagWithOrderAdded").willReturn(aResponse().withStatus(200).withBody("{}")));
+
+        stubFor(get(urlEqualTo(tagRequestUrl)).inScenario("Tags").whenScenarioStateIs("UserTagWithOrderAdded")
                 .willReturn(aResponse().withStatus(200).withBody(allTagsResponse)));
 
-        stubFor(delete(urlEqualTo(favouriteTagUrl)).inScenario("Tags").whenScenarioStateIs("UserTagAdded")
+        stubFor(delete(urlEqualTo(favouriteTagUrl)).inScenario("Tags").whenScenarioStateIs("UserTagWithOrderAdded")
                 .willSetStateTo("FavouriteTagDeleted").willReturn(aResponse().withStatus(200).withBody("{}")));
 
         stubFor(delete(urlEqualTo(lowPriorityTagUrl)).inScenario("Tags").whenScenarioStateIs("FavouriteTagDeleted")
@@ -87,7 +91,10 @@ public class MatrixHttpRoomTagWiremockTest extends AMatrixHttpRoomTagTest {
         stubFor(delete(urlEqualTo(userTagUrl)).inScenario("Tags").whenScenarioStateIs("LowPriorityTagDeleted")
                 .willSetStateTo("UserTagDeleted").willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(get(urlEqualTo(tagRequestUrl)).inScenario("Tags").whenScenarioStateIs("UserTagDeleted")
+        stubFor(delete(urlEqualTo(userTagWithOrderUrl)).inScenario("Tags").whenScenarioStateIs("UserTagDeleted")
+                .willSetStateTo("UserTagWithOrderDeleted").willReturn(aResponse().withStatus(200).withBody("{}")));
+
+        stubFor(get(urlEqualTo(tagRequestUrl)).inScenario("Tags").whenScenarioStateIs("UserTagWithOrderDeleted")
                 .willReturn(aResponse().withStatus(200).withBody(emptyTagsBody)));
 
         super.setAndReadTags();

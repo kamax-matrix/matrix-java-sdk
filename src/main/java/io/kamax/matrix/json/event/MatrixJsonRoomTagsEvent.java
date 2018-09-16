@@ -20,6 +20,7 @@
 
 package io.kamax.matrix.json.event;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import io.kamax.matrix.event._RoomTagsEvent;
@@ -71,8 +72,12 @@ public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _RoomTa
                         name = completeName.substring(lastDotIndex + 1);
                     }
 
-                    Double order = it.getValue().getAsJsonObject().get("order").getAsDouble();
-                    return new RoomTag(namespace, name, order, roomId);
+                    JsonElement jsonOrder = it.getValue().getAsJsonObject().get("order");
+
+                    if (jsonOrder != null) {
+                        return new RoomTag(namespace, name, jsonOrder.getAsDouble(), roomId);
+                    }
+                    return new RoomTag(namespace, name, null, roomId);
                 }).collect(Collectors.toList());
                 setTags(tags);
             });

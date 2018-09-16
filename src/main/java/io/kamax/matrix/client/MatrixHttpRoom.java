@@ -314,7 +314,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public void addUserTag(String tag) {
-        addTag("u." + tag, 1);
+        addTag("u." + tag, null);
     }
 
     @Override
@@ -329,7 +329,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public void addFavouriteTag() {
-        addTag("m.favourite", 1);
+        addTag("m.favourite", null);
     }
 
     @Override
@@ -350,7 +350,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public void addLowpriorityTag() {
-        addTag("m.lowpriority", 1);
+        addTag("m.lowpriority", null);
     }
 
     @Override
@@ -369,16 +369,20 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         deleteTag("m.lowpriority");
     }
 
-    private void addTag(String tag, double order) {
+    private void addTag(String tag, Double order) {
         // TODO check name size
 
-        if (order < 0 || order > 1) {
+        if (order != null && (order < 0 || order > 1)) {
             throw new IllegalArgumentException("Order out of range!");
         }
 
         URI path = getClientPathWithAccessToken("/user/{userId}/rooms/{roomId}/tags/" + tag);
         HttpPut httpPut = new HttpPut(path);
-        httpPut.setEntity(getJsonEntity(new RoomTagSetBody(order)));
+        if (order != null) {
+            httpPut.setEntity(getJsonEntity(new RoomTagSetBody(order)));
+        } else {
+            httpPut.setEntity(getJsonEntity(new JsonObject()));
+        }
         execute(httpPut);
     }
 
