@@ -360,6 +360,8 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
             context.getUser().ifPresent(user -> base.setParameter("user_id", user.getId()));
         }
 
+        context.getUser().ifPresent(user -> base.setPath(base.getPath().replace("{userId}", user.getId())));
+
         return base;
     }
 

@@ -63,7 +63,6 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     protected URIBuilder getClientPathBuilder(String action) {
         URIBuilder builder = super.getClientPathBuilder(action);
         builder.setPath(builder.getPath().replace("{roomId}", roomId));
-        context.getUser().ifPresent(user -> builder.setPath(builder.getPath().replace("{userId}", user.getId())));
 
         return builder;
     }
