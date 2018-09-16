@@ -25,13 +25,11 @@ public class RoomTag {
     private String namespace;
     private String name;
     private Double order;
-    private String roomId;
 
-    public RoomTag(String namespace, String name, Double order, String roomId) {
+    public RoomTag(String namespace, String name, Double order) {
         this.namespace = namespace;
         this.name = name;
         this.order = order;
-        this.roomId = roomId;
     }
 
     public String getNamespace() {

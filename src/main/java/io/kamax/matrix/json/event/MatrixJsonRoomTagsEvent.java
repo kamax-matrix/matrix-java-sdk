@@ -57,8 +57,6 @@ public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _RoomTa
         public Content(JsonObject obj) {
             super(obj);
 
-            String roomId = getStringOrNull("roomId");
-
             GsonUtil.findObj(obj, "tags").ifPresent(tagsJson -> {
                 List<RoomTag> tags = tagsJson.entrySet().stream().map(it -> {
                     String completeName = it.getKey();
@@ -75,9 +73,9 @@ public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _RoomTa
                     JsonElement jsonOrder = it.getValue().getAsJsonObject().get("order");
 
                     if (jsonOrder != null) {
-                        return new RoomTag(namespace, name, jsonOrder.getAsDouble(), roomId);
+                        return new RoomTag(namespace, name, jsonOrder.getAsDouble());
                     }
-                    return new RoomTag(namespace, name, null, roomId);
+                    return new RoomTag(namespace, name, null);
                 }).collect(Collectors.toList());
                 setTags(tags);
             });

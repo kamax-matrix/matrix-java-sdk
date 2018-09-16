@@ -306,7 +306,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                 order = jsonOrder.getAsDouble();
             }
 
-            return new RoomTag(namespace, name, order, roomId);
+            return new RoomTag(namespace, name, order);
         }).collect(Collectors.toList());
 
         return tags;
