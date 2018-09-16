@@ -281,14 +281,13 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     private List<RoomTag> getAllTags() {
-        List<RoomTag> tags = new ArrayList<>();
 
         URIBuilder builder = getClientPathBuilder("/user/{userId}/rooms/{roomId}/tags");
 
         String body = execute(new HttpGet(getWithAccessToken(builder)));
 
         JsonObject jsonTags = GsonUtil.parseObj(body).getAsJsonObject("tags").getAsJsonObject();
-        tags = jsonTags.entrySet().stream().filter(e -> e.getValue().isJsonObject()).map(entry -> {
+        List<RoomTag> tags = jsonTags.entrySet().stream().map(entry -> {
             String completeName = entry.getKey();
             String name = "";
             String namespace = "";
