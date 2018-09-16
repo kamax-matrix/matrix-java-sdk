@@ -20,6 +20,8 @@
 
 package io.kamax.matrix.room;
 
+import java.util.Optional;
+
 public class RoomTag {
 
     private String namespace;
@@ -40,7 +42,7 @@ public class RoomTag {
         return name;
     }
 
-    public Double getOrder() {
-        return order;
+    public Optional<Double> getOrder() {
+        return Optional.ofNullable(order);
     }
 }

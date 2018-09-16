@@ -60,12 +60,12 @@ public abstract class AMatrixHttpRoomTagTest extends MatrixHttpTest {
         Optional<RoomTag> roomTagWithOrder = room.getUserTags().stream()
                 .filter(tag -> testTagWithOrder.equals(tag.getName())).findFirst();
         assertTrue(roomTagWithOrder.isPresent());
-        assertTrue(roomTagWithOrder.get().getOrder().doubleValue() == testTagOrder);
+        assertTrue(roomTagWithOrder.get().getOrder().get().doubleValue() == testTagOrder);
 
         Optional<RoomTag> roomTag = room.getUserTags().stream().filter(tag -> testTag.equals(tag.getName()))
                 .findFirst();
         assertTrue(roomTag.isPresent());
-        assertTrue(roomTag.get().getOrder() == null);
+        assertFalse(roomTag.get().getOrder().isPresent());
 
         assertTrue(room.getFavouriteTag().isPresent());
         assertTrue(room.getLowpriorityTag().isPresent());
