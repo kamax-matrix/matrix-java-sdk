@@ -28,6 +28,7 @@ import io.kamax.matrix.room.RoomAlias;
 import io.kamax.matrix.room._RoomAliasLookup;
 import io.kamax.matrix.room._RoomCreationOptions;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -65,5 +66,18 @@ public interface _MatrixClient extends _MatrixClientRaw {
     _MatrixContent getMedia(String mxUri) throws IllegalArgumentException;
 
     _MatrixContent getMedia(URI mxUri) throws IllegalArgumentException;
+
+    /**
+     * Upload content to the media repository
+     * 
+     * @param io
+     *            The Input stream to read data from
+     * @param length
+     *            The length of the content, in bytes
+     * @param type
+     *            The mime-type of the content upload
+     * @return The MXC URI for the uploaded content
+     */
+    String putMedia(InputStream io, long length, String type);
 
 }

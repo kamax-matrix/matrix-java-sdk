@@ -392,7 +392,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     protected URIBuilder getMediaPathBuilder(String action) {
-        return getPathBuilder("media", "v1", action);
+        return getPathBuilder("media", "r0", action);
     }
 
     protected URI getWithAccessToken(URIBuilder builder) {

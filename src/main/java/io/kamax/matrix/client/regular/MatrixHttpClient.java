@@ -40,8 +40,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -214,6 +216,15 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     @Override
     public _MatrixContent getMedia(URI mxUri) throws IllegalArgumentException {
         return new MatrixHttpContent(context, mxUri);
+    }
+
+    @Override
+    public String putMedia(InputStream io, long length, String type) {
+        HttpPost request = new HttpPost(getMediaPath("/upload"));
+        request.setEntity(new InputStreamEntity(io, length));
+        request.setHeader("Content-Type", type);
+        String body = execute(request);
+        return GsonUtil.getStringOrThrow(GsonUtil.parseObj(body), "content_uri");
     }
 
 }
