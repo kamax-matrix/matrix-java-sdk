@@ -63,8 +63,26 @@ public interface _MatrixClient extends _MatrixClientRaw {
 
     _SyncData sync(_SyncOptions options);
 
+    /**
+     * Download content from the media repository
+     * 
+     * @param mxUri
+     *            The MXC URI for the content to download
+     * @return The content
+     * @throws IllegalArgumentException
+     *             if the parameter is not a valid MXC URI
+     */
     _MatrixContent getMedia(String mxUri) throws IllegalArgumentException;
 
+    /**
+     * Download content from the media repository
+     * 
+     * @param mxUri
+     *            The MXC URI for the content to download
+     * @return The content
+     * @throws IllegalArgumentException
+     *             if the parameter is not a valid MXC URI
+     */
     _MatrixContent getMedia(URI mxUri) throws IllegalArgumentException;
 
     /**
