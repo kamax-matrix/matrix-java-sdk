@@ -25,7 +25,10 @@ import com.google.gson.JsonObject;
 import io.kamax.matrix.codec.MxBase64;
 import io.kamax.matrix.json.MatrixJson;
 
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 
 
 import net.i2p.crypto.eddsa.EdDSAEngine;

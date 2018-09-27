@@ -20,16 +20,17 @@
 
 package io.kamax.matrix.client;
 
-import org.apache.http.client.methods.HttpRequestBase;
-
 import java.util.ArrayList;
 import java.util.List;
 
+
+import okhttp3.Request;
+
 public class MatrixHttpRequest {
-    private final HttpRequestBase httpRequest;
+    private final Request httpRequest;
     private List<Integer> ignoredErrorCodes = new ArrayList<>();
 
-    public MatrixHttpRequest(HttpRequestBase request) {
+    public MatrixHttpRequest(Request request) {
         this.httpRequest = request;
     }
 
@@ -38,7 +39,7 @@ public class MatrixHttpRequest {
         return this;
     }
 
-    public HttpRequestBase getHttpRequest() {
+    public Request getHttpRequest() {
         return httpRequest;
     }
 

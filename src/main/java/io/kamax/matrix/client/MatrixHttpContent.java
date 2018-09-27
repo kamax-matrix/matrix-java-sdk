@@ -23,15 +23,17 @@ package io.kamax.matrix.client;
 import io.kamax.matrix._MatrixContent;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.net.URL;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+
+import okhttp3.Request;
 
 public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixContent {
 
@@ -59,9 +61,8 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
             if (!StringUtils.equalsIgnoreCase("mxc", address.getScheme())) {
                 log.debug("{} is not a supported protocol for avatars, ignoring", address.getScheme());
             } else {
-                URI path = getMediaPath("/download/" + address.getHost() + address.getPath());
-
-                MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
+                URL path = getMediaPath("/download/" + address.getHost() + address.getPath());
+                MatrixHttpRequest request = new MatrixHttpRequest(new Request.Builder().url(path).build());
                 result = executeContentRequest(request);
                 valid = result.isValid();
             }
@@ -112,15 +113,16 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
             throw new IllegalStateException("This method should only be called, if valid is true.");
         }
 
-        Optional<Header> contentDisposition = result.getHeader("Content-Disposition");
-        if (contentDisposition.isPresent()) {
-            Matcher m = filenamePattern.matcher(contentDisposition.get().getValue());
-            if (m.find()) {
-                return Optional.of(m.group("filename"));
+        return result.getHeader("Content-Disposition").filter(l -> !l.isEmpty()).flatMap(l -> {
+            for (String v : l) {
+                Matcher m = filenamePattern.matcher(v);
+                if (m.find()) {
+                    return Optional.of(m.group("filename"));
+                }
             }
-        }
 
-        return Optional.empty();
+            return Optional.empty();
+        });
     }
 
 }

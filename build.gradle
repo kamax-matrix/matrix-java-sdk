@@ -73,7 +73,7 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.7'
     compile 'commons-io:commons-io:2.5'
     compile 'commons-codec:commons-codec:1.11'
-    compile 'org.apache.httpcomponents:fluent-hc:4.5.5'
+    compile 'com.squareup.okhttp3:okhttp:3.11.0'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'net.i2p.crypto:eddsa:0.1.0'
 
