@@ -24,7 +24,9 @@ package io.kamax.matrix.event;
 import com.google.gson.JsonObject;
 
 public interface _MatrixEvent {
+
     String getType();
 
     JsonObject getJson();
+
 }

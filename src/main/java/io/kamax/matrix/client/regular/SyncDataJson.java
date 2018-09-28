@@ -31,7 +31,6 @@ import io.kamax.matrix.event._MatrixPersistentEvent;
 import io.kamax.matrix.event._MatrixStateEvent;
 import io.kamax.matrix.json.MatrixJsonObject;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -56,8 +55,8 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         }
 
         @Override
-        public Instant getTime() {
-            return Instant.ofEpochMilli(getLong(EventKey.Timestamp.get()));
+        public Long getTime() {
+            return getLong(EventKey.Timestamp.get());
         }
 
         @Override
