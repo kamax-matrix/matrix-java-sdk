@@ -343,8 +343,8 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return HttpUrl.get(context.getIsBaseUrl()).newBuilder();
     }
 
-    protected HttpUrl.Builder getPathBuilder(HttpUrl.Builder base, String module, String... segments) {
-        base.addPathSegment("_matrix").addPathSegment(module);
+    protected HttpUrl.Builder getPathBuilder(HttpUrl.Builder base, String... segments) {
+        base.addPathSegment("_matrix");
         for (String segment : segments) {
             base.addPathSegment(segment);
         }
@@ -356,32 +356,32 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return base;
     }
 
-    protected HttpUrl.Builder getPathBuilder(String module, String... segments) {
-        return getPathBuilder(getHsBaseUrl(), module, segments);
+    protected HttpUrl.Builder getPathBuilder(String... segments) {
+        return getPathBuilder(getHsBaseUrl(), segments);
     }
 
-    protected HttpUrl.Builder getIdentityPathBuilder(String module, String... segments) {
-        return getPathBuilder(getIsBaseUrl(), module, segments);
+    protected HttpUrl.Builder getIdentityPathBuilder(String... segments) {
+        return getPathBuilder(getIsBaseUrl(), segments);
     }
 
-    protected URL getPath(String module, String... segments) {
-        return getPathBuilder(module, segments).build().url();
+    protected URL getPath(String... segments) {
+        return getPathBuilder(segments).build().url();
     }
 
-    protected URL getIdentityPath(String module, String... segments) {
-        return getIdentityPathBuilder(module, segments).build().url();
+    protected URL getIdentityPath(String... segments) {
+        return getIdentityPathBuilder(segments).build().url();
     }
 
     protected HttpUrl.Builder getClientPathBuilder(String... segments) {
-        String[] seg = { "r0" };
-        segments = ArrayUtils.addAll(seg, segments);
-        return getPathBuilder("client", segments);
+        String[] base = { "client", "r0" };
+        segments = ArrayUtils.addAll(base, segments);
+        return getPathBuilder(segments);
     }
 
     protected HttpUrl.Builder getMediaPathBuilder(String... segments) {
-        String[] seg = { "r0" };
-        segments = ArrayUtils.addAll(seg, segments);
-        return getPathBuilder("media", segments);
+        String[] base = { "media", "r0" };
+        segments = ArrayUtils.addAll(base, segments);
+        return getPathBuilder(segments);
     }
 
     protected URL getClientPath(String... segments) {
