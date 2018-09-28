@@ -200,7 +200,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     @Override
     public void sendReceipt(String type, String eventId) {
         URL path = getClientPath("rooms", roomId, "receipt", type, eventId);
-        executeAuthenticated(new Request.Builder().post(null).url(path));
+        executeAuthenticated(new Request.Builder().post(getJsonBody(new JsonObject())).url(path));
     }
 
     @Override
