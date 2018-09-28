@@ -50,8 +50,9 @@ public class MatrixApplicationServiceClient extends MatrixHttpClient implements 
     @Override
     public _MatrixClient createUser(String localpart) {
         log.debug("Creating new user {}", localpart);
-        URL path = getClientPathWithAccessToken("/register");
-        execute(new Request.Builder().post(getJsonBody(new VirtualUserRegistrationBody(localpart))).url(path));
+        URL path = getClientPath("register");
+        executeAuthenticated(
+                new Request.Builder().post(getJsonBody(new VirtualUserRegistrationBody(localpart))).url(path));
         return createClient(localpart);
     }
 

@@ -29,6 +29,7 @@ import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
 import io.kamax.matrix.json.GsonUtil;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,10 +89,9 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         String hostname = context.getDomain().split(":")[0];
         log.info("Performing .well-known auto-discovery for {}", hostname);
 
-        URL url = new HttpUrl.Builder().scheme("https").host(hostname).addPathSegments("/.well-known/matrix/client")
+        URL url = new HttpUrl.Builder().scheme("https").host(hostname).addPathSegments(".well-known/matrix/client")
                 .build().url();
-        Request req = new Request.Builder().get().url(url).build();
-        String body = execute(new MatrixHttpRequest(req).addIgnoredErrorCode(404));
+        String body = execute(new MatrixHttpRequest(new Request.Builder().get().url(url)).addIgnoredErrorCode(404));
         if (StringUtils.isBlank(body)) {
             if (Objects.isNull(context.getHsBaseUrl())) {
                 throw new IllegalStateException("No valid Homeserver base URL was found");
@@ -173,22 +173,36 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return "{}".equals(body);
     }
 
+    protected String getUserId() {
+        return getUser().orElseThrow(IllegalStateException::new).getId();
+    }
+
     @Override
     public Optional<_MatrixID> getUser() {
         return context.getUser();
     }
 
-    protected String execute(Request.Builder builder) {
-        return execute(builder.build());
+    protected Request.Builder addAuthHeader(Request.Builder builder) {
+        builder.addHeader("Authorization", "Bearer " + getAccessTokenOrThrow());
+        return builder;
     }
 
-    protected String execute(Request request) {
-        return execute(new MatrixHttpRequest(request));
+    protected String executeAuthenticated(Request.Builder builder) {
+        return execute(addAuthHeader(builder));
+    }
+
+    protected String executeAuthenticated(MatrixHttpRequest matrixRequest) {
+        addAuthHeader(matrixRequest.getHttpRequest());
+        return execute(matrixRequest);
+    }
+
+    protected String execute(Request.Builder builder) {
+        return execute(new MatrixHttpRequest(builder));
     }
 
     protected String execute(MatrixHttpRequest matrixRequest) {
         log(matrixRequest.getHttpRequest());
-        try (Response response = client.newCall(matrixRequest.getHttpRequest()).execute()) {
+        try (Response response = client.newCall(matrixRequest.getHttpRequest().build()).execute()) {
             String body = response.body().string();
             int responseStatus = response.code();
 
@@ -210,7 +224,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected MatrixHttpContentResult executeContentRequest(MatrixHttpRequest matrixRequest) {
         log(matrixRequest.getHttpRequest());
-        try (Response response = client.newCall(matrixRequest.getHttpRequest()).execute()) {
+        try (Response response = client.newCall(matrixRequest.getHttpRequest().build()).execute()) {
             int responseStatus = response.code();
 
             MatrixHttpContentResult result;
@@ -307,7 +321,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         }
     }
 
-    private void log(Request req) {
+    private void log(Request.Builder req) {
         String reqUrl = req.toString();
         Matcher m = accessTokenUrlPattern.matcher(reqUrl);
         if (m.find()) {
@@ -318,7 +332,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
             reqUrl = b.toString();
         }
 
-        log.debug("Doing {} {}", req.method(), reqUrl);
+        log.debug("Doing {} {}", req, reqUrl);
     }
 
     protected HttpUrl.Builder getHsBaseUrl() {
@@ -329,12 +343,11 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return HttpUrl.get(context.getIsBaseUrl()).newBuilder();
     }
 
-    protected HttpUrl.Builder getPathBuilder(HttpUrl.Builder base, String module, String version, String action) {
-        if (getUser().isPresent()) {
-            action = action.replace("{userId}", getUser().get().getId());
+    protected HttpUrl.Builder getPathBuilder(HttpUrl.Builder base, String module, String... segments) {
+        base.addPathSegment("_matrix").addPathSegment(module);
+        for (String segment : segments) {
+            base.addPathSegment(segment);
         }
-
-        base.addPathSegment("_matrix").addPathSegment(module).addPathSegments(version + action);
 
         if (context.isVirtual()) {
             context.getUser().ifPresent(user -> base.addQueryParameter("user_id", user.getId()));
@@ -343,45 +356,40 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return base;
     }
 
-    protected HttpUrl.Builder getPathBuilder(String module, String version, String action) {
-        return getPathBuilder(getHsBaseUrl(), module, version, action);
+    protected HttpUrl.Builder getPathBuilder(String module, String... segments) {
+        return getPathBuilder(getHsBaseUrl(), module, segments);
     }
 
-    protected HttpUrl.Builder getIdentityPathBuilder(String module, String version, String action) {
-        return getPathBuilder(getIsBaseUrl(), module, version, action);
+    protected HttpUrl.Builder getIdentityPathBuilder(String module, String... segments) {
+        return getPathBuilder(getIsBaseUrl(), module, segments);
     }
 
-    protected URL getPath(String module, String version, String action) {
-        return getPathBuilder(module, version, action).build().url();
+    protected URL getPath(String module, String... segments) {
+        return getPathBuilder(module, segments).build().url();
     }
 
-    protected URL getIdentityPath(String module, String version, String action) {
-        return getIdentityPathBuilder(module, version, action).build().url();
+    protected URL getIdentityPath(String module, String... segments) {
+        return getIdentityPathBuilder(module, segments).build().url();
     }
 
-    protected HttpUrl.Builder getClientPathBuilder(String action) {
-        return getPathBuilder("client", "r0", action);
+    protected HttpUrl.Builder getClientPathBuilder(String... segments) {
+        String[] seg = { "r0" };
+        segments = ArrayUtils.addAll(seg, segments);
+        return getPathBuilder("client", segments);
     }
 
-    protected HttpUrl.Builder getMediaPathBuilder(String action) {
-        return getPathBuilder("media", "r0", action);
+    protected HttpUrl.Builder getMediaPathBuilder(String... segments) {
+        String[] seg = { "r0" };
+        segments = ArrayUtils.addAll(seg, segments);
+        return getPathBuilder("media", segments);
     }
 
-    protected URL getWithAccessToken(HttpUrl.Builder builder) {
-        builder.addQueryParameter("access_token", getAccessTokenOrThrow());
-        return builder.build().url();
+    protected URL getClientPath(String... segments) {
+        return getClientPathBuilder(segments).build().url();
     }
 
-    protected URL getClientPathWithAccessToken(String action) {
-        return getWithAccessToken(getClientPathBuilder(action));
-    }
-
-    protected URL getClientPath(String action) {
-        return getClientPathBuilder(action).build().url();
-    }
-
-    protected URL getMediaPath(String action) {
-        return getWithAccessToken(getMediaPathBuilder(action));
+    protected URL getMediaPath(String... segments) {
+        return getMediaPathBuilder(segments).build().url();
     }
 
     protected RequestBody getJsonBody(Object o) {

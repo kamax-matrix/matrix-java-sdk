@@ -61,8 +61,9 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
             if (!StringUtils.equalsIgnoreCase("mxc", address.getScheme())) {
                 log.debug("{} is not a supported protocol for avatars, ignoring", address.getScheme());
             } else {
-                URL path = getMediaPath("/download/" + address.getHost() + address.getPath());
-                MatrixHttpRequest request = new MatrixHttpRequest(new Request.Builder().url(path).build());
+                URL path = getMediaPathBuilder("download").addEncodedPathSegments(address.getHost() + address.getPath())
+                        .build().url();
+                MatrixHttpRequest request = new MatrixHttpRequest(new Request.Builder().url(path));
                 result = executeContentRequest(request);
                 valid = result.isValid();
             }

@@ -29,7 +29,6 @@ import io.kamax.matrix.room._RoomAliasLookup;
 import io.kamax.matrix.room._RoomCreationOptions;
 
 import java.io.File;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;

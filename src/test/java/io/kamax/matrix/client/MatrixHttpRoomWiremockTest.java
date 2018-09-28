@@ -27,24 +27,22 @@ import java.net.URISyntaxException;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class MatrixHttpRoomWiremockTest extends AMatrixHttpRoomTest {
-    private String nameUrl = String.format("/_matrix/client/r0/rooms/%s/state/m.room.name", roomId) + tokenParameter;
+    private String nameUrl = String.format("/_matrix/client/r0/rooms/%s/state/m.room.name", roomId);
     private String nameResponse = String.format("{\"name\": \"%s\"}", nameOfRoom);
 
-    private String topicUrl = String.format("/_matrix/client/r0/rooms/%s/state/m.room.topic", roomId) + tokenParameter;
+    private String topicUrl = String.format("/_matrix/client/r0/rooms/%s/state/m.room.topic", roomId);
     private String topicResponse = String.format("{\"topic\": \"%s\"}", testTopic);
 
-    private String joinUrl = String.format("/_matrix/client/r0/rooms/%s/join", roomId) + tokenParameter;
+    private String joinUrl = String.format("/_matrix/client/r0/rooms/%s/join", roomId);
     private String joinResponse = String.format("{\"roomId\": \"%s\"}", roomId);
 
-    private String leaveUrl = String.format("/_matrix/client/r0/rooms/%s/leave", roomId) + tokenParameter;
+    private String leaveUrl = String.format("/_matrix/client/r0/rooms/%s/leave", roomId);
     private String leaveResponse = String.format("{\"roomId\": \"%s\"}", roomId);
 
-    private String sendTextUrl = String.format("/_matrix/client/r0/rooms/%s/send/m.room.message/([0-9.]+)\\", roomId)
-            + tokenParameter;
+    private String sendTextUrl = String.format("/_matrix/client/r0/rooms/%s/send/m.room.message/([0-9.]+)", roomId);
     private String sendTextResponse = String.format("{\"event_id\": \"%s\"}", eventId);
 
-    private String getJoinedUsersUrl = String.format("/_matrix/client/r0/rooms/%s/joined_members", roomId)
-            + tokenParameter;
+    private String getJoinedUsersUrl = String.format("/_matrix/client/r0/rooms/%s/joined_members", roomId);
     private String getJoinedUsersResponse = String.format("{\"joined\": {\"%s\": {}, \"%s\": {}}}", joinedUser1,
             joinedUser2);
 

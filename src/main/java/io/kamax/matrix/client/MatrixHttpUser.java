@@ -57,23 +57,21 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
 
     @Override
     public Optional<String> getName() {
-        URL path = getClientPathWithAccessToken("/profile/" + mxId.getId() + "/displayname");
+        URL path = getClientPath("profile", mxId.getId(), "displayname");
 
-        Request reqBase = new Request.Builder().get().url(path).build();
-        MatrixHttpRequest request = new MatrixHttpRequest(reqBase);
+        MatrixHttpRequest request = new MatrixHttpRequest(new Request.Builder().get().url(path));
         request.addIgnoredErrorCode(404);
-        String body = execute(request);
+        String body = executeAuthenticated(request);
         return extractAsStringFromBody(body, "displayname");
     }
 
     @Override
     public Optional<String> getAvatarUrl() {
-        URL path = getClientPathWithAccessToken("/profile/" + mxId.getId() + "/avatar_url");
+        URL path = getClientPath("profile", mxId.getId(), "avatar_url");
 
-        Request reqBase = new Request.Builder().get().url(path).build();
-        MatrixHttpRequest request = new MatrixHttpRequest(reqBase);
+        MatrixHttpRequest request = new MatrixHttpRequest(new Request.Builder().get().url(path));
         request.addIgnoredErrorCode(404);
-        String body = execute(request);
+        String body = executeAuthenticated(request);
         return extractAsStringFromBody(body, "avatar_url");
     }
 
@@ -91,10 +89,9 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
 
     @Override
     public Optional<_Presence> getPresence() {
-        URL path = getClientPathWithAccessToken("/presence/" + mxId.getId() + "/status");
+        URL path = getClientPath("presence", mxId.getId(), "status");
 
-        Request reqBase = new Request.Builder().get().url(path).build();
-        MatrixHttpRequest request = new MatrixHttpRequest(reqBase);
+        MatrixHttpRequest request = new MatrixHttpRequest(new Request.Builder().get().url(path));
         request.addIgnoredErrorCode(404);
         String body = execute(request);
         if (StringUtils.isBlank(body)) {

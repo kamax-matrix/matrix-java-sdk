@@ -27,10 +27,10 @@ import java.util.List;
 import okhttp3.Request;
 
 public class MatrixHttpRequest {
-    private final Request httpRequest;
+    private final Request.Builder httpRequest;
     private List<Integer> ignoredErrorCodes = new ArrayList<>();
 
-    public MatrixHttpRequest(Request request) {
+    public MatrixHttpRequest(Request.Builder request) {
         this.httpRequest = request;
     }
 
@@ -39,7 +39,7 @@ public class MatrixHttpRequest {
         return this;
     }
 
-    public Request getHttpRequest() {
+    public Request.Builder getHttpRequest() {
         return httpRequest;
     }
 
