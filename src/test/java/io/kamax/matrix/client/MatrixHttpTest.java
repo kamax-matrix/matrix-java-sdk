@@ -47,7 +47,6 @@ import static org.junit.Assert.assertTrue;
 
 public class MatrixHttpTest {
     protected String testToken = "testToken";
-    protected String tokenParameter = "?access_token=" + testToken;
     protected int port = 8098;
     protected String resourcePath = "src/test/resources/wiremock";
 

@@ -20,10 +20,7 @@
 
 package io.kamax.matrix.hs;
 
-import org.apache.http.client.utils.URIBuilder;
-
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 
 public class MatrixHomeserver implements _MatrixHomeserver {
@@ -56,11 +53,6 @@ public class MatrixHomeserver implements _MatrixHomeserver {
     @Override
     public URL getBaseEndpoint() {
         return base;
-    }
-
-    @Override
-    public URIBuilder getBaseEndpointBuilder() {
-        return new URIBuilder(URI.create(base.toString()));
     }
 
 }

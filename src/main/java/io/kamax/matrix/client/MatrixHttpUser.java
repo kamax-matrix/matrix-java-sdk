@@ -27,13 +27,16 @@ import io.kamax.matrix.client.regular.Presence;
 import io.kamax.matrix.json.GsonUtil;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Optional;
+
+
+import okhttp3.Request;
 
 public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
 
@@ -54,21 +57,21 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
 
     @Override
     public Optional<String> getName() {
-        URI path = getClientPathWithAccessToken("/profile/" + mxId.getId() + "/displayname");
+        URL path = getClientPath("profile", mxId.getId(), "displayname");
 
-        MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
+        MatrixHttpRequest request = new MatrixHttpRequest(new Request.Builder().get().url(path));
         request.addIgnoredErrorCode(404);
-        String body = execute(request);
+        String body = executeAuthenticated(request);
         return extractAsStringFromBody(body, "displayname");
     }
 
     @Override
     public Optional<String> getAvatarUrl() {
-        URI path = getClientPathWithAccessToken("/profile/" + mxId.getId() + "/avatar_url");
+        URL path = getClientPath("profile", mxId.getId(), "avatar_url");
 
-        MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
+        MatrixHttpRequest request = new MatrixHttpRequest(new Request.Builder().get().url(path));
         request.addIgnoredErrorCode(404);
-        String body = execute(request);
+        String body = executeAuthenticated(request);
         return extractAsStringFromBody(body, "avatar_url");
     }
 
@@ -86,8 +89,9 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
 
     @Override
     public Optional<_Presence> getPresence() {
-        URI path = getClientPathWithAccessToken("/presence/" + mxId.getId() + "/status");
-        MatrixHttpRequest request = new MatrixHttpRequest(new HttpGet(path));
+        URL path = getClientPath("presence", mxId.getId(), "status");
+
+        MatrixHttpRequest request = new MatrixHttpRequest(new Request.Builder().get().url(path));
         request.addIgnoredErrorCode(404);
         String body = execute(request);
         if (StringUtils.isBlank(body)) {

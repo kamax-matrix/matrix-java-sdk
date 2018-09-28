@@ -25,11 +25,13 @@ import io.kamax.matrix.client._MatrixClient;
 import io.kamax.matrix.client.regular.MatrixHttpClient;
 import io.kamax.matrix.json.VirtualUserRegistrationBody;
 
-import org.apache.http.client.methods.HttpPost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
+import java.net.URL;
+
+
+import okhttp3.Request;
 
 public class MatrixApplicationServiceClient extends MatrixHttpClient implements _MatrixApplicationServiceClient {
 
@@ -48,11 +50,9 @@ public class MatrixApplicationServiceClient extends MatrixHttpClient implements 
     @Override
     public _MatrixClient createUser(String localpart) {
         log.debug("Creating new user {}", localpart);
-        URI path = getClientPathWithAccessToken("/register");
-        HttpPost req = new HttpPost(path);
-        req.setEntity(getJsonEntity(new VirtualUserRegistrationBody(localpart)));
-        execute(req);
-
+        URL path = getClientPath("register");
+        executeAuthenticated(
+                new Request.Builder().post(getJsonBody(new VirtualUserRegistrationBody(localpart))).url(path));
         return createClient(localpart);
     }
 

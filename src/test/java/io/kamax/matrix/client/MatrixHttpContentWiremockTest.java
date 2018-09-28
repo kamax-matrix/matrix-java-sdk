@@ -28,7 +28,7 @@ import java.net.URISyntaxException;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class MatrixHttpContentWiremockTest extends AMatrixHttpContentTest {
-    private String downloadUrl = "/_matrix/media/r0/download/" + address.getHost() + address.getPath() + tokenParameter;
+    private String downloadUrl = "/_matrix/media/r0/download/" + address.getHost() + address.getPath();
 
     public MatrixHttpContentWiremockTest() throws URISyntaxException {
     }

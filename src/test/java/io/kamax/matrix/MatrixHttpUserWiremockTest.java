@@ -27,10 +27,10 @@ import java.net.URISyntaxException;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class MatrixHttpUserWiremockTest extends AMatrixHttpUserTest {
-    private String nameUrl = String.format("/_matrix/client/r0/profile/%s/displayname", user.getId()) + tokenParameter;
+    private String nameUrl = String.format("/_matrix/client/r0/profile/%s/displayname", user.getId());
     private String nameResponse = String.format("{\"displayname\": \"%s\"}", username);
 
-    private String avatarUrl = String.format("/_matrix/client/r0/profile/%s/avatar_url", user.getId()) + tokenParameter;
+    private String avatarUrl = String.format("/_matrix/client/r0/profile/%s/avatar_url", user.getId());
     private String avatarResponse = String.format("{\"avatar_url\": \"%s\"}", avatarMediaUrl);
 
     @Override
