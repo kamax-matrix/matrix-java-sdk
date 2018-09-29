@@ -32,7 +32,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MatrixApplicationServiceClientTest extends MatrixHttpTest {
-    private String createUserUrl = "/_matrix/client/r0/register" + tokenParameter;
+    private String createUserUrl = "/_matrix/client/r0/register";
     private String testUser = "testUser";
 
     @Override

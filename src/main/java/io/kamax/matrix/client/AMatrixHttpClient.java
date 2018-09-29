@@ -23,35 +23,22 @@ package io.kamax.matrix.client;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
 import io.kamax.matrix.json.GsonUtil;
-
-import org.apache.commons.io.IOUtils;
+import okhttp3.*;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.EntityBuilder;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,11 +46,11 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     private Logger log = LoggerFactory.getLogger(AMatrixHttpClient.class);
 
-    protected MatrixClientContext context = new MatrixClientContext();
+    protected MatrixClientContext context;
 
     protected Gson gson = GsonUtil.get();
     protected JsonParser jsonParser = new JsonParser();
-    private CloseableHttpClient client;
+    private OkHttpClient client;
 
     private Pattern accessTokenUrlPattern = Pattern.compile("\\?access_token=(?<token>[^&]*)");
 
@@ -80,15 +67,11 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     protected AMatrixHttpClient(MatrixClientContext context, MatrixClientDefaults defaults) {
-        this(context,
-                HttpClients.custom()
-                        .setDefaultRequestConfig(RequestConfig.custom().setConnectTimeout(defaults.getConnectTimeout())
-                                .setConnectionRequestTimeout(defaults.getRequestTimeout())
-                                .setSocketTimeout(defaults.getRequestTimeout()).build())
-                        .build());
+        this(context, new OkHttpClient.Builder().connectTimeout(defaults.getConnectTimeout(), TimeUnit.MILLISECONDS)
+                .followRedirects(false).build());
     }
 
-    protected AMatrixHttpClient(MatrixClientContext context, CloseableHttpClient client) {
+    protected AMatrixHttpClient(MatrixClientContext context, OkHttpClient client) {
         this.context = context;
         this.client = client;
     }
@@ -99,66 +82,59 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
             throw new IllegalStateException("A non-empty Matrix domain must be set to discover the client settings");
         }
 
-        try {
-            String hostname = context.getDomain().split(":")[0];
-            log.info("Performing .well-known auto-discovery for {}", hostname);
+        String hostname = context.getDomain().split(":")[0];
+        log.info("Performing .well-known auto-discovery for {}", hostname);
 
-            URIBuilder builder = new URIBuilder();
-            builder.setScheme("https");
-            builder.setHost(hostname);
-            builder.setPath("/.well-known/matrix/client");
-            HttpGet req = new HttpGet(builder.build());
-            String body = execute(new MatrixHttpRequest(req).addIgnoredErrorCode(404));
-            if (StringUtils.isBlank(body)) {
-                if (Objects.isNull(context.getHsBaseUrl())) {
-                    throw new IllegalStateException("No valid Homeserver base URL was found");
-                }
-
-                // No .well-known data found
-                // FIXME improve SDK so we can differentiate between not found and empty.
-                // not found = skip
-                // empty = failure
-                return Optional.empty();
-            }
-
-            log.info("Found body: {}", body);
-
-            WellKnownAutoDiscoverySettings settings = new WellKnownAutoDiscoverySettings(body);
-            log.info("Found .well-known data");
-
-            // TODO reconsider if and where we should check for an already present HS url in the context
-            if (settings.getHsBaseUrls().isEmpty()) {
+        URL url = new HttpUrl.Builder().scheme("https").host(hostname).addPathSegments(".well-known/matrix/client")
+                .build().url();
+        String body = execute(new MatrixHttpRequest(new Request.Builder().get().url(url)).addIgnoredErrorCode(404));
+        if (StringUtils.isBlank(body)) {
+            if (Objects.isNull(context.getHsBaseUrl())) {
                 throw new IllegalStateException("No valid Homeserver base URL was found");
             }
 
-            for (URL baseUrlCandidate : settings.getHsBaseUrls()) {
-                context.setHsBaseUrl(baseUrlCandidate);
-                try {
-                    if (!getHomeApiVersions().isEmpty()) {
-                        log.info("Found a valid HS at {}", getContext().getHsBaseUrl().toString());
-                        break;
-                    }
-                } catch (MatrixClientRequestException e) {
-                    log.warn("Error when trying to fetch {}: {}", baseUrlCandidate, e.getMessage());
-                }
-            }
-
-            for (URL baseUrlCandidate : settings.getIsBaseUrls()) {
-                context.setIsBaseUrl(baseUrlCandidate);
-                try {
-                    if (validateIsBaseUrl()) {
-                        log.info("Found a valid IS at {}", getContext().getHsBaseUrl().toString());
-                        break;
-                    }
-                } catch (MatrixClientRequestException e) {
-                    log.warn("Error when trying to fetch {}: {}", baseUrlCandidate, e.getMessage());
-                }
-            }
-
-            return Optional.of(settings);
-        } catch (URISyntaxException e) { // The domain was invalid when used in a URL
-            throw new IllegalArgumentException(e);
+            // No .well-known data found
+            // FIXME improve SDK so we can differentiate between not found and empty.
+            // not found = skip
+            // empty = failure
+            return Optional.empty();
         }
+
+        log.info("Found body: {}", body);
+
+        WellKnownAutoDiscoverySettings settings = new WellKnownAutoDiscoverySettings(body);
+        log.info("Found .well-known data");
+
+        // TODO reconsider if and where we should check for an already present HS url in the context
+        if (settings.getHsBaseUrls().isEmpty()) {
+            throw new IllegalStateException("No valid Homeserver base URL was found");
+        }
+
+        for (URL baseUrlCandidate : settings.getHsBaseUrls()) {
+            context.setHsBaseUrl(baseUrlCandidate);
+            try {
+                if (!getHomeApiVersions().isEmpty()) {
+                    log.info("Found a valid HS at {}", getContext().getHsBaseUrl().toString());
+                    break;
+                }
+            } catch (MatrixClientRequestException e) {
+                log.warn("Error when trying to fetch {}: {}", baseUrlCandidate, e.getMessage());
+            }
+        }
+
+        for (URL baseUrlCandidate : settings.getIsBaseUrls()) {
+            context.setIsBaseUrl(baseUrlCandidate);
+            try {
+                if (validateIsBaseUrl()) {
+                    log.info("Found a valid IS at {}", getContext().getHsBaseUrl().toString());
+                    break;
+                }
+            } catch (MatrixClientRequestException e) {
+                log.warn("Error when trying to fetch {}: {}", baseUrlCandidate, e.getMessage());
+            }
+        }
+
+        return Optional.of(settings);
     }
 
     @Override
@@ -183,14 +159,18 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     @Override
     public List<String> getHomeApiVersions() {
-        String body = execute(new HttpGet(getPath("client", "", "versions")));
+        String body = execute(new Request.Builder().get().url(getPath("client", "", "versions")));
         return GsonUtil.asList(GsonUtil.parseObj(body), "versions", String.class);
     }
 
     @Override
     public boolean validateIsBaseUrl() {
-        String body = execute(new HttpGet(getIdentityPath("identity", "api", "/v1")));
+        String body = execute(new Request.Builder().get().url(getIdentityPath("identity", "api", "/v1")));
         return "{}".equals(body);
+    }
+
+    protected String getUserId() {
+        return getUser().orElseThrow(IllegalStateException::new).getId();
     }
 
     @Override
@@ -198,16 +178,29 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return context.getUser();
     }
 
-    protected String execute(HttpRequestBase request) {
-        return execute(new MatrixHttpRequest(request));
+    protected Request.Builder addAuthHeader(Request.Builder builder) {
+        builder.addHeader("Authorization", "Bearer " + getAccessTokenOrThrow());
+        return builder;
+    }
+
+    protected String executeAuthenticated(Request.Builder builder) {
+        return execute(addAuthHeader(builder));
+    }
+
+    protected String executeAuthenticated(MatrixHttpRequest matrixRequest) {
+        addAuthHeader(matrixRequest.getHttpRequest());
+        return execute(matrixRequest);
+    }
+
+    protected String execute(Request.Builder builder) {
+        return execute(new MatrixHttpRequest(builder));
     }
 
     protected String execute(MatrixHttpRequest matrixRequest) {
         log(matrixRequest.getHttpRequest());
-        try (CloseableHttpResponse response = client.execute(matrixRequest.getHttpRequest())) {
-
-            String body = getBody(response.getEntity());
-            int responseStatus = response.getStatusLine().getStatusCode();
+        try (Response response = client.newCall(matrixRequest.getHttpRequest().build()).execute()) {
+            String body = response.body().string();
+            int responseStatus = response.code();
 
             if (responseStatus == 200) {
                 log.debug("Request successfully executed.");
@@ -220,7 +213,28 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
                 body = handleError(matrixRequest, responseStatus, info);
             }
             return body;
+        } catch (IOException e) {
+            throw new MatrixClientRequestException(e);
+        }
+    }
 
+    protected MatrixHttpContentResult executeContentRequest(MatrixHttpRequest matrixRequest) {
+        log(matrixRequest.getHttpRequest());
+        try (Response response = client.newCall(matrixRequest.getHttpRequest().build()).execute()) {
+            int responseStatus = response.code();
+
+            MatrixHttpContentResult result;
+
+            if (responseStatus == 200 || matrixRequest.getIgnoredErrorCodes().contains(responseStatus)) {
+                log.debug("Request successfully executed.");
+                result = new MatrixHttpContentResult(response);
+            } else {
+                String body = response.body().string();
+                MatrixErrorInfo info = createErrorInfo(body, responseStatus);
+
+                result = handleErrorContentRequest(matrixRequest, responseStatus, info);
+            }
+            return result;
         } catch (IOException e) {
             throw new MatrixClientRequestException(e);
         }
@@ -264,38 +278,6 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         // 2. return execute(request)
     }
 
-    protected MatrixHttpContentResult executeContentRequest(MatrixHttpRequest matrixRequest) {
-        log(matrixRequest.getHttpRequest());
-        try (CloseableHttpResponse response = client.execute(matrixRequest.getHttpRequest())) {
-            HttpEntity entity = response.getEntity();
-            int responseStatus = response.getStatusLine().getStatusCode();
-
-            MatrixHttpContentResult result = new MatrixHttpContentResult(response);
-
-            if (responseStatus == 200) {
-                log.debug("Request successfully executed.");
-
-                if (entity == null) {
-                    log.debug("No data received.");
-                } else if (entity.getContentType() == null) {
-                    log.debug("No content type was given.");
-                }
-
-            } else if (matrixRequest.getIgnoredErrorCodes().contains(responseStatus)) {
-                log.debug("Error code ignored: " + responseStatus);
-            } else {
-                String body = getBody(entity);
-                MatrixErrorInfo info = createErrorInfo(body, responseStatus);
-
-                result = handleErrorContentRequest(matrixRequest, responseStatus, info);
-            }
-            return result;
-
-        } catch (IOException e) {
-            throw new MatrixClientRequestException(e);
-        }
-    }
-
     protected MatrixHttpContentResult handleErrorContentRequest(MatrixHttpRequest matrixRequest, int responseStatus,
             MatrixErrorInfo info) {
         String message = String.format("Request failed with status code: %s", responseStatus);
@@ -323,11 +305,6 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return GsonUtil.findString(jsonParser.parse(body).getAsJsonObject(), jsonObjectName);
     }
 
-    private String getBody(HttpEntity entity) throws IOException {
-        Charset charset = ContentType.getOrDefault(entity).getCharset();
-        return IOUtils.toString(entity.getContent(), charset);
-    }
-
     private MatrixErrorInfo createErrorInfo(String body, int responseStatus) {
         try {
             MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
@@ -340,89 +317,78 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         }
     }
 
-    private void log(HttpRequestBase req) {
-        String reqUrl = req.getURI().toASCIIString();
+    private void log(Request.Builder req) {
+        String reqUrl = req.toString();
         Matcher m = accessTokenUrlPattern.matcher(reqUrl);
         if (m.find()) {
             StringBuilder b = new StringBuilder();
-            b.append(reqUrl.substring(0, m.start("token")));
+            b.append(reqUrl, 0, m.start("token"));
             b.append("<redacted>");
-            b.append(reqUrl.substring(m.end("token"), reqUrl.length()));
+            b.append(reqUrl.substring(m.end("token")));
             reqUrl = b.toString();
         }
 
-        log.debug("Doing {} {}", req.getMethod(), reqUrl);
+        log.debug("Doing {} {}", req, reqUrl);
     }
 
-    protected URIBuilder getPathBuilder(URIBuilder base, String module, String version, String action) {
-        base.setPath(base.getPath() + "/_matrix/" + module + "/" + version + action);
-        if (context.isVirtual()) {
-            context.getUser().ifPresent(user -> base.setParameter("user_id", user.getId()));
+    protected HttpUrl.Builder getHsBaseUrl() {
+        return HttpUrl.get(context.getHsBaseUrl()).newBuilder();
+    }
+
+    protected HttpUrl.Builder getIsBaseUrl() {
+        return HttpUrl.get(context.getIsBaseUrl()).newBuilder();
+    }
+
+    protected HttpUrl.Builder getPathBuilder(HttpUrl.Builder base, String... segments) {
+        base.addPathSegment("_matrix");
+        for (String segment : segments) {
+            base.addPathSegment(segment);
         }
 
-        context.getUser().ifPresent(user -> base.setPath(base.getPath().replace("{userId}", user.getId())));
-
+        if (context.isVirtual()) {
+            context.getUser().ifPresent(user -> base.addQueryParameter("user_id", user.getId()));
+        }
         return base;
     }
 
-    protected URIBuilder getPathBuilder(String module, String version, String action) {
-        return getPathBuilder(context.getHomeserver().getBaseEndpointBuilder(), module, version, action);
+    protected HttpUrl.Builder getPathBuilder(String... segments) {
+        return getPathBuilder(getHsBaseUrl(), segments);
     }
 
-    protected URIBuilder getIdentityPathBuilder(String module, String version, String action) {
-        return getPathBuilder(new URIBuilder(URI.create(context.getIsBaseUrl().toString())), module, version, action);
+    protected HttpUrl.Builder getIdentityPathBuilder(String... segments) {
+        return getPathBuilder(getIsBaseUrl(), segments);
     }
 
-    protected URI getPath(String module, String version, String action) {
-        try {
-            return getPathBuilder(module, version, action).build();
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
+    protected URL getPath(String... segments) {
+        return getPathBuilder(segments).build().url();
     }
 
-    protected URI getIdentityPath(String module, String version, String action) {
-        try {
-            return getIdentityPathBuilder(module, version, action).build();
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
+    protected URL getIdentityPath(String... segments) {
+        return getIdentityPathBuilder(segments).build().url();
     }
 
-    protected URIBuilder getClientPathBuilder(String action) {
-        return getPathBuilder("client", "r0", action);
+    protected HttpUrl.Builder getClientPathBuilder(String... segments) {
+        String[] base = { "client", "r0" };
+        segments = ArrayUtils.addAll(base, segments);
+        return getPathBuilder(segments);
     }
 
-    protected URIBuilder getMediaPathBuilder(String action) {
-        return getPathBuilder("media", "v1", action);
+    protected HttpUrl.Builder getMediaPathBuilder(String... segments) {
+        String[] base = { "media", "r0" };
+        segments = ArrayUtils.addAll(base, segments);
+        return getPathBuilder(segments);
     }
 
-    protected URI getWithAccessToken(URIBuilder builder) {
-        try {
-            builder.setParameter("access_token", getAccessTokenOrThrow());
-            return builder.build();
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
+    protected URL getClientPath(String... segments) {
+        return getClientPathBuilder(segments).build().url();
     }
 
-    protected URI getClientPathWithAccessToken(String action) {
-        return getWithAccessToken(getClientPathBuilder(action));
+    protected URL getMediaPath(String... segments) {
+        return getMediaPathBuilder(segments).build().url();
     }
 
-    protected URI getClientPath(String action) {
-        try {
-            return getClientPathBuilder(action).build();
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
+    protected RequestBody getJsonBody(Object o) {
+        return RequestBody.create(MediaType.parse("application/json"), GsonUtil.get().toJson(o));
     }
 
-    protected URI getMediaPath(String action) {
-        return getWithAccessToken(getMediaPathBuilder(action));
-    }
-
-    protected HttpEntity getJsonEntity(Object o) {
-        return EntityBuilder.create().setText(gson.toJson(o)).setContentType(ContentType.APPLICATION_JSON).build();
-    }
 }

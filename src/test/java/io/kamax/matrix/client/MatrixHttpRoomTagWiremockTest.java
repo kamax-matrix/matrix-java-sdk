@@ -39,15 +39,14 @@ public class MatrixHttpRoomTagWiremockTest extends AMatrixHttpRoomTagTest {
 
     private String tagsBaseUrl = "/_matrix/client/r0/user/" + user.getId() + "/rooms/" + roomId + "/tags";
 
-    private String tagRequestUrl = tagsBaseUrl + "?access_token=" + testToken;
     private String emptyTagsBody = "{\"tags\": " + "{}}";
     private String allTagsResponse = "{\"tags\": " + "{\"m.favourite\": {}," + "\"m.lowpriority\": {}," + "\"u."
             + testTag + "\": {}," + "\"u." + testTagWithOrder + "\": {\"order\": " + testTagOrder + "}}}";
 
-    private String favouriteTagUrl = tagsBaseUrl + "/m.favourite?access_token=" + testToken;
-    private String lowPriorityTagUrl = tagsBaseUrl + "/m.lowpriority?access_token=" + testToken;
-    private String userTagUrl = tagsBaseUrl + "/u." + testTag + "?access_token=" + testToken;
-    private String userTagWithOrderUrl = tagsBaseUrl + "/u." + testTagWithOrder + "?access_token=" + testToken;
+    private String favouriteTagUrl = tagsBaseUrl + "/m.favourite";
+    private String lowPriorityTagUrl = tagsBaseUrl + "/m.lowpriority";
+    private String userTagUrl = tagsBaseUrl + "/u." + testTag;
+    private String userTagWithOrderUrl = tagsBaseUrl + "/u." + testTagWithOrder;
 
     @Before
     public void createClient() {
@@ -67,34 +66,44 @@ public class MatrixHttpRoomTagWiremockTest extends AMatrixHttpRoomTagTest {
     public void setAndReadTags() {
         createPreparationStubs();
 
-        stubFor(put(urlEqualTo(favouriteTagUrl)).inScenario("Tags").whenScenarioStateIs("PreparationFinished")
-                .willSetStateTo("FavouriteTagAdded").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(put(urlEqualTo(favouriteTagUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("PreparationFinished").willSetStateTo("FavouriteTagAdded")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(put(urlEqualTo(lowPriorityTagUrl)).inScenario("Tags").whenScenarioStateIs("FavouriteTagAdded")
-                .willSetStateTo("LowPriorityTagAdded").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(put(urlEqualTo(lowPriorityTagUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("FavouriteTagAdded").willSetStateTo("LowPriorityTagAdded")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(put(urlEqualTo(userTagUrl)).inScenario("Tags").whenScenarioStateIs("LowPriorityTagAdded")
-                .willSetStateTo("UserTagAdded").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(put(urlEqualTo(userTagUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("LowPriorityTagAdded").willSetStateTo("UserTagAdded")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(put(urlEqualTo(userTagWithOrderUrl)).inScenario("Tags").whenScenarioStateIs("UserTagAdded")
-                .willSetStateTo("UserTagWithOrderAdded").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(put(urlEqualTo(userTagWithOrderUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("UserTagAdded").willSetStateTo("UserTagWithOrderAdded")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(get(urlEqualTo(tagRequestUrl)).inScenario("Tags").whenScenarioStateIs("UserTagWithOrderAdded")
+        stubFor(get(urlEqualTo(tagsBaseUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("UserTagWithOrderAdded")
                 .willReturn(aResponse().withStatus(200).withBody(allTagsResponse)));
 
-        stubFor(delete(urlEqualTo(favouriteTagUrl)).inScenario("Tags").whenScenarioStateIs("UserTagWithOrderAdded")
-                .willSetStateTo("FavouriteTagDeleted").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(delete(urlEqualTo(favouriteTagUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("UserTagWithOrderAdded").willSetStateTo("FavouriteTagDeleted")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(delete(urlEqualTo(lowPriorityTagUrl)).inScenario("Tags").whenScenarioStateIs("FavouriteTagDeleted")
-                .willSetStateTo("LowPriorityTagDeleted").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(delete(urlEqualTo(lowPriorityTagUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("FavouriteTagDeleted").willSetStateTo("LowPriorityTagDeleted")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(delete(urlEqualTo(userTagUrl)).inScenario("Tags").whenScenarioStateIs("LowPriorityTagDeleted")
-                .willSetStateTo("UserTagDeleted").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(delete(urlEqualTo(userTagUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("LowPriorityTagDeleted").willSetStateTo("UserTagDeleted")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(delete(urlEqualTo(userTagWithOrderUrl)).inScenario("Tags").whenScenarioStateIs("UserTagDeleted")
-                .willSetStateTo("UserTagWithOrderDeleted").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(delete(urlEqualTo(userTagWithOrderUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("UserTagDeleted").willSetStateTo("UserTagWithOrderDeleted")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(get(urlEqualTo(tagRequestUrl)).inScenario("Tags").whenScenarioStateIs("UserTagWithOrderDeleted")
+        stubFor(get(urlEqualTo(tagsBaseUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("UserTagWithOrderDeleted")
                 .willReturn(aResponse().withStatus(200).withBody(emptyTagsBody)));
 
         super.setAndReadTags();
@@ -110,21 +119,26 @@ public class MatrixHttpRoomTagWiremockTest extends AMatrixHttpRoomTagTest {
     @Override
     public void readTagsFromSync() {
         createPreparationStubs();
-        stubFor(put(urlEqualTo(favouriteTagUrl)).inScenario("Tags").whenScenarioStateIs("PreparationFinished")
-                .willSetStateTo("FavouriteTagAdded").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(put(urlEqualTo(favouriteTagUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("PreparationFinished").willSetStateTo("FavouriteTagAdded")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(put(urlEqualTo(userTagUrl)).inScenario("Tags").whenScenarioStateIs("FavouriteTagAdded")
-                .willSetStateTo("UserTagAdded").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(put(urlEqualTo(userTagUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("FavouriteTagAdded").willSetStateTo("UserTagAdded")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(get(urlEqualTo("/_matrix/client/r0/sync?timeout=30000&access_token=" + testToken)).inScenario("Tags")
+        stubFor(get(urlEqualTo("/_matrix/client/r0/sync?timeout=30000"))
+                .withHeader("Authorization", equalTo("Bearer " + testToken)).inScenario("Tags")
                 .whenScenarioStateIs("UserTagAdded").willSetStateTo("syncExecuted")
                 .willReturn(aResponse().withStatus(200).withBody(getSyncJson())));
 
-        stubFor(delete(urlEqualTo(favouriteTagUrl)).inScenario("Tags").whenScenarioStateIs("syncExecuted")
-                .willSetStateTo("FavouriteTagDeleted").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(delete(urlEqualTo(favouriteTagUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("syncExecuted").willSetStateTo("FavouriteTagDeleted")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
-        stubFor(delete(urlEqualTo(userTagUrl)).inScenario("Tags").whenScenarioStateIs("FavouriteTagDeleted")
-                .willSetStateTo("UserTagDeleted").willReturn(aResponse().withStatus(200).withBody("{}")));
+        stubFor(delete(urlEqualTo(userTagUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("FavouriteTagDeleted").willSetStateTo("UserTagDeleted")
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
 
         super.readTagsFromSync();
     }
@@ -139,22 +153,28 @@ public class MatrixHttpRoomTagWiremockTest extends AMatrixHttpRoomTagTest {
     }
 
     private void createPreparationStubs() {
-        stubFor(get(urlEqualTo("/_matrix/client/r0/joined_rooms?access_token=" + testToken))
-                .willReturn(aResponse().withStatus(200).withBody("{\"joined_rooms\": []}")));
-        stubFor(post(urlEqualTo("/_matrix/client/r0/createRoom?access_token=" + testToken))
+        stubFor(get(urlEqualTo("/_matrix/client/r0/joined_rooms"))
+                .willReturn(aResponse().withStatus(200).withBody("{\"joined_rooms\": []}"))
+                .withHeader("Authorization", equalTo("Bearer " + testToken)));
+        stubFor(post(urlEqualTo("/_matrix/client/r0/createRoom"))
+                .withHeader("Authorization", equalTo("Bearer " + testToken))
                 .willReturn(aResponse().withStatus(200).withBody("{\"room_id\": \"" + roomId + "\"}")));
 
-        stubFor(get(urlEqualTo(tagRequestUrl)).inScenario("Tags").whenScenarioStateIs(STARTED)
-                .willSetStateTo("PreparationStep1").willReturn(aResponse().withStatus(200).withBody(emptyTagsBody)));
+        stubFor(get(urlEqualTo(tagsBaseUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs(STARTED).willSetStateTo("PreparationStep1")
+                .willReturn(aResponse().withStatus(200).withBody(emptyTagsBody)));
 
-        stubFor(get(urlEqualTo(tagRequestUrl)).inScenario("Tags").whenScenarioStateIs("PreparationStep1")
-                .willSetStateTo("PreparationStep2").willReturn(aResponse().withStatus(200).withBody(emptyTagsBody)));
+        stubFor(get(urlEqualTo(tagsBaseUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("PreparationStep1").willSetStateTo("PreparationStep2")
+                .willReturn(aResponse().withStatus(200).withBody(emptyTagsBody)));
 
-        stubFor(get(urlEqualTo(tagRequestUrl)).inScenario("Tags").whenScenarioStateIs("PreparationStep2")
-                .willSetStateTo("PreparationStep3").willReturn(aResponse().withStatus(200).withBody(emptyTagsBody)));
+        stubFor(get(urlEqualTo(tagsBaseUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("PreparationStep2").willSetStateTo("PreparationStep3")
+                .willReturn(aResponse().withStatus(200).withBody(emptyTagsBody)));
 
-        stubFor(get(urlEqualTo(tagRequestUrl)).inScenario("Tags").whenScenarioStateIs("PreparationStep3")
-                .willSetStateTo("PreparationFinished").willReturn(aResponse().withStatus(200).withBody(emptyTagsBody)));
+        stubFor(get(urlEqualTo(tagsBaseUrl)).withHeader("Authorization", equalTo("Bearer " + testToken))
+                .inScenario("Tags").whenScenarioStateIs("PreparationStep3").willSetStateTo("PreparationFinished")
+                .willReturn(aResponse().withStatus(200).withBody(emptyTagsBody)));
 
     }
 

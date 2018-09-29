@@ -34,6 +34,7 @@ import java.net.URISyntaxException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
+
     protected String wrongPassword = "wrongPassword";
 
     protected String errorInvalidPassword = "Invalid password";

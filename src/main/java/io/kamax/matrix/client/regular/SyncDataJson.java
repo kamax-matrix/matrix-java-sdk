@@ -25,7 +25,11 @@ import com.google.gson.JsonObject;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.client._SyncData;
-import io.kamax.matrix.event.*;
+import io.kamax.matrix.event.EventKey;
+import io.kamax.matrix.event._MatrixAccountDataEvent;
+import io.kamax.matrix.event._MatrixEphemeralEvent;
+import io.kamax.matrix.event._MatrixPersistentEvent;
+import io.kamax.matrix.event._MatrixStateEvent;
 import io.kamax.matrix.json.MatrixJsonObject;
 
 import java.time.Instant;

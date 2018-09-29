@@ -26,7 +26,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.*;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
 public class KeyFileStoreTest {

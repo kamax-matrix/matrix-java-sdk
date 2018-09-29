@@ -27,7 +27,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class MatrixHttpClientLoginWiremockTest extends AMatrixHttpClientLoginTest {
     private String loginUrl = "/_matrix/client/r0/login";
-    private String logoutUrl = "/_matrix/client/r0/logout" + tokenParameter;
+    private String logoutUrl = "/_matrix/client/r0/logout";
     private String deviceId = "testDeviceId_892377";
 
     @Test
@@ -46,6 +46,8 @@ public class MatrixHttpClientLoginWiremockTest extends AMatrixHttpClientLoginTes
         stubFor(post(urlEqualTo(logoutUrl)));
 
         super.loginAndLogout();
+
+        verify(postRequestedFor(urlEqualTo(logoutUrl)).withHeader("Authorization", equalTo("Bearer " + testToken)));
     }
 
     @Test
