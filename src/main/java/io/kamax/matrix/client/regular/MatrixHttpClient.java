@@ -21,6 +21,7 @@
 package io.kamax.matrix.client.regular;
 
 import com.google.gson.JsonObject;
+
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
@@ -32,7 +33,7 @@ import io.kamax.matrix.room.RoomAlias;
 import io.kamax.matrix.room.RoomAliasLookup;
 import io.kamax.matrix.room._RoomAliasLookup;
 import io.kamax.matrix.room._RoomCreationOptions;
-import okhttp3.*;
+
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 
@@ -42,6 +43,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 import java8.util.Optional;
+
+
+import okhttp3.*;
 
 public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient {
 

@@ -23,11 +23,12 @@ package io.kamax.matrix.client;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+
 import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
 import io.kamax.matrix.json.GsonUtil;
-import okhttp3.*;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,6 +42,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java8.util.Optional;
+
+
+import okhttp3.*;
 
 public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
