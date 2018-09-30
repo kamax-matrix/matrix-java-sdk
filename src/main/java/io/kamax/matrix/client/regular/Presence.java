@@ -25,16 +25,14 @@ import com.google.gson.JsonObject;
 import io.kamax.matrix.client._Presence;
 import io.kamax.matrix.json.GsonUtil;
 
-import java.time.Instant;
-
 public class Presence implements _Presence {
 
     private String status;
-    private Instant lastActive;
+    private Long lastActive;
 
     public Presence(JsonObject json) {
         this.status = GsonUtil.getStringOrThrow(json, "presence");
-        this.lastActive = Instant.ofEpochMilli(GsonUtil.getLong(json, "last_active_ago"));
+        this.lastActive = GsonUtil.getLong(json, "last_active_ago");
     }
 
     @Override
@@ -43,7 +41,7 @@ public class Presence implements _Presence {
     }
 
     @Override
-    public Instant getLastActive() {
+    public Long getLastActive() {
         return lastActive;
     }
 

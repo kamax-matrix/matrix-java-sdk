@@ -37,10 +37,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java8.util.Optional;
 
 public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
@@ -68,7 +68,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected AMatrixHttpClient(MatrixClientContext context, MatrixClientDefaults defaults) {
         this(context, new OkHttpClient.Builder().connectTimeout(defaults.getConnectTimeout(), TimeUnit.MILLISECONDS)
-                .followRedirects(false).build());
+                .readTimeout(5, TimeUnit.MINUTES).followRedirects(false).build());
     }
 
     protected AMatrixHttpClient(MatrixClientContext context, OkHttpClient client) {

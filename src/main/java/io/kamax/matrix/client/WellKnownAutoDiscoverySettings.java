@@ -35,7 +35,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java8.util.Optional;
 
 public class WellKnownAutoDiscoverySettings implements _AutoDiscoverySettings {
 

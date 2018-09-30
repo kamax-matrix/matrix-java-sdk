@@ -22,7 +22,7 @@ package io.kamax.matrix.event;
 
 import io.kamax.matrix._MatrixID;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 public interface _RoomMembershipEvent extends _RoomEvent {
 

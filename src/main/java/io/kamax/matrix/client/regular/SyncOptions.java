@@ -22,7 +22,7 @@ package io.kamax.matrix.client.regular;
 
 import io.kamax.matrix.client._SyncOptions;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 public class SyncOptions implements _SyncOptions {
 

@@ -31,7 +31,7 @@ import io.kamax.matrix.room._RoomCreationOptions;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
+import java8.util.Optional;
 
 public interface _MatrixClient extends _MatrixClientRaw {
 

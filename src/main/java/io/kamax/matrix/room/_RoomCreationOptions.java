@@ -25,8 +25,8 @@ import com.google.gson.JsonElement;
 import io.kamax.matrix._MatrixID;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java8.util.Optional;
 
 /**
  * Possible options that can be passed to the room creation call.

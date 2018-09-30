@@ -27,7 +27,7 @@ import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.event._RoomMembershipEvent;
 import io.kamax.matrix.json.MatrixJsonObject;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 public class MatrixJsonRoomMembershipEvent extends MatrixJsonRoomEvent implements _RoomMembershipEvent {
 

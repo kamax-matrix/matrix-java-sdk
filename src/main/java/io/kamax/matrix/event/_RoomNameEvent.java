@@ -20,7 +20,7 @@
 
 package io.kamax.matrix.event;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 public interface _RoomNameEvent extends _RoomEvent {
 

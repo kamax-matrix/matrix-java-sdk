@@ -24,7 +24,7 @@ import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.hs._MatrixHomeserver;
 
 import java.util.List;
-import java.util.Optional;
+import java8.util.Optional;
 
 public interface _MatrixClientRaw {
 

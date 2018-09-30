@@ -49,8 +49,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import java8.util.Optional;
 
 public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 

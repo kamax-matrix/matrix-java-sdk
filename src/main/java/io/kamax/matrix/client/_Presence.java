@@ -20,12 +20,10 @@
 
 package io.kamax.matrix.client;
 
-import java.time.Instant;
-
 public interface _Presence {
 
     String getStatus();
 
-    Instant getLastActive();
+    Long getLastActive();
 
 }

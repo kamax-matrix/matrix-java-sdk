@@ -21,7 +21,7 @@
 package io.kamax.matrix;
 
 import java.net.URI;
-import java.util.Optional;
+import java8.util.Optional;
 
 public interface _MatrixContent {
 

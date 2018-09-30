@@ -32,7 +32,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +43,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class ReceiptsEventParsingTest {
+
     private String getJson() {
         try {
             InputStream is = new FileInputStream("src/test/resources/json/receipts.json");
@@ -61,7 +61,7 @@ public class ReceiptsEventParsingTest {
 
         List<MatrixJsonReadReceiptEvent.Receipt> receipts = ((MatrixJsonReadReceiptEvent) event).getReceipts();
 
-        Map<String, Map<MatrixID, Instant>> receiptsMap = receipts.stream()
+        Map<String, Map<MatrixID, Long>> receiptsMap = receipts.stream()
                 .collect(Collectors.toMap(it -> it.getEventId(), it -> it.getUsersWithTimestamp()));
 
         String id1 = "$15296836321000niTzS:matrix.localtoast.de";
@@ -76,13 +76,9 @@ public class ReceiptsEventParsingTest {
         MatrixID matrixId1b = MatrixID.asAcceptable("@arne:matrix.localtoast.de");
         MatrixID matrixId2 = MatrixID.asAcceptable("@arne:testmatrix.localtoast.de");
 
-        Instant instant1a = Instant.ofEpochMilli(1529683638046L);
-        Instant instant1b = Instant.ofEpochMilli(1531668885573L);
-        Instant instant2 = Instant.ofEpochMilli(1520971518671L);
-
-        assertThat(receiptsMap.get(id1).get(matrixId1a), is(instant1a));
-        assertThat(receiptsMap.get(id1).get(matrixId1b), is(instant1b));
-        assertThat(receiptsMap.get(id2).get(matrixId2), is(instant2));
+        assertThat(receiptsMap.get(id1).get(matrixId1a), is(1529683638046L));
+        assertThat(receiptsMap.get(id1).get(matrixId1b), is(1531668885573L));
+        assertThat(receiptsMap.get(id2).get(matrixId2), is(1520971518671L));
     }
 
 }

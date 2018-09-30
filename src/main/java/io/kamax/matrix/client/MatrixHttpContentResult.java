@@ -22,6 +22,7 @@ package io.kamax.matrix.client;
 
 import java.io.IOException;
 import java.util.*;
+import java8.util.Optional;
 
 
 import okhttp3.MediaType;

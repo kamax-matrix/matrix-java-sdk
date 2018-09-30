@@ -20,7 +20,7 @@
 
 package io.kamax.matrix.client;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 /**
  * Possible options that can be passed to the sync call.

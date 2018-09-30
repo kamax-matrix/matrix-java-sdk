@@ -25,7 +25,7 @@ import com.google.gson.JsonObject;
 import io.kamax.matrix.event._RoomMessageEvent;
 import io.kamax.matrix.json.GsonUtil;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 public class MatrixJsonRoomMessageEvent extends MatrixJsonRoomEvent implements _RoomMessageEvent {
 

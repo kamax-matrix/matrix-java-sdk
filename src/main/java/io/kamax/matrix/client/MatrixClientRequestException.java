@@ -23,7 +23,7 @@ package io.kamax.matrix.client;
 import io.kamax.matrix.MatrixErrorInfo;
 
 import java.io.IOException;
-import java.util.Optional;
+import java8.util.Optional;
 
 public class MatrixClientRequestException extends RuntimeException {
 

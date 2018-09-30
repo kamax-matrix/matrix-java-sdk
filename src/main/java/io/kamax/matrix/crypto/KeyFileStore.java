@@ -29,7 +29,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java8.util.Optional;
+import java8.util.stream.StreamSupport;
 
 public class KeyFileStore implements _KeyStore {
 
@@ -62,7 +63,7 @@ public class KeyFileStore implements _KeyStore {
     public Optional<String> load() {
         try {
             List<String> keys = FileUtils.readLines(file, charset);
-            return keys.stream().filter(StringUtils::isNotBlank).findFirst();
+            return StreamSupport.stream(keys).filter(StringUtils::isNotBlank).findFirst();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
