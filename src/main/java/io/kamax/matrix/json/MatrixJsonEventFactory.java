@@ -26,7 +26,7 @@ import io.kamax.matrix.event.EventKey;
 import io.kamax.matrix.event._MatrixEvent;
 import io.kamax.matrix.json.event.*;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 public class MatrixJsonEventFactory {
 

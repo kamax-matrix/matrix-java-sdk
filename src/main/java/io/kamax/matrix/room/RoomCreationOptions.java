@@ -25,6 +25,7 @@ import com.google.gson.JsonElement;
 import io.kamax.matrix._MatrixID;
 
 import java.util.*;
+import java8.util.Optional;
 
 public class RoomCreationOptions implements _RoomCreationOptions {
 

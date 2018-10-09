@@ -29,8 +29,8 @@ import io.kamax.matrix.json.MatrixJsonObject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import java8.util.Optional;
 
 public class MatrixJsonRoomPowerLevelsEvent extends MatrixJsonRoomEvent implements _RoomPowerLevelsEvent {
 

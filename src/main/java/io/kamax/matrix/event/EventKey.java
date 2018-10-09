@@ -26,7 +26,7 @@ import com.google.gson.JsonObject;
 import io.kamax.matrix.MalformedEventException;
 import io.kamax.matrix.json.GsonUtil;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 public enum EventKey {
 

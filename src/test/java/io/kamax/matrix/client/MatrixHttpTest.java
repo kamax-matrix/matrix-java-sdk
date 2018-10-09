@@ -37,8 +37,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import java8.util.Optional;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static junit.framework.TestCase.assertEquals;

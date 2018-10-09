@@ -31,7 +31,7 @@ import io.kamax.matrix.room._MatrixRoomMessageChunk;
 import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
 
 import java.util.List;
-import java.util.Optional;
+import java8.util.Optional;
 
 public interface _MatrixRoom {
 

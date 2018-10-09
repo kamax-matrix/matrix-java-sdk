@@ -50,7 +50,7 @@ public class KeyManager {
     private List<KeyPair> keys;
 
     public KeyManager(_KeyStore store) {
-        keySpecs = EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512);
+        keySpecs = EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.ED_25519);
         keys = new ArrayList<>();
 
         String seedBase64 = store.load().orElseGet(() -> {

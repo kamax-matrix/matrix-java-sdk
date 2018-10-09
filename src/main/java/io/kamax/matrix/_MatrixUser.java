@@ -22,7 +22,7 @@ package io.kamax.matrix;
 
 import io.kamax.matrix.client._Presence;
 
-import java.util.Optional;
+import java8.util.Optional;
 
 public interface _MatrixUser extends _MatrixUserProfile {
 

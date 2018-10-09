@@ -24,7 +24,7 @@ import io.kamax.matrix._ThreePid;
 import io.kamax.matrix._ThreePidMapping;
 
 import java.util.List;
-import java.util.Optional;
+import java8.util.Optional;
 
 public interface _IdentityServer {
 
