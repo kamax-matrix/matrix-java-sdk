@@ -72,7 +72,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected AMatrixHttpClient(MatrixClientContext context, MatrixClientDefaults defaults) {
         this(context, new OkHttpClient.Builder().connectTimeout(defaults.getConnectTimeout(), TimeUnit.MILLISECONDS)
-                .followRedirects(false).build());
+                .readTimeout(5, TimeUnit.MINUTES).followRedirects(false).build());
     }
 
     protected AMatrixHttpClient(MatrixClientContext context, OkHttpClient client) {
