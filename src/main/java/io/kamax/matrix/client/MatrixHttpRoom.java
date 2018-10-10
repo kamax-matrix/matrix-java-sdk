@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java8.util.Optional;
+import java8.util.stream.StreamSupport;
 
 
 import okhttp3.HttpUrl;
@@ -335,8 +336,8 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public Optional<RoomTag> getFavouriteTag() {
-        return getAllTags().stream().filter(tag -> "m".equals(tag.getNamespace()) && "favourite".equals(tag.getName()))
-                .findFirst();
+        return StreamSupport.stream(getAllTags())
+                .filter(tag -> "m".equals(tag.getNamespace()) && "favourite".equals(tag.getName())).findFirst();
     }
 
     @Override
@@ -356,7 +357,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public Optional<RoomTag> getLowpriorityTag() {
-        return getAllTags().stream()
+        return StreamSupport.stream(getAllTags())
                 .filter(tag -> "m".equals(tag.getNamespace()) && "lowpriority".equals(tag.getName())).findFirst();
     }
 
