@@ -1,5 +1,5 @@
 # Matrix Client SDK for Java
-[![Build Status](https://travis-ci.org/kamax-io/matrix-java-sdk.svg?branch=master)](https://travis-ci.org/kamax-io/matrix-java-sdk)
+[![Build Status](https://travis-ci.org/kamax-matrix/matrix-java-sdk.svg?branch=master)](https://travis-ci.org/kamax-matrix/matrix-java-sdk)
 
 ## Purpose
 Matrix SDK in Java 1.8 for:
@@ -37,7 +37,7 @@ dependencies {
   </dependency>
 </dependencies>
 ```
-**WARNING:** This SDK was originally created to support [Kamax.io projects](https://github.com/kamax-io) and is therefore not necessarly complete. It will be built as the various projects evolve and grow. The SDK is therefore still in Alpha.
+**WARNING:** This SDK was originally created to support [Kamax.io projects](https://github.com/kamax-matrix) and is therefore not necessarly complete. It will be built as the various projects evolve and grow. The SDK is therefore still in Alpha.
 
 ## Tests
 ### Unit tests
