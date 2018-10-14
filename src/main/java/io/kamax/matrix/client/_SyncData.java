@@ -22,6 +22,7 @@ package io.kamax.matrix.client;
 
 import com.google.gson.JsonObject;
 
+import io.kamax.matrix.event._MatrixAccountDataEvent;
 import io.kamax.matrix.event._MatrixEphemeralEvent;
 import io.kamax.matrix.event._MatrixPersistentEvent;
 import io.kamax.matrix.event._MatrixStateEvent;
@@ -77,6 +78,16 @@ public interface _SyncData {
          * @return List of events.
          */
         List<_MatrixEphemeralEvent> getEvents();
+    }
+
+    interface AccountData {
+
+        /**
+         * Events that happened in the sync window.
+         *
+         * @return List of events.
+         */
+        List<_MatrixAccountDataEvent> getEvents();
     }
 
     interface InvitedRoom {
@@ -144,6 +155,13 @@ public interface _SyncData {
          * @return a list of ephemeral events.
          */
         Ephemeral getEphemeral();
+
+        /**
+         * Account events of the room.
+         *
+         * @return a list of account data events.
+         */
+        AccountData getAccountData();
 
         /**
          * The Counts of unread notifications.

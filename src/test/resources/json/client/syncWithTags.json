@@ -1,0 +1,71 @@
+{
+    "account_data": {},
+    "device_lists": {
+        "changed": [],
+        "left": []
+    },
+    "device_one_time_keys_count": {
+        "signed_curve25519": 50
+    },
+    "groups": {
+        "invite": {},
+        "join": {},
+        "leave": {}
+    },
+    "next_batch": "s70_301_72_2_36_1_1_5_1",
+    "presence": {
+        "events": [
+            {
+                "content": {
+                    "currently_active": true,
+                    "last_active_ago": 6,
+                    "presence": "online"
+                },
+                "sender": "@user:synapse.local.kamax.io",
+                "type": "m.presence"
+            }
+        ]
+    },
+    "rooms": {
+        "invite": {},
+        "join": {
+            "<roomId>": {
+                "account_data": {
+                    "events": [
+                        {
+                            "content": {
+                                "tags": {
+                                    "m.favourite": {
+                                        "order": "1.0"
+                                    },
+                                    "u.usertag": {
+                                        "order": "1.0"
+                                    }
+                                }
+                            },
+                            "type": "m.tag"
+                        }
+                    ]
+                },
+                "ephemeral": {
+                    "events": [
+                        {}
+                    ]
+                },
+                "state": {
+                    "events": []
+                },
+                "timeline": {
+                    "events": [],
+                    "limited": true,
+                    "prev_batch": "t33-51_301_72_2_36_1_1_5_1"
+                },
+                "unread_notifications": {}
+            }
+        },
+        "leave": {}
+    },
+    "to_device": {
+        "events": []
+    }
+}

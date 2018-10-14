@@ -352,7 +352,6 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         if (context.isVirtual()) {
             context.getUser().ifPresent(user -> base.addQueryParameter("user_id", user.getId()));
         }
-
         return base;
     }
 

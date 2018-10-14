@@ -26,6 +26,7 @@ import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.client._SyncData;
 import io.kamax.matrix.event.EventKey;
+import io.kamax.matrix.event._MatrixAccountDataEvent;
 import io.kamax.matrix.event._MatrixEphemeralEvent;
 import io.kamax.matrix.event._MatrixPersistentEvent;
 import io.kamax.matrix.event._MatrixStateEvent;
@@ -68,6 +69,19 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
     public class MatrixEphemeralEventJson extends MatrixJsonObject implements _MatrixEphemeralEvent {
 
         public MatrixEphemeralEventJson(JsonObject obj) {
+            super(obj);
+        }
+
+        @Override
+        public String getType() {
+            return getString(EventKey.Type.get());
+        }
+
+    }
+
+    public class MatrixAccountDataEventJson extends MatrixJsonObject implements _MatrixAccountDataEvent {
+
+        public MatrixAccountDataEventJson(JsonObject obj) {
             super(obj);
         }
 
@@ -155,6 +169,24 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         }
     }
 
+    public class AccountDataJson extends MatrixJsonObject implements _SyncData.AccountData {
+
+        private List<_MatrixAccountDataEvent> events = new ArrayList<>();
+
+        public AccountDataJson(JsonObject obj) {
+            super(obj);
+
+            findArray("events").ifPresent(array -> array.forEach(el -> {
+                events.add(new MatrixAccountDataEventJson(asObj(el)));
+            }));
+        }
+
+        @Override
+        public List<_MatrixAccountDataEvent> getEvents() {
+            return events;
+        }
+    }
+
     public class InvitedRoomJson extends MatrixJsonObject implements _SyncData.InvitedRoom {
 
         private String id;
@@ -207,6 +239,7 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         private Timeline timeline;
         private UnreadNotifications unreadNotifications;
         private Ephemeral ephemeral;
+        private AccountData accountData;
 
         public JoinedRoomJson(String id, JsonObject data) {
             super(data);
@@ -215,6 +248,7 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
             this.timeline = new TimelineJson(findObj("timeline").orElseGet(JsonObject::new));
             this.unreadNotifications = new UnreadNotificationsJson(computeObj("unread_notifications"));
             this.ephemeral = new EphemeralJson(findObj("ephemeral").orElseGet(JsonObject::new));
+            this.accountData = new AccountDataJson(findObj("account_data").orElseGet(JsonObject::new));
         }
 
         @Override
@@ -235,6 +269,11 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         @Override
         public Ephemeral getEphemeral() {
             return ephemeral;
+        }
+
+        @Override
+        public AccountData getAccountData() {
+            return accountData;
         }
 
         @Override

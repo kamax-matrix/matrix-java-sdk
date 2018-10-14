@@ -55,7 +55,7 @@ public class MatrixHttpTest {
     protected String baseUrl = "http://" + hostname + ":" + port;
     protected String username = "testuser";
     protected String password = "MostSecretPasswordEver";
-    protected MatrixID user = new MatrixID(username, domain);
+    protected MatrixID user = MatrixID.asAcceptable(username, domain);
 
     protected String errorResponseTemplate = "{\"errcode\": \"%s\", \"error\": \"%s\"}";
 

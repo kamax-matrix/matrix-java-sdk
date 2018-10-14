@@ -20,16 +20,23 @@
 
 package io.kamax.matrix.client;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import io.kamax.matrix.*;
+import io.kamax.matrix.MatrixErrorInfo;
+import io.kamax.matrix.MatrixID;
+import io.kamax.matrix._MatrixContent;
+import io.kamax.matrix._MatrixID;
+import io.kamax.matrix._MatrixUserProfile;
 import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.RoomMessageChunkResponseJson;
 import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
 import io.kamax.matrix.json.RoomMessageTextPutBody;
+import io.kamax.matrix.json.RoomTagSetBody;
 import io.kamax.matrix.json.event.MatrixJsonPersistentEvent;
 import io.kamax.matrix.room.MatrixRoomMessageChunk;
+import io.kamax.matrix.room.RoomTag;
 import io.kamax.matrix.room._MatrixRoomMessageChunk;
 import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
 
@@ -44,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java8.util.Optional;
+import java8.util.stream.StreamSupport;
 
 
 import okhttp3.HttpUrl;
@@ -90,6 +98,11 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                 return Optional.empty();
             }
         });
+    }
+
+    @Override
+    public String getId() {
+        return roomId;
     }
 
     @Override
@@ -259,4 +272,119 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                 body.getChunk().stream().map(MatrixJsonPersistentEvent::new).collect(Collectors.toList()));
     }
 
+    @Override
+    public List<RoomTag> getUserTags() {
+        return getAllTags().stream().filter(tag -> "u".equals(tag.getNamespace())).collect(Collectors.toList());
+    }
+
+    private List<RoomTag> getAllTags() {
+
+        URL path = getClientPath("user", getUserId(), "rooms", getAddress(), "tags");
+
+        String body = executeAuthenticated(new Request.Builder().get().url(path));
+
+        JsonObject jsonTags = GsonUtil.parseObj(body).getAsJsonObject("tags").getAsJsonObject();
+        List<RoomTag> tags = jsonTags.entrySet().stream().map(entry -> {
+            String completeName = entry.getKey();
+            String name = "";
+            String namespace = "";
+            if (completeName.startsWith("m.")) {
+                name = completeName.substring(2);
+                namespace = "m";
+            } else if (completeName.startsWith("u.")) {
+                name = completeName.substring(2);
+                namespace = "u";
+            } else {
+                name = completeName;
+            }
+            JsonElement jsonOrder = entry.getValue().getAsJsonObject().get("order");
+            Double order = null;
+            if (jsonOrder != null) {
+                order = jsonOrder.getAsDouble();
+            }
+
+            return new RoomTag(namespace, name, order);
+        }).collect(Collectors.toList());
+
+        return tags;
+    }
+
+    @Override
+    public void addUserTag(String tag) {
+        addTag("u." + tag, null);
+    }
+
+    @Override
+    public void addUserTag(String tag, double order) {
+        addTag("u." + tag, order);
+    }
+
+    @Override
+    public void deleteUserTag(String tag) {
+        deleteTag("u." + tag);
+    }
+
+    @Override
+    public void addFavouriteTag() {
+        addTag("m.favourite", null);
+    }
+
+    @Override
+    public void addFavouriteTag(double order) {
+        addTag("m.favourite", order);
+    }
+
+    @Override
+    public Optional<RoomTag> getFavouriteTag() {
+        return StreamSupport.stream(getAllTags())
+                .filter(tag -> "m".equals(tag.getNamespace()) && "favourite".equals(tag.getName())).findFirst();
+    }
+
+    @Override
+    public void deleteFavouriteTag() {
+        deleteTag("m.favourite");
+    }
+
+    @Override
+    public void addLowpriorityTag() {
+        addTag("m.lowpriority", null);
+    }
+
+    @Override
+    public void addLowpriorityTag(double order) {
+        addTag("m.lowpriority", order);
+    }
+
+    @Override
+    public Optional<RoomTag> getLowpriorityTag() {
+        return StreamSupport.stream(getAllTags())
+                .filter(tag -> "m".equals(tag.getNamespace()) && "lowpriority".equals(tag.getName())).findFirst();
+    }
+
+    @Override
+    public void deleteLowpriorityTag() {
+        deleteTag("m.lowpriority");
+    }
+
+    private void addTag(String tag, Double order) {
+        // TODO check name size
+
+        if (order != null && (order < 0 || order > 1)) {
+            throw new IllegalArgumentException("Order out of range!");
+        }
+
+        URL path = getClientPath("user", getUserId(), "rooms", getAddress(), "tags", tag);
+        Request.Builder request = new Request.Builder().url(path);
+        if (order != null) {
+            request.put(getJsonBody(new RoomTagSetBody(order)));
+        } else {
+            request.put(getJsonBody(new JsonObject()));
+        }
+        executeAuthenticated(request);
+    }
+
+    private void deleteTag(String tag) {
+        URL path = getClientPath("user", getUserId(), "rooms", getAddress(), "tags", tag);
+        executeAuthenticated(new Request.Builder().url(path).delete());
+    }
 }
