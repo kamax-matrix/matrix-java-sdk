@@ -199,7 +199,7 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     }
 
     private String putMedia(Request.Builder builder) {
-        String body = execute(builder.url(getMediaPath("upload")));
+        String body = executeAuthenticated(builder.url(getMediaPath("upload")));
         return GsonUtil.getStringOrThrow(GsonUtil.parseObj(body), "content_uri");
     }
 
