@@ -122,6 +122,8 @@ public interface _MatrixRoom {
 
     _MatrixRoomMessageChunk getMessages(_MatrixRoomMessageChunkOptions options);
 
+    List<RoomTag> getAllTags();
+
     List<RoomTag> getUserTags();
 
     void addUserTag(String tag);

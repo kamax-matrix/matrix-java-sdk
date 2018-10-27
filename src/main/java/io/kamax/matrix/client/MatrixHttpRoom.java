@@ -284,7 +284,8 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         return getAllTags().stream().filter(tag -> "u".equals(tag.getNamespace())).collect(Collectors.toList());
     }
 
-    private List<RoomTag> getAllTags() {
+    @Override
+    public List<RoomTag> getAllTags() {
 
         URL path = getClientPath("user", getUserId(), "rooms", getAddress(), "tags");
 
