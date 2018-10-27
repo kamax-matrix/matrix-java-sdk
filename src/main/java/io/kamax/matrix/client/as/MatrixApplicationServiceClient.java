@@ -21,6 +21,7 @@
 package io.kamax.matrix.client.as;
 
 import io.kamax.matrix.client.MatrixClientContext;
+import io.kamax.matrix.client.MatrixClientDefaults;
 import io.kamax.matrix.client._MatrixClient;
 import io.kamax.matrix.client.regular.MatrixHttpClient;
 import io.kamax.matrix.json.VirtualUserRegistrationBody;
@@ -31,14 +32,36 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 
 
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 public class MatrixApplicationServiceClient extends MatrixHttpClient implements _MatrixApplicationServiceClient {
 
     private Logger log = LoggerFactory.getLogger(MatrixApplicationServiceClient.class);
 
+    public MatrixApplicationServiceClient(String domain) {
+        super(domain);
+    }
+
+    public MatrixApplicationServiceClient(URL hsBaseUrl) {
+        super(hsBaseUrl);
+    }
+
     public MatrixApplicationServiceClient(MatrixClientContext context) {
         super(context);
+    }
+
+    public MatrixApplicationServiceClient(MatrixClientContext context, OkHttpClient.Builder client) {
+        super(context, client);
+    }
+
+    public MatrixApplicationServiceClient(MatrixClientContext context, OkHttpClient.Builder client,
+            MatrixClientDefaults defaults) {
+        super(context, client, defaults);
+    }
+
+    public MatrixApplicationServiceClient(MatrixClientContext context, OkHttpClient client) {
+        super(context, client);
     }
 
     private MatrixHttpClient createClient(String localpart) {

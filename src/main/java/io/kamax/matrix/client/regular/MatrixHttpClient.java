@@ -54,12 +54,20 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         super(domain);
     }
 
+    public MatrixHttpClient(URL hsBaseUrl) {
+        super(hsBaseUrl);
+    }
+
     public MatrixHttpClient(MatrixClientContext context) {
         super(context);
     }
 
-    public MatrixHttpClient(MatrixClientContext context, MatrixClientDefaults defaults) {
-        super(context, defaults);
+    public MatrixHttpClient(MatrixClientContext context, OkHttpClient.Builder client) {
+        super(context, client);
+    }
+
+    public MatrixHttpClient(MatrixClientContext context, OkHttpClient.Builder client, MatrixClientDefaults defaults) {
+        super(context, client, defaults);
     }
 
     public MatrixHttpClient(MatrixClientContext context, OkHttpClient client) {
