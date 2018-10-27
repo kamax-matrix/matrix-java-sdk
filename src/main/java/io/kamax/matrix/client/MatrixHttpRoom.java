@@ -35,10 +35,7 @@ import io.kamax.matrix.json.RoomMessageFormattedTextPutBody;
 import io.kamax.matrix.json.RoomMessageTextPutBody;
 import io.kamax.matrix.json.RoomTagSetBody;
 import io.kamax.matrix.json.event.MatrixJsonPersistentEvent;
-import io.kamax.matrix.room.MatrixRoomMessageChunk;
-import io.kamax.matrix.room.RoomTag;
-import io.kamax.matrix.room._MatrixRoomMessageChunk;
-import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
+import io.kamax.matrix.room.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -214,6 +211,16 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     public void sendReceipt(String type, String eventId) {
         URL path = getClientPath("rooms", roomId, "receipt", type, eventId);
         executeAuthenticated(new Request.Builder().post(getJsonBody(new JsonObject())).url(path));
+    }
+
+    @Override
+    public void sendReceipt(ReceiptType type, String eventId) {
+        sendReceipt(type.getId(), eventId);
+    }
+
+    @Override
+    public void sendReadReceipt(String eventId) {
+        sendReceipt(ReceiptType.Read, eventId);
     }
 
     @Override

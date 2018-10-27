@@ -106,9 +106,7 @@ public interface _MatrixRoom {
      * @param eventId
      *            The Event ID targeted by the receipt
      */
-    default void sendReceipt(ReceiptType type, String eventId) {
-        sendReceipt(type.getId(), eventId);
-    }
+    void sendReceipt(ReceiptType type, String eventId);
 
     /**
      * Send a Read receipt for an event
@@ -116,9 +114,7 @@ public interface _MatrixRoom {
      * @param eventId
      *            The Event ID targeted by the read receipt
      */
-    default void sendReadReceipt(String eventId) {
-        sendReceipt(ReceiptType.Read, eventId);
-    }
+    void sendReadReceipt(String eventId);
 
     void invite(_MatrixID mxId);
 
