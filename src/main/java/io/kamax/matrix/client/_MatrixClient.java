@@ -98,6 +98,19 @@ public interface _MatrixClient extends _MatrixClientRaw {
 
     /**
      * Upload content to the media repository
+     * 
+     * @param data
+     *            The data to send
+     * @param type
+     *            The mime-type of the content upload
+     * @param filename
+     *            A suggested filename for the content
+     * @return The MXC URI for the uploaded content
+     */
+    String putMedia(byte[] data, String type, String filename);
+
+    /**
+     * Upload content to the media repository
      *
      * @param data
      *            The file to read the data from
@@ -106,5 +119,18 @@ public interface _MatrixClient extends _MatrixClientRaw {
      * @return The MXC URI for the uploaded content
      */
     String putMedia(File data, String type);
+
+    /**
+     * Upload content to the media repository
+     * 
+     * @param data
+     *            The data to send
+     * @param type
+     *            The mime-type of the content upload
+     * @param filename
+     *            A suggested filename for the content
+     * @return The MXC URI for the uploaded content
+     */
+    String putMedia(File data, String type, String filename);
 
 }

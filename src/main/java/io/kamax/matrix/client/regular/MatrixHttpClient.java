@@ -36,6 +36,7 @@ import io.kamax.matrix.room._RoomCreationOptions;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.net.URI;
@@ -198,19 +199,32 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         return new MatrixHttpContent(context, mxUri);
     }
 
-    private String putMedia(Request.Builder builder) {
-        String body = executeAuthenticated(builder.url(getMediaPath("upload")));
+    private String putMedia(Request.Builder builder, String filename) {
+        HttpUrl.Builder b = getMediaPathBuilder("upload");
+        if (StringUtils.isNotEmpty(filename)) b.addQueryParameter("filename", filename);
+
+        String body = executeAuthenticated(builder.url(b.build()));
         return GsonUtil.getStringOrThrow(GsonUtil.parseObj(body), "content_uri");
     }
 
     @Override
     public String putMedia(byte[] data, String type) {
-        return putMedia(new Request.Builder().post(RequestBody.create(MediaType.parse(type), data)));
+        return putMedia(data, type, null);
+    }
+
+    @Override
+    public String putMedia(byte[] data, String type, String filename) {
+        return putMedia(new Request.Builder().post(RequestBody.create(MediaType.parse(type), data)), filename);
     }
 
     @Override
     public String putMedia(File data, String type) {
-        return putMedia(new Request.Builder().post(RequestBody.create(MediaType.parse(type), data)));
+        return putMedia(data, type, null);
+    }
+
+    @Override
+    public String putMedia(File data, String type, String filename) {
+        return putMedia(new Request.Builder().post(RequestBody.create(MediaType.parse(type), data)), filename);
     }
 
 }
