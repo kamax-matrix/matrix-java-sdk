@@ -20,6 +20,8 @@
 
 package io.kamax.matrix.client;
 
+import com.google.gson.JsonObject;
+
 import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
@@ -66,6 +68,13 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
     }
 
     @Override
+    public void setName(String name) {
+        URL path = getClientPath("profile", mxId.getId(), "displayname");
+        JsonObject body = GsonUtil.makeObj("displayname", name);
+        executeAuthenticated(new Request.Builder().put(getJsonBody(body)).url(path));
+    }
+
+    @Override
     public Optional<String> getAvatarUrl() {
         URL path = getClientPath("profile", mxId.getId(), "avatar_url");
 
@@ -73,6 +82,18 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
         request.addIgnoredErrorCode(404);
         String body = executeAuthenticated(request);
         return extractAsStringFromBody(body, "avatar_url");
+    }
+
+    @Override
+    public void setAvatar(String avatarRef) {
+        URL path = getClientPath("profile", mxId.getId(), "avatar_url");
+        JsonObject body = GsonUtil.makeObj("avatar_url", avatarRef);
+        executeAuthenticated(new Request.Builder().put(getJsonBody(body)).url(path));
+    }
+
+    @Override
+    public void setAvatar(URI avatarUri) {
+        setAvatar(avatarUri.toString());
     }
 
     @Override

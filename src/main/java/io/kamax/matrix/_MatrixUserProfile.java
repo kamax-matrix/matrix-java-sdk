@@ -20,6 +20,7 @@
 
 package io.kamax.matrix;
 
+import java.net.URI;
 import java8.util.Optional;
 
 public interface _MatrixUserProfile {
@@ -28,7 +29,13 @@ public interface _MatrixUserProfile {
 
     Optional<String> getName();
 
+    void setName(String name);
+
     Optional<String> getAvatarUrl();
+
+    void setAvatar(String avatarRef);
+
+    void setAvatar(URI avatarUri);
 
     Optional<_MatrixContent> getAvatar();
 
