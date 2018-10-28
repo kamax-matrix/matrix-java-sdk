@@ -25,7 +25,7 @@ import io.kamax.matrix.client._SyncData;
 
 import org.junit.platform.commons.util.StringUtils;
 
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.*;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -40,6 +40,7 @@ public abstract class AMatrixHttpClientSyncTest extends MatrixHttpTest {
     private void validateSyncData(_SyncData data) {
         assertNotNull(data);
         assertTrue(StringUtils.isNotBlank(data.nextBatchToken()));
+        assertNotNull(data.getAccountData());
         assertNotNull(data.getRooms());
         assertNotNull(data.getRooms().getInvited());
         assertNotNull(data.getRooms().getJoined());
@@ -49,6 +50,7 @@ public abstract class AMatrixHttpClientSyncTest extends MatrixHttpTest {
     public void getInitialSync() throws Exception {
         _SyncData data = client.sync(SyncOptions.build().get());
         validateSyncData(data);
+        assertFalse(data.getAccountData().getEvents().isEmpty());
     }
 
     public void getSeveralSync() throws Exception {

@@ -350,17 +350,24 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
     }
 
     private String nextBatch;
+    private AccountDataJson accountData;
     private RoomsJson rooms;
 
     public SyncDataJson(JsonObject data) {
         super(data);
         nextBatch = getString("next_batch");
+        accountData = new AccountDataJson(findObj("account_data").orElseGet(JsonObject::new));
         rooms = new RoomsJson(findObj("rooms").orElseGet(JsonObject::new));
     }
 
     @Override
     public String nextBatchToken() {
         return nextBatch;
+    }
+
+    @Override
+    public AccountData getAccountData() {
+        return accountData;
     }
 
     @Override

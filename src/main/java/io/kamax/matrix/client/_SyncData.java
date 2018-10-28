@@ -230,6 +230,13 @@ public interface _SyncData {
     String nextBatchToken();
 
     /**
+     * The global private data created by this user.
+     *
+     * @return the account data.
+     */
+    AccountData getAccountData();
+
+    /**
      * Update to the rooms.
      * 
      * @return rooms object.
