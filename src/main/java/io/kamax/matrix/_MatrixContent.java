@@ -21,11 +21,14 @@
 package io.kamax.matrix;
 
 import java.net.URI;
+import java.net.URL;
 import java8.util.Optional;
 
 public interface _MatrixContent {
 
     URI getAddress();
+
+    URL getPermaLink();
 
     boolean isValid();
 

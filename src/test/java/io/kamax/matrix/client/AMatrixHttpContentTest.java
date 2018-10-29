@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public abstract class AMatrixHttpContentTest extends MatrixHttpTest {
     protected String bodyFilename = "textfile.txt";
-    protected URI address = new URI("mxc://localhost/testpath/" + bodyFilename);
+    protected URI address = new URI("mxc://localhost/" + bodyFilename);
 
     public AMatrixHttpContentTest() throws URISyntaxException {
     }
