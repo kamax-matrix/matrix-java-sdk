@@ -27,7 +27,7 @@ import io.kamax.matrix.hs._MatrixRoom;
 import io.kamax.matrix.json.MatrixJsonEventFactory;
 import io.kamax.matrix.json.event.MatrixJsonRoomTagsEvent;
 import io.kamax.matrix.room.RoomCreationOptions;
-import io.kamax.matrix.room.RoomTag;
+import io.kamax.matrix.room.Tag;
 
 import org.junit.Test;
 
@@ -57,13 +57,12 @@ public abstract class AMatrixHttpRoomTagTest extends MatrixHttpTest {
 
         assertTrue(room.getUserTags().size() == 2);
 
-        Optional<RoomTag> roomTagWithOrder = room.getUserTags().stream()
+        Optional<Tag> roomTagWithOrder = room.getUserTags().stream()
                 .filter(tag -> testTagWithOrder.equals(tag.getName())).findFirst();
         assertTrue(roomTagWithOrder.isPresent());
         assertTrue(roomTagWithOrder.get().getOrder().get().doubleValue() == testTagOrder);
 
-        Optional<RoomTag> roomTag = room.getUserTags().stream().filter(tag -> testTag.equals(tag.getName()))
-                .findFirst();
+        Optional<Tag> roomTag = room.getUserTags().stream().filter(tag -> testTag.equals(tag.getName())).findFirst();
         assertTrue(roomTag.isPresent());
         assertFalse(roomTag.get().getOrder().isPresent());
 
@@ -108,7 +107,7 @@ public abstract class AMatrixHttpRoomTagTest extends MatrixHttpTest {
         for (_MatrixAccountDataEvent event : roomFromSync.get().getAccountData().getEvents()) {
             _MatrixEvent parsedEvent = MatrixJsonEventFactory.get(event.getJson());
             if (parsedEvent instanceof MatrixJsonRoomTagsEvent) {
-                List<RoomTag> tags = ((MatrixJsonRoomTagsEvent) parsedEvent).getTags();
+                List<Tag> tags = ((MatrixJsonRoomTagsEvent) parsedEvent).getTags();
                 List<String> tagNames = tags.stream().map(it -> it.getNamespace() + "." + it.getName())
                         .collect(Collectors.toList());
                 if (tagNames.contains("u." + testTag)) {
@@ -151,7 +150,7 @@ public abstract class AMatrixHttpRoomTagTest extends MatrixHttpTest {
             room.deleteLowpriorityTag();
         }
 
-        for (RoomTag tag : room.getUserTags()) {
+        for (Tag tag : room.getUserTags()) {
             room.deleteUserTag(tag.getName());
         }
 

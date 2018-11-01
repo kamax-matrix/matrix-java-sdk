@@ -280,19 +280,19 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
-    public List<RoomTag> getUserTags() {
+    public List<Tag> getUserTags() {
         return getAllTags().stream().filter(tag -> "u".equals(tag.getNamespace())).collect(Collectors.toList());
     }
 
     @Override
-    public List<RoomTag> getAllTags() {
+    public List<Tag> getAllTags() {
 
         URL path = getClientPath("user", getUserId(), "rooms", getAddress(), "tags");
 
         String body = executeAuthenticated(new Request.Builder().get().url(path));
 
         JsonObject jsonTags = GsonUtil.parseObj(body).getAsJsonObject("tags").getAsJsonObject();
-        List<RoomTag> tags = jsonTags.entrySet().stream().map(entry -> {
+        List<Tag> tags = jsonTags.entrySet().stream().map(entry -> {
             String completeName = entry.getKey();
             String name = "";
             String namespace = "";
@@ -311,7 +311,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
                 order = jsonOrder.getAsDouble();
             }
 
-            return new RoomTag(namespace, name, order);
+            return new Tag(namespace, name, order);
         }).collect(Collectors.toList());
 
         return tags;
@@ -343,7 +343,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
-    public Optional<RoomTag> getFavouriteTag() {
+    public Optional<Tag> getFavouriteTag() {
         return StreamSupport.stream(getAllTags())
                 .filter(tag -> "m".equals(tag.getNamespace()) && "favourite".equals(tag.getName())).findFirst();
     }
@@ -364,7 +364,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
-    public Optional<RoomTag> getLowpriorityTag() {
+    public Optional<Tag> getLowpriorityTag() {
         return StreamSupport.stream(getAllTags())
                 .filter(tag -> "m".equals(tag.getNamespace()) && "lowpriority".equals(tag.getName())).findFirst();
     }

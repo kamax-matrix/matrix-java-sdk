@@ -20,11 +20,9 @@
 
 package io.kamax.matrix.json;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 
+import java8.util.Objects;
 import java8.util.Optional;
 
 public class MatrixJsonObject {
@@ -32,6 +30,10 @@ public class MatrixJsonObject {
     private JsonObject obj;
 
     public MatrixJsonObject(JsonObject obj) {
+        if (Objects.isNull(obj)) {
+            throw new InvalidJsonException("JSON Object is null");
+        }
+
         this.obj = obj;
     }
 

@@ -23,17 +23,17 @@ package io.kamax.matrix.json.event;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import io.kamax.matrix.event._RoomTagsEvent;
+import io.kamax.matrix.event._TagsEvent;
 import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.MatrixJsonObject;
-import io.kamax.matrix.room.RoomTag;
+import io.kamax.matrix.room.Tag;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _RoomTagsEvent {
+public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _TagsEvent {
 
     private Content content;
 
@@ -52,13 +52,13 @@ public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _RoomTa
 
     private class Content extends MatrixJsonObject {
 
-        private List<RoomTag> tags = new ArrayList<>();
+        private List<Tag> tags = new ArrayList<>();
 
         public Content(JsonObject obj) {
             super(obj);
 
             GsonUtil.findObj(obj, "tags").ifPresent(tagsJson -> {
-                List<RoomTag> tags = tagsJson.entrySet().stream().map(it -> {
+                List<Tag> tags = tagsJson.entrySet().stream().map(it -> {
                     String completeName = it.getKey();
                     String name = completeName;
                     String namespace = "";
@@ -73,26 +73,26 @@ public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _RoomTa
                     JsonElement jsonOrder = it.getValue().getAsJsonObject().get("order");
 
                     if (jsonOrder != null) {
-                        return new RoomTag(namespace, name, jsonOrder.getAsDouble());
+                        return new Tag(namespace, name, jsonOrder.getAsDouble());
                     }
-                    return new RoomTag(namespace, name, null);
+                    return new Tag(namespace, name, null);
                 }).collect(Collectors.toList());
                 setTags(tags);
             });
         }
 
-        public List<RoomTag> getTags() {
+        public List<Tag> getTags() {
             return tags;
         }
 
-        public void setTags(List<RoomTag> tags) {
+        public void setTags(List<Tag> tags) {
             this.tags = new ArrayList<>(tags);
         }
 
     }
 
     @Override
-    public List<RoomTag> getTags() {
+    public List<Tag> getTags() {
         return Collections.unmodifiableList(content.getTags());
     }
 

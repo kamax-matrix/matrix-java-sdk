@@ -22,8 +22,7 @@ package io.kamax.matrix.json;
 
 import com.google.gson.JsonObject;
 
-import io.kamax.matrix.event.EventKey;
-import io.kamax.matrix.event._MatrixEvent;
+import io.kamax.matrix.event.*;
 import io.kamax.matrix.json.event.*;
 
 import java8.util.Optional;
@@ -45,14 +44,18 @@ public class MatrixJsonEventFactory {
             return new MatrixJsonRoomTopicEvent(obj);
         } else if ("m.room.aliases".contentEquals(type)) {
             return new MatrixJsonRoomAliasesEvent(obj);
+        } else if (_RoomCanonicalAliasEvent.Type.contentEquals(type)) {
+            return new MatrixJsonRoomCanonicalAliasEvent(obj);
         } else if ("m.room.message".contentEquals(type)) {
             return new MatrixJsonRoomMessageEvent(obj);
         } else if ("m.receipt".contentEquals(type)) {
             return new MatrixJsonReadReceiptEvent(obj);
         } else if ("m.room.history_visibility".contentEquals(type)) {
             return new MatrixJsonRoomHistoryVisibilityEvent(obj);
-        } else if ("m.tag".contentEquals(type)) {
+        } else if (_TagsEvent.Type.contentEquals(type)) {
             return new MatrixJsonRoomTagsEvent(obj);
+        } else if (_DirectEvent.Type.contentEquals(type)) {
+            return new MatrixJsonDirectEvent(obj);
         } else {
             Optional<String> timestamp = EventKey.Timestamp.findString(obj);
             Optional<String> sender = EventKey.Sender.findString(obj);
@@ -60,7 +63,6 @@ public class MatrixJsonEventFactory {
             if (!timestamp.isPresent() || !sender.isPresent()) {
                 return new MatrixJsonEphemeralEvent(obj);
             } else {
-
                 Optional<String> rId = EventKey.RoomId.findString(obj);
                 if (rId.isPresent()) {
                     return new MatrixJsonRoomEvent(obj);

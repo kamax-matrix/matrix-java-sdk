@@ -1,6 +1,6 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
- * Copyright (C) 2018 Arne Augenstein
+ * Copyright (C) 2018 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -20,12 +20,14 @@
 
 package io.kamax.matrix.event;
 
-import io.kamax.matrix.room.RoomTag;
+import java8.util.Optional;
 
-import java.util.List;
+public interface _RoomCanonicalAliasEvent extends _RoomEvent {
 
-public interface _RoomTagsEvent extends _MatrixEvent {
+    String Type = "m.room.canonical_alias";
 
-    List<RoomTag> getTags();
+    boolean hasAlias();
+
+    Optional<String> getAlias();
 
 }

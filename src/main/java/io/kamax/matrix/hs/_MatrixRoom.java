@@ -27,7 +27,7 @@ import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUserProfile;
 import io.kamax.matrix.room.ReceiptType;
-import io.kamax.matrix.room.RoomTag;
+import io.kamax.matrix.room.Tag;
 import io.kamax.matrix.room._MatrixRoomMessageChunk;
 import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
 
@@ -122,9 +122,9 @@ public interface _MatrixRoom {
 
     _MatrixRoomMessageChunk getMessages(_MatrixRoomMessageChunkOptions options);
 
-    List<RoomTag> getAllTags();
+    List<Tag> getAllTags();
 
-    List<RoomTag> getUserTags();
+    List<Tag> getUserTags();
 
     void addUserTag(String tag);
 
@@ -138,13 +138,13 @@ public interface _MatrixRoom {
 
     void deleteFavouriteTag();
 
-    Optional<RoomTag> getFavouriteTag();
+    Optional<Tag> getFavouriteTag();
 
     void addLowpriorityTag();
 
     void addLowpriorityTag(double order);
 
-    Optional<RoomTag> getLowpriorityTag();
+    Optional<Tag> getLowpriorityTag();
 
     void deleteLowpriorityTag();
 }

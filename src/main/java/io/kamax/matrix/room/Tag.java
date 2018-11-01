@@ -1,6 +1,7 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
  * Copyright (C) 2018 Arne Augenstein
+ * Copyright (C) 2018 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -22,13 +23,13 @@ package io.kamax.matrix.room;
 
 import java.util.Optional;
 
-public class RoomTag {
+public class Tag {
 
     private String namespace;
     private String name;
     private Double order;
 
-    public RoomTag(String namespace, String name, Double order) {
+    public Tag(String namespace, String name, Double order) {
         this.namespace = namespace;
         this.name = name;
         this.order = order;
