@@ -26,8 +26,9 @@ public class LoginPostBody extends LoginBasePostBody {
 //    private static String MEDIUM_EMAIL_TYPE = "email";
 //    private static String IDENTIFIER_TYPE = "m.id.thirdparty";
 
-    protected String user;
-    protected String deviceId;
+    private String user;
+    private String deviceId;
+
 
     public LoginPostBody(String user, String password) {
         super(password);

@@ -30,6 +30,7 @@ public class LoginIdentifierBody extends LoginBasePostBody {
     protected String medium;
     protected Identifier identifier;
 
+
     public LoginIdentifierBody(String password, Identifier identifier) {
         super(password);
         this.identifier = identifier;
@@ -41,7 +42,5 @@ public class LoginIdentifierBody extends LoginBasePostBody {
         this(password, identifier);
         this.setInitialDeviceDisplayName(initialDeviceDisplayName);
     }
-
-
 }
 

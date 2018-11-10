@@ -54,7 +54,18 @@ public class MatrixHttpClientLoginWiremockTest extends AMatrixHttpClientLoginTes
     @Override
     public void loginAndLogoutWithIdentifier() throws URISyntaxException {
         stubFor(post(urlEqualTo(loginUrl))
-                .willReturn(aResponse().withStatus(200)));
+                .withRequestBody(equalToJson("{\"address\":\"my@address.com\",\"medium\":\"email\",\"identifier\":{\"type\":\"m.id.thirdparty\",\"medium\":\"email\",\"address\":\"my@address.com\"},\"password\":\"MostSecretPasswordEver\",\"type\":\"m.login.password\"}"))
+                .willReturn(aResponse().withStatus(200)
+                .withBody("{\n" +
+                        "    \"access_token\": \"FAKE_IGV4dDAyLmNpdGFkZWwudGVhbQowMDEzaWRlbnRpZmllciBrZXkKMDAxMGNpZCBnZW4gPSAxCjAwMzljaWQgdXNlcl9pZCA9IEBzdW1xc210dXhza3liYWdqc3k6ZXh0MDIuY2l0YWRlbC50ZWFtCjAwMTZjaWQgdHlwZSA9IGFjY2VzcwowMDIxY2lkIG5vbmNlID0gRGtsUzswYXQwdXFWRWEmWgowMDJmc2lnbmF0dXJlINHzZ957gMoG6F5Qm4x2k_6OmT2Ro8t1c3LJnSApEWwqCg\",\n" +
+                        "    \"device_id\": \"fake_deviceid\",\n" +
+                        "    \"home_server\": \"your.home.server\",\n" +
+                        "    \"user_id\": \"@your_user:id\"\n" +
+                        "}")));
+
+        stubFor(post(urlEqualTo(logoutUrl)));
+
+        super.loginAndLogoutWithIdentifier();
     }
 
     @Test
