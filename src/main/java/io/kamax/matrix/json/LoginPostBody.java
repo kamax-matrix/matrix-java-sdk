@@ -23,11 +23,16 @@ package io.kamax.matrix.json;
 
 public class LoginPostBody {
 
+    private static String MEDIUM_EMAIL_TYPE = "email";
+    private static String IDENTIFIER_TYPE = "m.id.thirdparty";
+
     private String type = "m.login.password";
     private String user;
     private String password;
     private String deviceId;
     private String initialDeviceDisplayName;
+    private String medium;
+    private Identifier identifier;
 
     public LoginPostBody(String user, String password) {
         this.user = user;
@@ -37,6 +42,14 @@ public class LoginPostBody {
     public LoginPostBody(String user, String password, String deviceId) {
         this(user, password);
         this.deviceId = deviceId;
+    }
+
+    public LoginPostBody(String user, String password, String deviceId, boolean hasEmailSpecificIdenfier){
+        this(user, password, deviceId);
+        this.identifier.setAddress(user);
+        this.identifier.setMedium(MEDIUM_EMAIL_TYPE);
+        this.identifier.setType(IDENTIFIER_TYPE);
+        this.medium=MEDIUM_EMAIL_TYPE;
     }
 
     public String getDeviceId() {
@@ -56,3 +69,4 @@ public class LoginPostBody {
     }
 
 }
+

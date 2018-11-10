@@ -21,7 +21,6 @@
 package io.kamax.matrix.client.regular;
 
 import com.google.gson.JsonObject;
-
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
@@ -33,7 +32,8 @@ import io.kamax.matrix.room.RoomAlias;
 import io.kamax.matrix.room.RoomAliasLookup;
 import io.kamax.matrix.room._RoomAliasLookup;
 import io.kamax.matrix.room._RoomCreationOptions;
-
+import java8.util.Optional;
+import okhttp3.*;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,10 +43,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
-import java8.util.Optional;
-
-
-import okhttp3.*;
 
 public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient {
 
@@ -168,7 +164,7 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     public void login(MatrixPasswordCredentials credentials) {
         URL url = getClientPath("login");
 
-        LoginPostBody data = new LoginPostBody(credentials.getLocalPart(), credentials.getPassword());
+        LoginPostBody data = new LoginPostBody(credentials.getLocalPart(), credentials.getPassword(),"", credentials.isThirdPartyTypeIdenfifier());
         getDeviceId().ifPresent(data::setDeviceId);
         Optional.ofNullable(context.getInitialDeviceName()).ifPresent(data::setInitialDeviceDisplayName);
 
