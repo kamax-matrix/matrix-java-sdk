@@ -74,8 +74,8 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
         MatrixIdentifierCredentials credentials = new MatrixIdentifierCredentials(password, type, address, medium);
         client.login(credentials);
 
-//        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
-//        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
+        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
+        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
 
         client.logout();
     }
