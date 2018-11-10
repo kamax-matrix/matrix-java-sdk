@@ -161,15 +161,28 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     }
 
     @Override
-    public void login(MatrixPasswordCredentials credentials) {
+    public void login(MatrixCredentials credentials) {
         URL url = getClientPath("login");
 
-        LoginPostBody data = new LoginPostBody(credentials.getLocalPart(), credentials.getPassword(),"", credentials.isThirdPartyTypeIdenfifier());
-        getDeviceId().ifPresent(data::setDeviceId);
-        Optional.ofNullable(context.getInitialDeviceName()).ifPresent(data::setInitialDeviceDisplayName);
-
-        updateContext(execute(new Request.Builder().post(getJsonBody(data)).url(url)));
+        if ((credentials instanceof MatrixPasswordCredentials)) {
+            MatrixPasswordCredentials passwordCredentials = (MatrixPasswordCredentials) credentials;
+            LoginPostBody data  = new LoginPostBody(passwordCredentials.getLocalPart(), passwordCredentials.getPassword());
+            getDeviceId().ifPresent(data::setDeviceId);
+            Optional.ofNullable(context.getInitialDeviceName()).ifPresent(data::setInitialDeviceDisplayName);
+            updateContext(execute(new Request.Builder().post(getJsonBody(data)).url(url)));
+        }
+        else if ((credentials instanceof MatrixIdentifierCredentials)) {
+            MatrixIdentifierCredentials identifierCredentials = (MatrixIdentifierCredentials) credentials;
+            LoginIdentifierBody data = new LoginIdentifierBody(
+                    identifierCredentials.getPassword(),
+                    identifierCredentials.getIdentifier()
+            );
+            getDeviceId().ifPresent(data::setInitialDeviceDisplayName);
+            Optional.ofNullable(context.getInitialDeviceName()).ifPresent(data::setInitialDeviceDisplayName);
+            updateContext(execute(new Request.Builder().post(getJsonBody(data)).url(url)));
+        }
     }
+
 
     @Override
     public void logout() {

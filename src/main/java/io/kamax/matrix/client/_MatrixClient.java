@@ -57,7 +57,7 @@ public interface _MatrixClient extends _MatrixClientRaw {
     // TODO refactor into custom synapse class?
     void register(MatrixPasswordCredentials credentials, String sharedSecret, boolean admin);
 
-    void login(MatrixPasswordCredentials credentials);
+    void login(MatrixCredentials credentials);
 
     void logout();
 

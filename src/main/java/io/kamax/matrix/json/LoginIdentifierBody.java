@@ -21,31 +21,27 @@
 
 package io.kamax.matrix.json;
 
-public class LoginPostBody extends LoginBasePostBody {
+public class LoginIdentifierBody extends LoginBasePostBody {
 
 //    private static String MEDIUM_EMAIL_TYPE = "email";
 //    private static String IDENTIFIER_TYPE = "m.id.thirdparty";
 
-    protected String user;
-    protected String deviceId;
+    protected String address;
+    protected String medium;
+    protected Identifier identifier;
 
-    public LoginPostBody(String user, String password) {
+    public LoginIdentifierBody(String password, Identifier identifier) {
         super(password);
-        this.user = user;
+        this.identifier = identifier;
+        this.address = identifier.getAddress();
+        this.medium = identifier.getMedium();
     }
 
-    public LoginPostBody(String user, String password, String deviceId) {
-        this(user, password);
-        this.deviceId = deviceId;
+    public LoginIdentifierBody(String password, Identifier identifier, String initialDeviceDisplayName) {
+        this(password, identifier);
+        this.setInitialDeviceDisplayName(initialDeviceDisplayName);
     }
 
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
-    }
 
 }
 

@@ -52,6 +52,13 @@ public class MatrixHttpClientLoginWiremockTest extends AMatrixHttpClientLoginTes
 
     @Test
     @Override
+    public void loginAndLogoutWithIdentifier() throws URISyntaxException {
+        stubFor(post(urlEqualTo(loginUrl))
+                .willReturn(aResponse().withStatus(200)));
+    }
+
+    @Test
+    @Override
     public void loginWithDeviceIdAndLogout() throws URISyntaxException {
         stubFor(post(urlEqualTo(loginUrl))
                 .withRequestBody(equalToJson("{\"type\": \"m.login.password\"," + //

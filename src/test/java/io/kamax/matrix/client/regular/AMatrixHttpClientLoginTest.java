@@ -20,10 +20,7 @@
 
 package io.kamax.matrix.client.regular;
 
-import io.kamax.matrix.client.MatrixClientContext;
-import io.kamax.matrix.client.MatrixClientRequestException;
-import io.kamax.matrix.client.MatrixHttpTest;
-import io.kamax.matrix.client.MatrixPasswordCredentials;
+import io.kamax.matrix.client.*;
 import io.kamax.matrix.hs.MatrixHomeserver;
 
 import org.junit.Test;
@@ -64,6 +61,25 @@ public abstract class AMatrixHttpClientLoginTest extends MatrixHttpTest {
 
         client.logout();
     }
+
+    @Test
+    public void loginAndLogoutWithIdentifier() throws URISyntaxException {
+        MatrixHomeserver hs = new MatrixHomeserver(domain, baseUrl);
+        MatrixClientContext context = new MatrixClientContext(hs);
+        MatrixHttpClient client = new MatrixHttpClient(context);
+        String type =  "m.id.thirdparty";
+        String address = "my@address.com";
+        String medium = "email";
+
+        MatrixIdentifierCredentials credentials = new MatrixIdentifierCredentials(password, type, address, medium);
+        client.login(credentials);
+
+//        assertTrue(StringUtils.isNotBlank(client.getAccessToken().get()));
+//        assertTrue(StringUtils.isNotBlank(client.getUser().get().getId()));
+
+        client.logout();
+    }
+
 
     @Test
     public void loginWithDeviceIdAndLogout() throws URISyntaxException {

@@ -20,20 +20,36 @@
 
 package io.kamax.matrix.client;
 
-public class MatrixPasswordCredentials implements MatrixCredentials {
-    private final String localPart;
-    private final String password;
+import io.kamax.matrix.json.Identifier;
 
-    public MatrixPasswordCredentials(String localPart, String password ) {
-        this.localPart = localPart;
+public class MatrixIdentifierCredentials implements MatrixCredentials {
+
+    private final Identifier identifier;
+    private final String password;
+    private String initialDeviceDisplayName;
+
+    public MatrixIdentifierCredentials(String password, String type, String address, String medium) {
         this.password = password;
+        this.identifier = new Identifier();
+        this.identifier.setType(type);
+        this.identifier.setMedium(medium);
+        this.identifier.setAddress(address);
+    }
+    public MatrixIdentifierCredentials(String password, String type, String address, String medium, String initialDeviceDisplayName) {
+        this(password, type, address, medium);
+        this.initialDeviceDisplayName = initialDeviceDisplayName;
     }
 
-    public String getLocalPart() {
-        return localPart;
+    public Identifier getIdentifier() {
+        return identifier;
     }
 
     public String getPassword() {
         return password;
     }
+
+    public String getInitialDeviceDisplayName() {
+        return initialDeviceDisplayName;
+    }
+
 }
