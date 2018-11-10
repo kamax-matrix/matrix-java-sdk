@@ -23,11 +23,15 @@ package io.kamax.matrix.client;
 public class MatrixPasswordCredentials {
     private final String localPart;
     private final String password;
-    private final boolean thirdPartyTypeIdentifier;
+    private boolean thirdPartyTypeIdentifier=false;
 
-    public MatrixPasswordCredentials(String localPart, String password, boolean isThirdPartyTypeIdentifier) {
+    public MatrixPasswordCredentials(String localPart, String password ) {
         this.localPart = localPart;
         this.password = password;
+    }
+
+    public MatrixPasswordCredentials(String localPart, String password, boolean isThirdPartyTypeIdentifier){
+        this(localPart, password);
         this.thirdPartyTypeIdentifier = isThirdPartyTypeIdentifier;
     }
 

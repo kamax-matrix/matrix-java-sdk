@@ -41,11 +41,11 @@ buildscript {
 }
 
 plugins {
-    id "com.diffplug.gradle.spotless" version "3.5.2"
+    // id "com.diffplug.gradle.spotless" version "3.5.2"
 }
 
 group = 'io.kamax'
-version = gitVersion()
+version = '0.0.18'
 
 apply plugin: 'java'
 apply plugin: 'maven'
@@ -126,20 +126,20 @@ publishing {
     }
 }
 
-spotless {
-    format 'misc', {
-        target '**/*.gradle', '**/.gitignore'
-
-        trimTrailingWhitespace()
-        indentWithSpaces()
-        endWithNewline()
-    }
-    java {
-        eclipse().configFile 'spotless.eclipseformat.xml'
-        removeUnusedImports()
-        importOrderFile 'spotless.importorder'
-    }
-}
+//spotless {
+//    format 'misc', {
+//        target '**/*.gradle', '**/.gitignore'
+//
+//        trimTrailingWhitespace()
+//        indentWithSpaces()
+//        endWithNewline()
+//    }
+//    java {
+//        eclipse().configFile 'spotless.eclipseformat.xml'
+//        removeUnusedImports()
+//        importOrderFile 'spotless.importorder'
+//    }
+//}
 
 junitPlatform {
     enableStandardTestTask true
