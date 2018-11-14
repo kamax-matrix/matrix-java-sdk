@@ -20,6 +20,7 @@
 
 package io.kamax.matrix.client.regular;
 
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 import io.kamax.matrix.MatrixID;
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java8.util.Optional;
@@ -239,6 +241,40 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     @Override
     public String putMedia(File data, String type, String filename) {
         return putMedia(new Request.Builder().post(RequestBody.create(MediaType.parse(type), data)), filename);
+    }
+
+    @Override
+    public List<JsonObject> getPushers() {
+        URL url = getClientPath("pushers");
+        JsonObject response = GsonUtil.parseObj(executeAuthenticated(new Request.Builder().get().url(url)));
+        return GsonUtil.findArray(response, "pushers").map(array -> GsonUtil.asList(array, JsonObject.class))
+                .orElse(Collections.emptyList());
+    }
+
+    @Override
+    public void setPusher(JsonObject pusher) {
+        URL url = getClientPath("pushers", "set");
+        executeAuthenticated(new Request.Builder().url(url).post(getJsonBody(pusher)));
+    }
+
+    @Override
+    public void deletePusher(String pushKey) {
+        JsonObject pusher = new JsonObject();
+        pusher.add("kind", JsonNull.INSTANCE);
+        pusher.addProperty("pushkey", pushKey);
+        setPusher(pusher);
+    }
+
+    @Override
+    public _GlobalPushRulesSet getPushRules() {
+        URL url = getClientPath("pushrules", "global", "");
+        JsonObject response = GsonUtil.parseObj(executeAuthenticated(new Request.Builder().url(url).get()));
+        return new GlobalPushRulesSet(response);
+    }
+
+    @Override
+    public _PushRule getPushRule(String scope, String kind, String id) {
+        return new MatrixHttpPushRule(context, scope, kind, id);
     }
 
 }

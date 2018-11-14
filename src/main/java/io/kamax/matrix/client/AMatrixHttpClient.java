@@ -400,4 +400,12 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return RequestBody.create(MediaType.parse("application/json"), GsonUtil.get().toJson(o));
     }
 
+    protected Request.Builder request(URL url) {
+        return new Request.Builder().url(url);
+    }
+
+    protected Request.Builder getRequest(URL url) {
+        return request(url).get();
+    }
+
 }

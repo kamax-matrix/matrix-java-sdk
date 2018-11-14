@@ -20,6 +20,8 @@
 
 package io.kamax.matrix.client;
 
+import com.google.gson.JsonObject;
+
 import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUser;
@@ -132,5 +134,15 @@ public interface _MatrixClient extends _MatrixClientRaw {
      * @return The MXC URI for the uploaded content
      */
     String putMedia(File data, String type, String filename);
+
+    List<JsonObject> getPushers();
+
+    void setPusher(JsonObject pusher);
+
+    void deletePusher(String pushKey);
+
+    _GlobalPushRulesSet getPushRules();
+
+    _PushRule getPushRule(String scope, String kind, String id);
 
 }
