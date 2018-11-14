@@ -74,10 +74,6 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         super(context, client);
     }
 
-    protected _MatrixID getMatrixId(String localpart) {
-        return new MatrixID(localpart, getHomeserver().getDomain());
-    }
-
     @Override
     public _MatrixID getWhoAmI() {
         URL path = getClientPath("account", "whoami");
