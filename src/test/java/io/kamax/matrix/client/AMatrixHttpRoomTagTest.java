@@ -1,6 +1,7 @@
 /*
  * matrix-java-sdk - Matrix Client SDK for Java
  * Copyright (C) 2018 Arne Augenstein
+ * Copyright (C) 2018 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -32,8 +33,9 @@ import io.kamax.matrix.room.Tag;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import java8.util.Optional;
+import java8.util.stream.StreamSupport;
 
 import static junit.framework.TestCase.assertTrue;
 
@@ -41,6 +43,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public abstract class AMatrixHttpRoomTagTest extends MatrixHttpTest {
+
     protected String testTag = "usertag";
     protected String testTagWithOrder = "usertagWithOrder";
     protected Double testTagOrder = 0.5;
@@ -57,12 +60,13 @@ public abstract class AMatrixHttpRoomTagTest extends MatrixHttpTest {
 
         assertTrue(room.getUserTags().size() == 2);
 
-        Optional<Tag> roomTagWithOrder = room.getUserTags().stream()
+        Optional<Tag> roomTagWithOrder = StreamSupport.stream(room.getUserTags())
                 .filter(tag -> testTagWithOrder.equals(tag.getName())).findFirst();
         assertTrue(roomTagWithOrder.isPresent());
         assertTrue(roomTagWithOrder.get().getOrder().get().doubleValue() == testTagOrder);
 
-        Optional<Tag> roomTag = room.getUserTags().stream().filter(tag -> testTag.equals(tag.getName())).findFirst();
+        Optional<Tag> roomTag = StreamSupport.stream(room.getUserTags()).filter(tag -> testTag.equals(tag.getName()))
+                .findFirst();
         assertTrue(roomTag.isPresent());
         assertFalse(roomTag.get().getOrder().isPresent());
 
@@ -96,7 +100,7 @@ public abstract class AMatrixHttpRoomTagTest extends MatrixHttpTest {
         room.addUserTag(testTag);
 
         _SyncData syncData = client.sync(SyncOptions.build().get());
-        Optional<_SyncData.JoinedRoom> roomFromSync = syncData.getRooms().getJoined().stream()
+        Optional<_SyncData.JoinedRoom> roomFromSync = StreamSupport.stream(syncData.getRooms().getJoined())
                 .filter(joinedRoom -> room.getId().equals(joinedRoom.getId())).findFirst();
 
         assertTrue(roomFromSync.isPresent());
@@ -158,4 +162,5 @@ public abstract class AMatrixHttpRoomTagTest extends MatrixHttpTest {
         assertTrue(room.getUserTags().isEmpty());
         return room;
     }
+
 }
