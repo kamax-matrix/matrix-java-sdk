@@ -37,6 +37,8 @@ import io.kamax.matrix.room._RoomCreationOptions;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URI;
@@ -49,6 +51,8 @@ import java8.util.Optional;
 import okhttp3.*;
 
 public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient {
+
+    private Logger log = LoggerFactory.getLogger(MatrixHttpClient.class);
 
     public MatrixHttpClient(String domain) {
         super(domain);
@@ -182,6 +186,7 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
 
     @Override
     public _SyncData sync(_SyncOptions options) {
+        long start = System.currentTimeMillis();
         HttpUrl.Builder path = getClientPathBuilder("sync");
         path.addQueryParameter("timeout", options.getTimeout().map(Long::intValue).orElse(30000).toString());
         options.getSince().ifPresent(since -> path.addQueryParameter("since", since));
@@ -190,7 +195,12 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         options.getSetPresence().ifPresent(presence -> path.addQueryParameter("presence", presence));
 
         String body = executeAuthenticated(new Request.Builder().get().url(path.build().url()));
-        return new SyncDataJson(GsonUtil.parseObj(body));
+        long request = System.currentTimeMillis();
+        log.info("Sync: network request took {} ms", (request - start));
+        SyncDataJson data = new SyncDataJson(GsonUtil.parseObj(body));
+        long parsing = System.currentTimeMillis();
+        log.info("Sync: parsing took {} ms", (parsing - request));
+        return data;
     }
 
     @Override
