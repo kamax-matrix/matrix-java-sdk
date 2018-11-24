@@ -20,6 +20,7 @@
 
 package io.kamax.matrix.client.regular;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import io.kamax.matrix.MatrixID;
@@ -32,10 +33,7 @@ import io.kamax.matrix.event._MatrixPersistentEvent;
 import io.kamax.matrix.event._MatrixStateEvent;
 import io.kamax.matrix.json.MatrixJsonObject;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class SyncDataJson extends MatrixJsonObject implements _SyncData {
 
@@ -112,9 +110,11 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         public StateJson(JsonObject obj) {
             super(obj);
 
-            findArray("events").ifPresent(array -> array.forEach(el -> {
-                events.add(new MatrixStateEventJson(asObj(el)));
-            }));
+            findArray("events").ifPresent(array -> {
+                for (JsonElement el : array) {
+                    events.add(new MatrixStateEventJson(asObj(el)));
+                }
+            });
         }
 
         @Override
@@ -130,9 +130,11 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         public TimelineJson(JsonObject obj) {
             super(obj);
 
-            findArray("events").ifPresent(array -> array.forEach(el -> {
-                events.add(new MatrixPersistentEventJson(asObj(el)));
-            }));
+            findArray("events").ifPresent(array -> {
+                for (JsonElement el : array) {
+                    events.add(new MatrixPersistentEventJson(asObj(el)));
+                }
+            });
         }
 
         @Override
@@ -158,9 +160,11 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         public EphemeralJson(JsonObject obj) {
             super(obj);
 
-            findArray("events").ifPresent(array -> array.forEach(el -> {
-                events.add(new MatrixEphemeralEventJson(asObj(el)));
-            }));
+            findArray("events").ifPresent(array -> {
+                for (JsonElement el : array) {
+                    events.add(new MatrixEphemeralEventJson(asObj(el)));
+                }
+            });
         }
 
         @Override
@@ -176,9 +180,11 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         public AccountDataJson(JsonObject obj) {
             super(obj);
 
-            findArray("events").ifPresent(array -> array.forEach(el -> {
-                events.add(new MatrixAccountDataEventJson(asObj(el)));
-            }));
+            findArray("events").ifPresent(array -> {
+                for (JsonElement el : array) {
+                    events.add(new MatrixAccountDataEventJson(asObj(el)));
+                }
+            });
         }
 
         @Override
@@ -319,17 +325,23 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
 
         public RoomsJson(JsonObject obj) {
             super(obj);
-            findObj("invite").ifPresent(o -> o.entrySet().forEach(entry -> {
-                invited.add(new InvitedRoomJson(entry.getKey(), asObj(entry.getValue())));
-            }));
+            findObj("invite").ifPresent(o -> {
+                for (Map.Entry<String, JsonElement> entry : o.entrySet()) {
+                    invited.add(new InvitedRoomJson(entry.getKey(), asObj(entry.getValue())));
+                }
+            });
 
-            findObj("join").ifPresent(o -> o.entrySet().forEach(entry -> {
-                joined.add(new JoinedRoomJson(entry.getKey(), asObj(entry.getValue())));
-            }));
+            findObj("join").ifPresent(o -> {
+                for (Map.Entry<String, JsonElement> entry : o.entrySet()) {
+                    joined.add(new JoinedRoomJson(entry.getKey(), asObj(entry.getValue())));
+                }
+            });
 
-            findObj("leave").ifPresent(o -> o.entrySet().forEach(entry -> {
-                left.add(new LeftRoomJson(entry.getKey(), asObj(entry.getValue())));
-            }));
+            findObj("leave").ifPresent(o -> {
+                for (Map.Entry<String, JsonElement> entry : o.entrySet()) {
+                    left.add(new LeftRoomJson(entry.getKey(), asObj(entry.getValue())));
+                }
+            });
         }
 
         @Override
