@@ -300,7 +300,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     protected MatrixHttpContentResult handleRateLimitedContentRequest(MatrixHttpRequest matrixRequest,
             MatrixErrorInfo info) {
-        throw new MatrixClientRequestException(info, "Request was rate limited.");
+        throw new MatrixClientRequestRateLimitedException(info, "Request was rate limited.");
         // TODO Add default handling of rate limited call, i.e. repeated call after given time interval.
         // 1. Wait for timeout
         // 2. return execute(request)
