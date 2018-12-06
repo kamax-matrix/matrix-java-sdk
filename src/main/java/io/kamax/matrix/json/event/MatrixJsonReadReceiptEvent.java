@@ -30,7 +30,8 @@ import io.kamax.matrix.json.GsonUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
 public class MatrixJsonReadReceiptEvent extends MatrixJsonEphemeralEvent implements _ReadReceiptEvent {
 
@@ -45,13 +46,14 @@ public class MatrixJsonReadReceiptEvent extends MatrixJsonEphemeralEvent impleme
         super(obj);
 
         JsonObject content = getObj("content");
-        List<String> eventIds = content.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());
+        List<String> eventIds = StreamSupport.stream(content.entrySet()).map(Map.Entry::getKey)
+                .collect(Collectors.toList());
 
-        receipts = eventIds.stream().map(id -> {
+        receipts = StreamSupport.stream(eventIds).map(id -> {
             JsonObject targetEvent = content.getAsJsonObject(id);
             JsonObject mRead = targetEvent.getAsJsonObject("m.read");
 
-            Map<MatrixID, Long> readMarkers = mRead.entrySet().stream()
+            Map<MatrixID, Long> readMarkers = StreamSupport.stream(mRead.entrySet())
                     .collect(Collectors.toMap(it -> MatrixID.asAcceptable(it.getKey()),
                             it -> GsonUtil.getLong(it.getValue().getAsJsonObject(), "ts")));
             return new Receipt(id, readMarkers);

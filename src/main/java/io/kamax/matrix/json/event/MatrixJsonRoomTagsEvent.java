@@ -31,7 +31,8 @@ import io.kamax.matrix.room.Tag;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
 public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _TagsEvent {
 
@@ -58,7 +59,7 @@ public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _TagsEv
             super(obj);
 
             GsonUtil.findObj(obj, "tags").ifPresent(tagsJson -> {
-                List<Tag> tags = tagsJson.entrySet().stream().map(it -> {
+                List<Tag> tags = StreamSupport.stream(tagsJson.entrySet()).map(it -> {
                     String completeName = it.getKey();
                     String name = completeName;
                     String namespace = "";

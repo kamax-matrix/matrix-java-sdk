@@ -24,8 +24,9 @@ import com.google.gson.*;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java8.util.Optional;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
 public class GsonUtil {
 
@@ -52,11 +53,12 @@ public class GsonUtil {
     }
 
     public static JsonArray asArrayObj(List<? extends Object> elements) {
-        return asArray(elements.stream().map(e -> get().toJsonTree(e)).collect(Collectors.toList()));
+        return asArray(StreamSupport.stream(elements).map(e -> get().toJsonTree(e)).collect(Collectors.toList()));
     }
 
     public static JsonArray asArray(String... elements) {
-        return asArray(Arrays.stream(elements).map(JsonPrimitive::new).collect(Collectors.toList()));
+        return asArray(
+                StreamSupport.stream(Arrays.asList(elements)).map(JsonPrimitive::new).collect(Collectors.toList()));
     }
 
     public static JsonArray asArray(Collection<String> elements) {

@@ -27,7 +27,8 @@ import io.kamax.matrix.room._RoomCreationOptions;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
 public class RoomCreationRequestJson {
 
@@ -47,7 +48,7 @@ public class RoomCreationRequestJson {
         this.name = options.getName().orElse(null);
         this.topic = options.getTopic().orElse(null);
         this.invite = options.getInvites().filter(ids -> !ids.isEmpty())
-                .map(ids -> ids.stream().map(_MatrixID::getId).collect(Collectors.toSet())).orElse(null);
+                .map(ids -> StreamSupport.stream(ids).map(_MatrixID::getId).collect(Collectors.toSet())).orElse(null);
         this.creationContent = options.getCreationContent().filter(c -> !c.isEmpty()).orElse(null);
         this.preset = options.getPreset().orElse(null);
         this.isDirect = options.isDirect().orElse(null);

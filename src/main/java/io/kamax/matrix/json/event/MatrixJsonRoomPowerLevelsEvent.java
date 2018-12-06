@@ -29,8 +29,9 @@ import io.kamax.matrix.json.MatrixJsonObject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java8.util.Optional;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
 public class MatrixJsonRoomPowerLevelsEvent extends MatrixJsonRoomEvent implements _RoomPowerLevelsEvent {
 
@@ -111,13 +112,13 @@ public class MatrixJsonRoomPowerLevelsEvent extends MatrixJsonRoomEvent implemen
             setUsersDefault(getDoubleIfPresent("users_default"));
 
             GsonUtil.findObj(obj, "events").ifPresent(eventsJson -> {
-                Map<String, Double> eventsMap = eventsJson.entrySet().stream()
+                Map<String, Double> eventsMap = StreamSupport.stream(eventsJson.entrySet())
                         .collect(Collectors.toMap(it -> it.getKey(), it -> it.getValue().getAsDouble()));
                 setEvents(eventsMap);
             });
 
             GsonUtil.findObj(obj, "users").ifPresent(usersJson -> {
-                Map<String, Double> usersMap = usersJson.entrySet().stream()
+                Map<String, Double> usersMap = StreamSupport.stream(usersJson.entrySet())
                         .collect(Collectors.toMap(it -> it.getKey(), it -> it.getValue().getAsDouble()));
                 setUsers(usersMap);
             });

@@ -46,8 +46,9 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java8.util.Optional;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
 
 import okhttp3.*;
@@ -119,7 +120,7 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
     public List<_MatrixRoom> getJoinedRooms() {
         URL path = getClientPath("joined_rooms");
         JsonObject resBody = GsonUtil.parseObj(executeAuthenticated(new Request.Builder().get().url(path)));
-        return GsonUtil.asList(resBody, "joined_rooms", String.class).stream().map(this::getRoom)
+        return StreamSupport.stream(GsonUtil.asList(resBody, "joined_rooms", String.class)).map(this::getRoom)
                 .collect(Collectors.toList());
     }
 

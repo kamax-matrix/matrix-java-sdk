@@ -46,8 +46,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java8.util.Optional;
+import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
 
@@ -238,7 +238,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         List<_MatrixUserProfile> ids = new ArrayList<>();
         if (StringUtils.isNotEmpty(body)) {
             JsonObject joinedUsers = jsonParser.parse(body).getAsJsonObject().get("joined").getAsJsonObject();
-            ids = joinedUsers.entrySet().stream().filter(e -> e.getValue().isJsonObject()).map(entry -> {
+            ids = StreamSupport.stream(joinedUsers.entrySet()).filter(e -> e.getValue().isJsonObject()).map(entry -> {
                 JsonObject obj = entry.getValue().getAsJsonObject();
                 return new MatrixHttpUser(getContext(), MatrixID.asAcceptable(entry.getKey())) {
 
@@ -276,12 +276,13 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         String bodyRaw = executeAuthenticated(new Request.Builder().get().url(builder.build().url()));
         RoomMessageChunkResponseJson body = GsonUtil.get().fromJson(bodyRaw, RoomMessageChunkResponseJson.class);
         return new MatrixRoomMessageChunk(body.getStart(), body.getEnd(),
-                body.getChunk().stream().map(MatrixJsonPersistentEvent::new).collect(Collectors.toList()));
+                StreamSupport.stream(body.getChunk()).map(MatrixJsonPersistentEvent::new).collect(Collectors.toList()));
     }
 
     @Override
     public List<Tag> getUserTags() {
-        return getAllTags().stream().filter(tag -> "u".equals(tag.getNamespace())).collect(Collectors.toList());
+        return StreamSupport.stream(getAllTags()).filter(tag -> "u".equals(tag.getNamespace()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -292,7 +293,7 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
         String body = executeAuthenticated(new Request.Builder().get().url(path));
 
         JsonObject jsonTags = GsonUtil.parseObj(body).getAsJsonObject("tags").getAsJsonObject();
-        List<Tag> tags = jsonTags.entrySet().stream().map(entry -> {
+        List<Tag> tags = StreamSupport.stream(jsonTags.entrySet()).map(entry -> {
             String completeName = entry.getKey();
             String name = "";
             String namespace = "";
