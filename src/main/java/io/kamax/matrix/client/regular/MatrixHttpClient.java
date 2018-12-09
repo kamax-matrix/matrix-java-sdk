@@ -81,6 +81,12 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         super(context, client);
     }
 
+    protected _MatrixID getIdentity(String token) {
+        URL path = getClientPath("account", "whoami");
+        String body = executeAuthenticated(new Request.Builder().get().url(path), token);
+        return MatrixID.from(GsonUtil.getStringOrThrow(GsonUtil.parseObj(body), "user_id")).acceptable();
+    }
+
     @Override
     public _MatrixID getWhoAmI() {
         URL path = getClientPath("account", "whoami");
@@ -165,6 +171,12 @@ public class MatrixHttpClient extends AMatrixHttpClient implements _MatrixClient
         body.addProperty("admin", false);
         URL url = getPath("client", "api", "v1", "register");
         updateContext(execute(new Request.Builder().post(getJsonBody(body)).url(url)));
+    }
+
+    @Override
+    public void setAccessToken(String accessToken) {
+        context.setUser(getIdentity(accessToken));
+        context.setToken(accessToken);
     }
 
     @Override

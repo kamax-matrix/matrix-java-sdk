@@ -187,9 +187,17 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
         return context.getUser();
     }
 
-    protected Request.Builder addAuthHeader(Request.Builder builder) {
-        builder.addHeader("Authorization", "Bearer " + getAccessTokenOrThrow());
+    protected Request.Builder addAuthHeader(Request.Builder builder, String token) {
+        builder.addHeader("Authorization", "Bearer " + token);
         return builder;
+    }
+
+    protected Request.Builder addAuthHeader(Request.Builder builder) {
+        return addAuthHeader(builder, getAccessTokenOrThrow());
+    }
+
+    protected String executeAuthenticated(Request.Builder builder, String token) {
+        return execute(addAuthHeader(builder, token));
     }
 
     protected String executeAuthenticated(Request.Builder builder) {

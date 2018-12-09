@@ -59,6 +59,16 @@ public interface _MatrixClient extends _MatrixClientRaw {
     // TODO refactor into custom synapse class?
     void register(MatrixPasswordCredentials credentials, String sharedSecret, boolean admin);
 
+    /***
+     * Set the access token to use for any authenticated API calls.
+     * 
+     * @param accessToken
+     *            The access token provided by the server which must be valid
+     * @throws MatrixClientRequestException
+     *             If an error occurred while checking for the identity behind the access token
+     */
+    void setAccessToken(String accessToken) throws MatrixClientRequestException;
+
     void login(MatrixPasswordCredentials credentials);
 
     void logout();
