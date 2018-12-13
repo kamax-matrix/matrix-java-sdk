@@ -92,8 +92,7 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
         }
     }
 
-    @Override
-    public Optional<_MatrixContent> getAvatar() {
+    private Optional<URI> getAvatarURI() {
         try {
             URI path = getClientPath("/profile/" + mxId.getId() + "/avatar_url");
             try (CloseableHttpResponse res = client.execute(log(new HttpGet(path)))) {
@@ -126,7 +125,7 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
                 String uriRaw = urlObj.get("avatar_url").getAsString();
                 log.info("Avatar URI of {}: {}", mxId, uriRaw);
                 try {
-                    return Optional.of(new MatrixHttpContent(getContext(), new URI(uriRaw)));
+                    return Optional.of(new URI(uriRaw));
                 } catch (URISyntaxException e) {
                     log.warn("{} is not a valid URI for avatar, returning empty", uriRaw);
                     return Optional.empty();
@@ -135,7 +134,16 @@ public class MatrixHttpUser extends AMatrixHttpClient implements _MatrixUser {
         } catch (IOException e) {
             throw new MatrixClientRequestException(e);
         }
+    }
 
+    @Override
+    public Optional<_MatrixContent> getAvatar() {
+        return getAvatarURI().map(uri -> new MatrixHttpContent(getContext(), uri));
+    }
+
+    @Override
+    public Optional<_MatrixContent> getAvatarThumbnail(long width, long height) {
+        return getAvatarURI().map(uri -> new MatrixHttpContentThumbnail(getContext(), uri, width, height));
     }
 
 }

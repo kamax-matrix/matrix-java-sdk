@@ -30,4 +30,6 @@ public interface _MatrixUser {
 
     Optional<_MatrixContent> getAvatar();
 
+    Optional<_MatrixContent> getAvatarThumbnail(long width, long height);
+
 }

@@ -19,7 +19,7 @@
  */
 
 group = 'io.kamax'
-version = '0.0.1'
+version = '0.0.1-bridge-email'
 
 apply plugin: 'java'
 apply plugin: 'maven'
