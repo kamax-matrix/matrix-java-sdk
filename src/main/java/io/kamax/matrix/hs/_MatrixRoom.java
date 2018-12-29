@@ -72,7 +72,11 @@ public interface _MatrixRoom {
 
     void join();
 
+    void join(List<String> servers);
+
     Optional<MatrixErrorInfo> tryJoin();
+
+    Optional<MatrixErrorInfo> tryJoin(List<String> servers);
 
     void leave();
 

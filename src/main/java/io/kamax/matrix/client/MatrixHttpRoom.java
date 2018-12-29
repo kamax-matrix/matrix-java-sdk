@@ -45,6 +45,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java8.util.Optional;
 import java8.util.stream.Collectors;
@@ -132,14 +133,25 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
 
     @Override
     public void join() {
-        URL path = getClientPath("rooms", roomId, "join");
-        executeAuthenticated(new Request.Builder().post(getJsonBody(new JsonObject())).url(path));
+        join(Collections.emptyList());
+    }
+
+    @Override
+    public void join(List<String> servers) {
+        HttpUrl.Builder b = getClientPathBuilder("rooms", roomId, "join");
+        servers.forEach(server -> b.addQueryParameter("server_name", server));
+        executeAuthenticated(new Request.Builder().post(getJsonBody(new JsonObject())).url(b.build()));
     }
 
     @Override
     public Optional<MatrixErrorInfo> tryJoin() {
+        return tryJoin(Collections.emptyList());
+    }
+
+    @Override
+    public Optional<MatrixErrorInfo> tryJoin(List<String> servers) {
         try {
-            join();
+            join(servers);
             return Optional.empty();
         } catch (MatrixClientRequestException e) {
             return e.getError();
