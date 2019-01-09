@@ -201,7 +201,7 @@ public class SyncDataJson extends MatrixJsonObject implements _SyncData {
         public InvitedRoomJson(String id, JsonObject data) {
             super(data);
             this.id = id;
-            this.state = new StateJson(findObj("state").orElseGet(JsonObject::new));
+            this.state = new StateJson(findObj("invite_state").orElseGet(JsonObject::new));
         }
 
         @Override
