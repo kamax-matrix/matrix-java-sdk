@@ -135,7 +135,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
             context.setIsBaseUrl(baseUrlCandidate);
             try {
                 if (validateIsBaseUrl()) {
-                    log.info("Found a valid IS at {}", getContext().getHsBaseUrl().toString());
+                    log.info("Found a valid IS at {}", getContext().getIsBaseUrl().toString());
                     break;
                 }
             } catch (MatrixClientRequestException e) {
@@ -174,7 +174,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
 
     @Override
     public boolean validateIsBaseUrl() {
-        String body = execute(new Request.Builder().get().url(getIdentityPath("identity", "api", "/v1")));
+        String body = execute(new Request.Builder().get().url(getIdentityPath("identity", "api", "v1")));
         return "{}".equals(body);
     }
 
