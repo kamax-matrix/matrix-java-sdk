@@ -22,9 +22,12 @@ package io.kamax.matrix.json;
 
 import com.google.gson.*;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java8.util.Optional;
+import java8.util.function.Consumer;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
