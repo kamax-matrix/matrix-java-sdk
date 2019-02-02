@@ -38,8 +38,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java8.util.Objects;
 import java8.util.Optional;
 
@@ -55,8 +53,6 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     protected Gson gson = GsonUtil.get();
     protected JsonParser jsonParser = new JsonParser();
     private OkHttpClient client;
-
-    private Pattern accessTokenUrlPattern = Pattern.compile("\\?access_token=(?<token>[^&]*)");
 
     public AMatrixHttpClient(String domain) {
         this(new MatrixClientContext().setDomain(domain));
@@ -335,17 +331,7 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     private void log(Request.Builder req) {
-        String reqUrl = req.toString();
-        Matcher m = accessTokenUrlPattern.matcher(reqUrl);
-        if (m.find()) {
-            StringBuilder b = new StringBuilder();
-            b.append(reqUrl, 0, m.start("token"));
-            b.append("<redacted>");
-            b.append(reqUrl.substring(m.end("token")));
-            reqUrl = b.toString();
-        }
-
-        log.debug("Doing {} {}", req, reqUrl);
+        log.debug("Doing {} {}", req, req.toString());
     }
 
     protected HttpUrl.Builder getHsBaseUrl() {
