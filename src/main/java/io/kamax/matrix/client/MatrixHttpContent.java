@@ -38,7 +38,7 @@ import okhttp3.Request;
 public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixContent {
 
     private Logger log = LoggerFactory.getLogger(MatrixHttpContent.class);
-    private final Pattern filenamePattern = Pattern.compile("filename=\"?(?<filename>[^\";]+)");
+    private final Pattern filenamePattern = Pattern.compile("filename=\"?([^\";]+)");
     private URI address;
 
     private MatrixHttpContentResult result;
@@ -122,7 +122,7 @@ public class MatrixHttpContent extends AMatrixHttpClient implements _MatrixConte
             for (String v : l) {
                 Matcher m = filenamePattern.matcher(v);
                 if (m.find()) {
-                    return Optional.of(m.group("filename"));
+                    return Optional.of(m.group(1));
                 }
             }
 
