@@ -72,7 +72,9 @@ public class GsonUtil {
 
     public static <T> List<T> asList(JsonArray a, Class<T> c) {
         List<T> l = new ArrayList<>();
-        a.forEach(v -> l.add(GsonUtil.get().fromJson(v, c)));
+        for (JsonElement v : a) {
+            l.add(GsonUtil.get().fromJson(v, c));
+        }
         return l;
     }
 
