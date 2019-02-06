@@ -36,22 +36,7 @@ import java8.util.stream.StreamSupport;
 
 public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _TagsEvent {
 
-    private Content content;
-
-    private String type;
-
-    public MatrixJsonRoomTagsEvent(JsonObject obj) {
-        super(obj);
-        type = getString("type");
-        content = new Content(getObj("content"));
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    private class Content extends MatrixJsonObject {
+    public static class Content extends MatrixJsonObject {
 
         private List<Tag> tags = new ArrayList<>();
 
@@ -90,6 +75,20 @@ public class MatrixJsonRoomTagsEvent extends MatrixJsonObject implements _TagsEv
             this.tags = new ArrayList<>(tags);
         }
 
+    }
+
+    private String type;
+    protected Content content;
+
+    public MatrixJsonRoomTagsEvent(JsonObject obj) {
+        super(obj);
+        type = getString("type");
+        content = new Content(getObj("content"));
+    }
+
+    @Override
+    public String getType() {
+        return type;
     }
 
     @Override

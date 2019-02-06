@@ -31,7 +31,7 @@ import java.util.List;
 
 public class MatrixJsonRoomAliasesEvent extends MatrixJsonRoomEvent implements _RoomAliasesEvent {
 
-    private class Content extends MatrixJsonObject {
+    public static class Content extends MatrixJsonObject {
 
         private List<String> aliases;
 
@@ -51,7 +51,7 @@ public class MatrixJsonRoomAliasesEvent extends MatrixJsonRoomEvent implements _
 
     }
 
-    private Content content;
+    protected Content content;
 
     public MatrixJsonRoomAliasesEvent(JsonObject obj) {
         super(obj);

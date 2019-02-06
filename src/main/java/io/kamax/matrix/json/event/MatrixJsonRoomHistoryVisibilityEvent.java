@@ -26,7 +26,27 @@ import io.kamax.matrix.event._RoomHistoryVisibilityEvent;
 import io.kamax.matrix.json.MatrixJsonObject;
 
 public class MatrixJsonRoomHistoryVisibilityEvent extends MatrixJsonRoomEvent implements _RoomHistoryVisibilityEvent {
-    private Content content;
+
+    public static class Content extends MatrixJsonObject {
+
+        private String historyVisibility;
+
+        public Content(JsonObject obj) {
+            super(obj);
+            setHistoryVisibility(getString("history_visibility"));
+        }
+
+        public String getHistoryVisibility() {
+            return historyVisibility;
+        }
+
+        public void setHistoryVisibility(String historyVisibility) {
+            this.historyVisibility = historyVisibility;
+        }
+
+    }
+
+    protected Content content;
 
     public MatrixJsonRoomHistoryVisibilityEvent(JsonObject obj) {
         super(obj);
@@ -39,22 +59,4 @@ public class MatrixJsonRoomHistoryVisibilityEvent extends MatrixJsonRoomEvent im
         return content.getHistoryVisibility();
     }
 
-    private class Content extends MatrixJsonObject {
-
-        private String historyVisibility;
-
-        Content(JsonObject obj) {
-            super(obj);
-            setHistoryVisibility(getString("history_visibility"));
-        }
-
-        String getHistoryVisibility() {
-            return historyVisibility;
-        }
-
-        void setHistoryVisibility(String historyVisibility) {
-            this.historyVisibility = historyVisibility;
-        }
-
-    }
 }

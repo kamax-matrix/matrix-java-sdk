@@ -29,7 +29,7 @@ import java8.util.Optional;
 
 public class MatrixJsonRoomMessageEvent extends MatrixJsonRoomEvent implements _RoomMessageEvent {
 
-    private JsonObject content;
+    protected JsonObject content;
 
     public MatrixJsonRoomMessageEvent(JsonObject obj) {
         super(obj);

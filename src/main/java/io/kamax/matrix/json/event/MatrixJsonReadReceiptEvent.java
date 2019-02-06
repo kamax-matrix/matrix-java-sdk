@@ -35,35 +35,10 @@ import java8.util.stream.StreamSupport;
 
 public class MatrixJsonReadReceiptEvent extends MatrixJsonEphemeralEvent implements _ReadReceiptEvent {
 
-    private List<Receipt> receipts;
-
-    @Override
-    public List<Receipt> getReceipts() {
-        return receipts;
-    }
-
-    public MatrixJsonReadReceiptEvent(JsonObject obj) {
-        super(obj);
-
-        JsonObject content = getObj("content");
-        List<String> eventIds = StreamSupport.stream(content.entrySet()).map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-
-        receipts = StreamSupport.stream(eventIds).map(id -> {
-            JsonObject targetEvent = content.getAsJsonObject(id);
-            JsonObject mRead = targetEvent.getAsJsonObject("m.read");
-
-            Map<MatrixID, Long> readMarkers = StreamSupport.stream(mRead.entrySet())
-                    .collect(Collectors.toMap(it -> MatrixID.asAcceptable(it.getKey()),
-                            it -> GsonUtil.getLong(it.getValue().getAsJsonObject(), "ts")));
-            return new Receipt(id, readMarkers);
-        }).collect(Collectors.toList());
-    }
-
     /**
      * Read receipts for a specific event.
      */
-    public class Receipt {
+    public static class Receipt {
         /**
          * ID of the event, the read markers point to.
          */
@@ -92,4 +67,30 @@ public class MatrixJsonReadReceiptEvent extends MatrixJsonEphemeralEvent impleme
             return eventId;
         }
     }
+
+    private List<Receipt> receipts;
+
+    @Override
+    public List<Receipt> getReceipts() {
+        return receipts;
+    }
+
+    public MatrixJsonReadReceiptEvent(JsonObject obj) {
+        super(obj);
+
+        JsonObject content = getObj("content");
+        List<String> eventIds = StreamSupport.stream(content.entrySet()).map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        receipts = StreamSupport.stream(eventIds).map(id -> {
+            JsonObject targetEvent = content.getAsJsonObject(id);
+            JsonObject mRead = targetEvent.getAsJsonObject("m.read");
+
+            Map<MatrixID, Long> readMarkers = StreamSupport.stream(mRead.entrySet())
+                    .collect(Collectors.toMap(it -> MatrixID.asAcceptable(it.getKey()),
+                            it -> GsonUtil.getLong(it.getValue().getAsJsonObject(), "ts")));
+            return new Receipt(id, readMarkers);
+        }).collect(Collectors.toList());
+    }
+
 }

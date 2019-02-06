@@ -32,7 +32,7 @@ import java8.util.Optional;
 
 public class MatrixJsonRoomCanonicalAliasEvent extends MatrixJsonRoomEvent implements _RoomCanonicalAliasEvent {
 
-    private class Content extends MatrixJsonObject {
+    public static class Content extends MatrixJsonObject {
 
         private String alias;
 
@@ -51,7 +51,7 @@ public class MatrixJsonRoomCanonicalAliasEvent extends MatrixJsonRoomEvent imple
 
     }
 
-    private Content content;
+    protected Content content;
 
     public MatrixJsonRoomCanonicalAliasEvent(JsonObject obj) {
         super(obj);

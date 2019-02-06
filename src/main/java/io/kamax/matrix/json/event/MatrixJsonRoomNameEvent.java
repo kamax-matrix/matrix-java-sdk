@@ -29,7 +29,7 @@ import java8.util.Optional;
 
 public class MatrixJsonRoomNameEvent extends MatrixJsonRoomEvent implements _RoomNameEvent {
 
-    private class Content extends MatrixJsonObject {
+    public static class Content extends MatrixJsonObject {
 
         private String name;
 
@@ -49,7 +49,7 @@ public class MatrixJsonRoomNameEvent extends MatrixJsonRoomEvent implements _Roo
 
     }
 
-    private Content content;
+    protected Content content;
 
     public MatrixJsonRoomNameEvent(JsonObject obj) {
         super(obj);

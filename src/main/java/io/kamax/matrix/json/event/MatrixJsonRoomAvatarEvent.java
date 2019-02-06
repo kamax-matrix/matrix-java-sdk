@@ -27,7 +27,7 @@ import io.kamax.matrix.json.GsonUtil;
 
 public class MatrixJsonRoomAvatarEvent extends MatrixJsonRoomEvent implements _RoomAvatarEvent {
 
-    private class Content {
+    public static class Content {
 
         private String url;
 
@@ -41,7 +41,7 @@ public class MatrixJsonRoomAvatarEvent extends MatrixJsonRoomEvent implements _R
 
     }
 
-    private Content content;
+    protected Content content;
 
     public MatrixJsonRoomAvatarEvent(JsonObject obj) {
         super(obj);

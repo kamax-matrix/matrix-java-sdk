@@ -31,7 +31,47 @@ import java8.util.Optional;
 
 public class MatrixJsonRoomMembershipEvent extends MatrixJsonRoomEvent implements _RoomMembershipEvent {
 
-    private Content content;
+    public static class Content extends MatrixJsonObject {
+
+        private String membership;
+        private String avatar;
+        private String displayName;
+
+        public Content(JsonObject obj) {
+            super(obj);
+
+            setMembership(getString("membership"));
+            setAvatar(avatar = getStringOrNull("avatar_url"));
+            setDisplayName(displayName = getStringOrNull("displayname"));
+        }
+
+        public String getMembership() {
+            return membership;
+        }
+
+        public void setMembership(String membership) {
+            this.membership = membership;
+        }
+
+        public String getAvatar() {
+            return avatar;
+        }
+
+        public void setAvatar(String avatar) {
+            this.avatar = avatar;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public void setDisplayName(String displayName) {
+            this.displayName = displayName;
+        }
+
+    }
+
+    protected Content content;
     private _MatrixID invitee;
 
     public MatrixJsonRoomMembershipEvent(JsonObject obj) {
@@ -59,46 +99,6 @@ public class MatrixJsonRoomMembershipEvent extends MatrixJsonRoomEvent implement
     @Override
     public _MatrixID getInvitee() {
         return invitee;
-    }
-
-    private class Content extends MatrixJsonObject {
-
-        private String membership;
-        private String avatar;
-        private String displayName;
-
-        Content(JsonObject obj) {
-            super(obj);
-
-            setMembership(getString("membership"));
-            setAvatar(avatar = getStringOrNull("avatar_url"));
-            setDisplayName(displayName = getStringOrNull("displayname"));
-        }
-
-        String getMembership() {
-            return membership;
-        }
-
-        void setMembership(String membership) {
-            this.membership = membership;
-        }
-
-        String getAvatar() {
-            return avatar;
-        }
-
-        void setAvatar(String avatar) {
-            this.avatar = avatar;
-        }
-
-        String getDisplayName() {
-            return displayName;
-        }
-
-        void setDisplayName(String displayName) {
-            this.displayName = displayName;
-        }
-
     }
 
 }

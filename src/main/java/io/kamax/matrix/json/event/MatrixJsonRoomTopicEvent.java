@@ -29,7 +29,7 @@ import java8.util.Optional;
 
 public class MatrixJsonRoomTopicEvent extends MatrixJsonRoomEvent implements _RoomTopicEvent {
 
-    private class Content extends MatrixJsonObject {
+    public static class Content extends MatrixJsonObject {
 
         private String topic;
 
