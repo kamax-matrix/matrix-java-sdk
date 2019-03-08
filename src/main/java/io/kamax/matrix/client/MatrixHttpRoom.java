@@ -186,6 +186,36 @@ public class MatrixHttpRoom extends AMatrixHttpClient implements _MatrixRoom {
     }
 
     @Override
+    public void kick(_MatrixID user) {
+        kick(user, null);
+    }
+
+    @Override
+    public void kick(_MatrixID user, String reason) {
+        JsonObject body = new JsonObject();
+        body.addProperty("user_id", user.getId());
+        body.addProperty("reason", reason);
+        URL path = getClientPath("rooms", roomId, "kick");
+        MatrixHttpRequest request = new MatrixHttpRequest(new Request.Builder().post(getJsonBody(body)).url(path));
+        executeAuthenticated(request);
+    }
+
+    @Override
+    public Optional<MatrixErrorInfo> tryKick(_MatrixID user) {
+        return tryKick(user, null);
+    }
+
+    @Override
+    public Optional<MatrixErrorInfo> tryKick(_MatrixID user, String reason) {
+        try {
+            kick(user, reason);
+            return Optional.empty();
+        } catch (MatrixClientRequestException e) {
+            return e.getError();
+        }
+    }
+
+    @Override
     public String sendEvent(String type, JsonObject content) {
         // FIXME URL encoding
         URL path = getClientPath("rooms", roomId, "send", type, Long.toString(System.currentTimeMillis()));

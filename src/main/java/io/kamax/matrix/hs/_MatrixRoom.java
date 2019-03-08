@@ -26,10 +26,7 @@ import io.kamax.matrix.MatrixErrorInfo;
 import io.kamax.matrix._MatrixContent;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix._MatrixUserProfile;
-import io.kamax.matrix.room.ReceiptType;
-import io.kamax.matrix.room.Tag;
-import io.kamax.matrix.room._MatrixRoomMessageChunk;
-import io.kamax.matrix.room._MatrixRoomMessageChunkOptions;
+import io.kamax.matrix.room.*;
 
 import java.util.List;
 import java8.util.Optional;
@@ -81,6 +78,14 @@ public interface _MatrixRoom {
     void leave();
 
     Optional<MatrixErrorInfo> tryLeave();
+
+    void kick(_MatrixID user);
+
+    void kick(_MatrixID user, String reason);
+
+    Optional<MatrixErrorInfo> tryKick(_MatrixID user);
+
+    Optional<MatrixErrorInfo> tryKick(_MatrixID user, String reason);
 
     String sendEvent(String type, JsonObject content);
 
