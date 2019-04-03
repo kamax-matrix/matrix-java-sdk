@@ -319,15 +319,19 @@ public abstract class AMatrixHttpClient implements _MatrixClientRaw {
     }
 
     private MatrixErrorInfo createErrorInfo(String body, int responseStatus) {
+        MatrixErrorInfo info = null;
+
         try {
-            MatrixErrorInfo info = gson.fromJson(body, MatrixErrorInfo.class);
-            log.debug("Request returned with an error. Status code: {}, errcode: {}, error: {}", responseStatus,
-                    info.getErrcode(), info.getError());
-            return info;
+            info = gson.fromJson(body, MatrixErrorInfo.class);
+            if (Objects.nonNull(info)) {
+                log.debug("Request returned with an error. Status code: {}, errcode: {}, error: {}", responseStatus,
+                        info.getErrcode(), info.getError());
+            }
         } catch (JsonSyntaxException e) {
             log.debug("Unable to parse Matrix error info. Content was:\n{}", body);
-            return null;
         }
+
+        return info;
     }
 
     private void log(Request.Builder req) {
