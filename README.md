@@ -1,7 +1,14 @@
 # Matrix Client SDK for Java
 [![Build Status](https://travis-ci.org/kamax-matrix/matrix-java-sdk.svg?branch=master)](https://travis-ci.org/kamax-matrix/matrix-java-sdk)
 
+---
+
+**This project is no longer maintained.**
+
+---
+
 ## Purpose
+
 Matrix SDK in Java 1.8 for:
 - Client -> Homeserver
 - Client -> Identity Server
@@ -145,11 +152,3 @@ Make sure you run:
 ```bash
 ./gradlew test
 ```
-
-## Contact
-Matrix:
-- Join [#matrix-java-sdk:kamax.io](https://matrix.to/#/#matrix-java-sdk:kamax.io)
-- Read-only [view](https://view.matrix.org/room/!fQxAyfvcUDMivbUqFX:kamax.io/)
-
-Email:
-- On our website [Kamax.io](https://www.kamax.io)
